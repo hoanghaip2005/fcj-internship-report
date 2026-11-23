@@ -1,0 +1,26 @@
+<style>
+.event2-evidence{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:24px 0}
+.event2-evidence figure{margin:0;min-width:0;border:1px solid #d7dfe8;border-radius:10px;overflow:hidden;background:#f4f6f8}
+.event2-evidence a{display:block}
+#body .event2-evidence img{display:block;width:100%;height:240px;object-fit:contain;margin:0;padding:8px;background:#edf1f5;border:0}
+.event2-evidence figcaption{padding:10px 12px;font-size:13px;line-height:1.5;color:#354354}
+.event2-evidence a:focus-visible{outline:3px solid #0073bb;outline-offset:-3px}
+@media(max-width:1100px){.event2-evidence{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.event2-evidence{gap:10px}#body .event2-evidence img{height:180px}.event2-evidence figcaption{padding:8px;font-size:12px}}
+</style>
+<div class="event2-evidence">
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Ảnh tập thể tại không gian AWS" "Group photo at the AWS venue" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-01.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-01.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>01. {{ $caption }}</figcaption></figure>
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Giao lưu cùng các bạn tham dự" "Connecting with other attendees" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-03.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-03.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>02. {{ $caption }}</figcaption></figure>
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Các bạn tham dự trong hội trường" "Attendees in the session room" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-04.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-04.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>03. {{ $caption }}</figcaption></figure>
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Màn hình minh họa bot trao đổi trên Slack" "Slack bot conversation demonstration" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-05.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-05.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>04. {{ $caption }}</figcaption></figure>
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Màn hình minh họa tiếp nhận và theo dõi yêu cầu" "Request intake and follow-up demonstration" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-06.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-06.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>05. {{ $caption }}</figcaption></figure>
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Màn hình cấu hình vai trò và phạm vi của agent" "Agent role and scope configuration" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-07.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-07.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>06. {{ $caption }}</figcaption></figure>
+{{ $caption := cond (eq .Page.Language.Lang "vi") "Thông tin phản hồi và kênh CMC Global Careers" "Feedback and CMC Global Careers channels" }}
+<figure><a href="{{ "images/4-EventParticipated/event2/evidence-08.jpg" | relURL }}" target="_blank" rel="noopener"><img src="{{ "images/4-EventParticipated/event2/evidence-08.jpg" | relURL }}" alt="{{ $caption }}" loading="lazy" decoding="async"></a><figcaption>07. {{ $caption }}</figcaption></figure>
+</div>

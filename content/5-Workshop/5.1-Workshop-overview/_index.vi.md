@@ -1,0 +1,93 @@
+---
+title: "5.1 Tổng quan FLASHRUSH"
+weight: 1
+draft: false
+---
+
+
+
+
+> **Trạng thái:** Bản hướng dẫn thực hành thủ công dựa trên source FLASHRUSH; **có ảnh thực hành từng dịch vụ, chưa đủ bằng chứng nghiệm thu toàn bộ luồng**. Không sử dụng CloudFormation/CLI để tạo hạ tầng. Các bước tạo/sửa/xóa tài nguyên AWS có thể phát sinh phí. Chỉ thực hiện trong môi trường demo có quyền hợp lệ; chụp ảnh thực tế khi làm, không thay bằng ảnh giả.
+
+> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`, đối chiếu cấu hình stack `flashrush-lab` trước đây. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+
+## Mục tiêu
+
+- Hiểu kiến trúc hệ thống Flash Sale không bán vượt tồn kho.
+- Nhận biết đúng vai trò của 9 dịch vụ AWS và thứ tự thiết lập thủ công.
+- Phân biệt `202 Accepted` với đơn hàng `CONFIRMED`.
+
+![Kiến trúc Serverless FLASHRUSH v1.1 sơ đồ tham chiếu do nhóm cung cấp](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
+
+*Hình 5.1.1 Sơ đồ kiến trúc tham chiếu v1.1 (bản nhóm cung cấp, không phải ảnh chụp tài nguyên AWS đang chạy; cần phê duyệt baseline).*
+
+
+## 5.1.1 Lộ trình dựng từ nhỏ đến lớn
+
+| Thứ tự | Dịch vụ | Tài nguyên | Kết quả |
+|---|---|---|---|
+| 1 | DynamoDB | Products và Orders | Lưu sản phẩm, tồn kho và đơn |
+| 2 | SQS | Queue chính và DLQ | Hàng đợi xử lý và giữ message lỗi |
+| 3 | IAM | Hai execution roles | Quyền riêng cho API và Worker |
+| 4 | Lambda | API và Worker | Logic nghiệp vụ hoạt động |
+| 5 | API Gateway | HTTP API, routes, stage | API có địa chỉ HTTPS |
+| 6 | S3 | Bucket private | Lưu frontend đã build |
+| 7 | CloudFront | Distribution, OAC, Function | Website HTTPS, refresh route đúng |
+| 8 | SNS | Topic và email subscription | Nhận thông báo |
+| 9 | CloudWatch | Logs, metrics, alarms | Theo dõi và cảnh báo |
+
+Thứ tự theo phụ thuộc: Lambda cần bảng/queue; frontend cần API URL. Log groups của CloudWatch được tạo sớm ở mục 5.3.3.1 để giới hạn quyền ghi log; cấu hình giám sát đầy đủ ở mục 5.3.9.
+
+Luồng website: Browser → CloudFront → S3. Luồng mua: Browser → API Gateway → Lambda API → Orders PENDING + SQS → Worker → DynamoDB transaction. Luồng cảnh báo: CloudWatch → SNS → email đã xác nhận.
+
+HTTP 202 chỉ xác nhận tiếp nhận, chưa phải mua thành công. Worker mới xác nhận hoặc ghi OUT_OF_STOCK. DLQ không tự chuyển order thành FAILED.
+
+Dùng prefix **flashrush-manual** cho bài thực hành để tách khỏi bộ **flashrush-lab** trước đây. Nếu tên manual đã tồn tại, kiểm tra trước khi dùng lại. Không sửa/xóa tài nguyên khác trong bài này.
+
+Đây là lab không thanh toán thật, chưa có đăng nhập khách hàng production. Admin và Monitoring trong React vẫn mô phỏng. Backend hiện chưa cưỡng chế thời gian sale ở server; countdown giao diện không phải kiểm soát server.
+
+## 5.1.2 Mã nguồn và tài liệu AWS tham khảo
+
+### 5.1.2.1 Source project
+
+- [Backend `app.py` để dán vào Lambda](https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale/blob/main/FLASHRUSH-Serverless-Flash-Sale/backend/app.py).
+
+- [Schema sản phẩm](https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale/blob/main/FLASHRUSH-Serverless-Flash-Sale/frontend/src/types/product.ts).
+
+- [Template đối chiếu cấu hình](https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale/blob/main/FLASHRUSH-Serverless-Flash-Sale/infrastructure/templates/flashrush.json): chỉ dùng để đọc, không cần deploy trong bài này.
+
+- [Runbook AWS hiện có](https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale/blob/main/FLASHRUSH-Serverless-Flash-Sale/docs/operations/aws-lab.md).
+
+### 5.1.2.2 Tài liệu AWS chính thức
+
+- [Tạo HTTP API với Lambda và DynamoDB bằng Console](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html).
+
+- [Lambda execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html).
+
+- [SQS mapping và visibility timeout](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html).
+
+- [Partial batch failures](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html).
+
+- [IAM cho DynamoDB transaction](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis-iam.html).
+
+- [HTTP API CORS](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html).
+
+- [S3 Block Public Access](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingBucket.html).
+
+- [CloudFront OAC](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html).
+
+- [SNS email](https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html).
+
+- [CloudWatch missing data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarms-and-missing-data.html).
+
+## Đối chiếu kiến trúc với code đang bàn giao
+
+Sơ đồ v1.1 đi kèm vẫn mang nhãn thiết kế đề xuất. Khi thực hành, ưu tiên cấu hình trong từng chương và code snapshot:
+
+- Có đủ bốn routes, gồm GET `/products/{productId}`; GET order cần `X-Order-Token` là key gốc.
+- `quantity` chỉ nhận số nguyên 1. Không có API liệt kê tất cả orders.
+- Send exception giữ `enqueueState=UNKNOWN`; chưa phân loại `RETRY_REQUIRED`. Lease 30 giây, tối đa 3 lần gửi có điều kiện; không có scheduler tự khôi phục.
+- Worker xử lý lỗi kỹ thuật bằng partial batch failure. Không tự chuyển `FAILED`; DLQ không đồng nghĩa đơn thất bại nghiệp vụ.
+- S3 private/OAC, SPA Function, ba alarms là cấu hình đã có trong implementation; ảnh đề xuất không chứng minh trạng thái AWS hiện tại.
+- Admin/Monitoring vẫn dùng dữ liệu mock, không có backend quản trị, đăng nhập, thanh toán hay vận chuyển.
+

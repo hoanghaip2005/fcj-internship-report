@@ -1,0 +1,8 @@
+/* Responsive overrides for the supplied FCJ Learn theme. */
+#body-inner h1 { overflow-wrap: anywhere; font-size: clamp(1.8rem, 3.5vw, 3.25rem); }
+#body-inner table { display: block; max-width: 100%; overflow-x: auto; }
+#body-inner pre { max-width: 100%; overflow-x: auto; }
+@media (max-width: 600px) {
+  #body-inner h1 { font-size: 1.85rem; line-height: 1.2; }
+  #body-inner h2 { font-size: 1.6rem; overflow-wrap: anywhere; }
+}
