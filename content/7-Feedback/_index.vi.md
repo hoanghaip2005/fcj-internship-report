@@ -7,11 +7,17 @@ pre: "<b>7. </b> "
 
 # Chia sẻ và đóng góp ý kiến về chương trình
 
-## 1. Trải nghiệm học tập
+## 1. Cảm nhận về chương trình thực tập FCAJ
 
 Tham gia **First Cloud AI Journey** giúp em có cơ hội tiếp cận kiến thức điện toán đám mây theo một lộ trình gắn với bài viết, hoạt động sự kiện và sản phẩm thực hành. Với nền tảng sinh viên Công nghệ thông tin, em nhận thấy việc kết nối kiến thức về lập trình, mạng và cơ sở dữ liệu trong một kiến trúc AWS cụ thể giúp quá trình học có mục tiêu rõ ràng hơn.
 
-Qua nhật ký năm tuần đầu, ba bài blog, bốn bài thu hoạch sự kiện và quá trình chuẩn bị FLASHRUSH, em rèn luyện cả việc tìm hiểu kỹ thuật lẫn trình bày kết quả. Những chia sẻ dưới đây tập trung vào trải nghiệm học và xây dựng báo cáo; các đề xuất là mong muốn cải thiện của cá nhân, không phải kết luận rằng chương trình đang thiếu những hoạt động đó.
+Qua quá trình biên soạn nhật ký 12 tuần, ba bài blog, bốn bài thu hoạch sự kiện và quá trình chuẩn bị FLASHRUSH, em rèn luyện cả việc tìm hiểu kỹ thuật lẫn trình bày kết quả. Những chia sẻ dưới đây tập trung vào trải nghiệm học và xây dựng báo cáo; các đề xuất là mong muốn cải thiện của cá nhân, không phải kết luận rằng chương trình đang thiếu những hoạt động đó.
+
+### Mức độ hài lòng
+
+Em **hài lòng** với chương trình First Cloud AI Journey. Lộ trình AWS, hoạt động cộng đồng và yêu cầu xây dựng sản phẩm học tập giúp em xác định hướng học, rèn luyện khả năng tự nghiên cứu và trình bày kiến thức. Việc kết nối các dịch vụ trong Workshop FLASHRUSH mang lại cho em góc nhìn cụ thể hơn về phát triển và vận hành ứng dụng trên Cloud.
+
+Điều em mong muốn cải thiện là có thêm các mốc phản hồi cho bài thực hành, tiêu chí kiểm chứng đầu ra rõ ràng và cơ hội trao đổi về lỗi thực tế. Về phía bản thân, em cần duy trì việc cập nhật nhật ký, chuẩn bị câu hỏi và lưu bằng chứng sau mỗi lần thực hành để tận dụng tốt hơn những cơ hội học tập của chương trình.
 
 ## 2. Những điểm mang lại giá trị
 
@@ -59,7 +65,7 @@ Về phía bản thân, em cần chuẩn bị câu hỏi rõ ràng, đọc tài 
 
 ## 4. Đóng góp của bản thân
 
-Trong phạm vi hồ sơ hiện có, em đã tổng hợp nhật ký năm tuần đầu, chuẩn bị ba bài blog kỹ thuật và bốn bài thu hoạch sự kiện. Phần đề xuất FLASHRUSH và tài liệu Workshop được xây dựng để trình bày một luồng ứng dụng Serverless thống nhất, từ kiến trúc đến hướng dẫn cấu hình và kiểm thử.
+Trong phạm vi hồ sơ hiện có, em đã biên soạn nhật ký chi tiết cho 12 tuần, phân biệt công việc đã thực hiện với kế hoạch của các tuần tiếp theo, chuẩn bị ba bài blog kỹ thuật và bốn bài thu hoạch sự kiện. Phần đề xuất FLASHRUSH và tài liệu Workshop được xây dựng để trình bày một luồng ứng dụng Serverless thống nhất, từ kiến trúc đến hướng dẫn cấu hình và kiểm thử.
 
 Các nội dung này trước hết là sản phẩm học tập của cá nhân. Em chưa xem đây là tài liệu đã được chương trình nghiệm thu hoặc đã được sử dụng chính thức. Em mong muốn tiếp tục hoàn thiện tính chính xác, bổ sung bằng chứng thực tế và chia sẻ lại sau khi được rà soát phù hợp.
 

@@ -9,7 +9,7 @@ pre: "<b>6. </b> "
 
 ## 1. Cơ sở tự đánh giá
 
-Em là **Phạm Hoàng Hải MSSV 2302700162**, sinh viên ngành Công nghệ thông tin tại Trường Đại học Quản lý và Công nghệ TP.HCM (UMT), tham gia chương trình **Workforce Bootcamp First Cloud AI Journey**. Phần tự đánh giá này dựa trên nhật ký năm tuần đầu từ **21/09 đến 24/10/2026** và các nội dung blog, sự kiện, đề xuất, Workshop đang được tổng hợp trong báo cáo.
+Em là **Phạm Hoàng Hải MSSV 2302700162**, sinh viên ngành Công nghệ thông tin tại Trường Đại học Quản lý và Công nghệ TP.HCM (UMT), tham gia chương trình **Workforce Bootcamp First Cloud AI Journey**. Phần tự đánh giá bao quát lộ trình **12 tuần từ 21/09 đến 12/12/2026**, gồm kiến thức AWS, blog, sự kiện, phân tích dự án và Workshop FLASHRUSH. Nhận định về kết quả dựa trên công việc đã có ghi nhận; các tuần và nhiệm vụ dự kiến được dùng để xác định mục tiêu rèn luyện tiếp theo.
 
 Đây là đánh giá của cá nhân tại thời điểm cập nhật báo cáo, không thay thế nhận xét của người hướng dẫn hoặc xác nhận hoàn thành toàn bộ kỳ thực tập. Những nội dung đang ở mức khảo sát, đề xuất hay chưa có bằng chứng kiểm thử được trình bày theo đúng trạng thái đó.
 
@@ -50,11 +50,24 @@ Em cần tiếp tục thực hành để kiểm chứng đầy đủ cấu hình
 | 11  | **Đóng góp vào dự án/tổ chức**      | Hiệu quả công việc, sáng kiến cải tiến, ghi nhận từ team                                         | ✅ | ☐ | ☐ |
 | 12  | **Tổng thể**                        | Đánh giá chung về toàn bộ quá trình thực tập                                                     | ✅ | ☐ | ☐ |
 
+### Nhận xét cụ thể theo tiêu chí FCAJ
+
+| Tiêu chí | Tự đánh giá | Nhận xét |
+|---|---|---|
+| Kiến thức chuyên môn | Tốt | Em hệ thống hóa kiến thức IAM, mạng, lưu trữ, cơ sở dữ liệu và Serverless; vận dụng để phân tích kiến trúc FLASHRUSH và viết hướng dẫn cấu hình từng dịch vụ. Em cần tiếp tục kiểm thử các tình huống lỗi để củng cố chiều sâu thực hành. |
+| Khả năng tự học & nghiên cứu | Tốt | Em chủ động tìm hiểu tài liệu AWS, tổng hợp ba bài blog về Karpenter/EKS, S3 Express One Zone và Cognito; liên hệ kiến thức với bài toán sử dụng, điều kiện áp dụng và giới hạn của dịch vụ. |
+| Tính chủ động trong công việc | Tốt | Em chủ động rà soát nội dung mẫu, bổ sung nhật ký, sắp xếp ảnh minh chứng theo thao tác và ghi nhận những cấu hình cần xác thực để hoàn thiện Workshop. |
+| Kỷ luật & tuân thủ quy định | Khá | Em có ý thức tuân thủ quy trình và phạm vi công việc. Việc cập nhật nhật ký, lưu bằng chứng và đồng bộ tài liệu còn cần thực hiện đều đặn hơn; em sẽ kiểm tra tiến độ và hồ sơ sau mỗi tuần. |
+| Kỹ năng giao tiếp | Tốt | Em rèn luyện cách trình bày kiến trúc, viết bài thu hoạch và mô tả vấn đề kỹ thuật qua mục tiêu, thao tác, kết quả quan sát. Em tiếp tục cải thiện cách diễn đạt ngắn gọn để người đọc dễ thực hiện theo. |
+| Làm việc nhóm (Teamwork) | Tốt | Em tổng hợp ảnh thực hành do các bạn cung cấp, đối chiếu với hướng dẫn và xác định nội dung cần bổ sung. Quá trình phối hợp giúp em chú ý hơn đến việc thống nhất cấu hình, cách ghi nhận kết quả và tài liệu bàn giao. |
+| Năng lực giải quyết vấn đề | Tốt | Em phân biệt sai lệch trong bài viết với sai lệch cấu hình thực tế, sử dụng ảnh Console và kết quả kiểm tra AWS để xác định phần cần sửa. Những kịch bản chưa đủ bằng chứng được giữ lại để kiểm thử tiếp. |
+| Đóng góp cho Workshop | Tốt | Em biên soạn hướng dẫn FLASHRUSH, tích hợp 192 ảnh từ tài liệu thực hành của chín dịch vụ, bố trí ảnh theo từng bước và rà soát liên kết, chú thích. Em cần bổ sung bằng chứng kiểm thử xuyên suốt để hoàn thiện tài liệu. |
+
 ## 4. Những hạn chế còn tồn tại
 
 - **Chiều sâu thực hành chưa đồng đều:** Một số chủ đề mới dừng ở mức đọc hiểu và phân tích; cần triển khai, quan sát lỗi và khôi phục để hiểu đầy đủ.
 - **Bằng chứng chưa hoàn chỉnh:** Workshop đã có ảnh Console của chín dịch vụ, nhưng còn thiếu một lần kiểm chứng xuyên suốt và xác nhận các cấu hình chưa thể hiện đầy đủ trong ảnh. Cần ghi thời điểm, cấu hình đầu vào và kết quả của từng bước.
-- **Tài liệu cần đồng bộ thường xuyên:** Nhật ký hiện mới chi tiết đến tuần 5; khi kiến trúc Workshop thay đổi, các liên kết và nội dung liên quan cần được rà soát cùng nhau.
+- **Tài liệu cần đồng bộ thường xuyên:** Nhật ký đã được biên soạn chi tiết cho đủ 12 tuần; trạng thái thực hiện cần tiếp tục cập nhật theo kết quả thực tế; khi kiến trúc Workshop thay đổi, các liên kết và nội dung liên quan cần được rà soát cùng nhau.
 - **Ước tính chi phí cần cơ sở cụ thể:** Chưa nên đưa ra tổng tiền cố định khi chưa xác định workload, thời gian chạy và các giả định trên AWS Pricing Calculator.
 - **Kỹ năng xử lý sự cố cần rèn luyện thêm:** Cần đi từ triệu chứng đến log, metrics và dữ liệu, tránh sửa nhiều cấu hình cùng lúc khiến khó xác định nguyên nhân.
 
