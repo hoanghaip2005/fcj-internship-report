@@ -5,13 +5,13 @@ chapter: false
 pre: "<b>2. </b> "
 ---
 
-# Đề xuất xây dựng hệ thống Flash Sale Serverless FLASHRUSH trên AWS
+## Đề xuất xây dựng hệ thống Flash Sale Serverless FLASHRUSH trên AWS
 
 ## 1. Tóm tắt đề xuất
 
 FLASHRUSH là hệ thống minh họa xử lý đơn hàng trong một đợt bán giới hạn số lượng. Đề xuất tập trung vào ba vấn đề: tiếp nhận yêu cầu tăng đột biến, xử lý đơn bất đồng bộ và bảo đảm số đơn được xác nhận không vượt tồn kho. Hệ thống sử dụng React cho giao diện, Python cho nghiệp vụ và các dịch vụ AWS Serverless để giảm công việc quản lý máy chủ.
 
-Sản phẩm hướng tới môi trường học tập và thực hành trong chương trình **First Cloud AI Journey** của sinh viên **Phạm Hoàng Hải MSSV 2302700162**. Phần triển khai chi tiết được trình bày tại [Workshop FLASHRUSH]({{< relref "/5-Workshop/" >}}).
+Sản phẩm hướng tới môi trường học tập và thực hành trong chương trình **First Cloud AI Journey** của sinh viên **Phạm Hoàng Hải, MSSV 2302700162, lớp IT2307V, vị trí Cloud AI Intern**. Phần triển khai chi tiết được trình bày tại [Workshop FLASHRUSH]({{< relref "/5-Workshop/" >}}).
 
 **Trạng thái đề xuất:** Dự án đã có mã nguồn, hướng dẫn và ảnh thực hành của chín dịch vụ AWS. Các ảnh ghi nhận quá trình cấu hình cùng một số kết quả kiểm thử. Cần tiếp tục đối chiếu cấu hình trên AWS và kiểm chứng toàn bộ luồng đặt hàng trước khi nghiệm thu.
 
@@ -30,6 +30,8 @@ Trong Flash Sale, nhiều người có thể cùng mua sản phẩm còn ít hà
 
 ## 3. Phạm vi thực hiện
 
+Đề xuất này mô tả phạm vi Workshop AWS Console với prefix `flashrush-manual-*`; không đồng nhất với môi trường CloudFormation `flashrush-lab` hoặc các bản mở rộng của dự án.
+
 | Trong phạm vi | Kết quả dự kiến |
 |---|---|
 | Danh mục và chi tiết sản phẩm | Đọc dữ liệu từ DynamoDB qua API |
@@ -41,7 +43,7 @@ Trong Flash Sale, nhiều người có thể cùng mua sản phẩm còn ít hà
 | Giám sát | CloudWatch logs, metrics, alarms và email qua SNS |
 | Tài liệu thực hành | Chín dịch vụ AWS, kiểm thử, ảnh minh chứng và cleanup |
 
-Chưa đưa vào phạm vi: thanh toán thật, vận chuyển, tài khoản khách hàng production, backend quản trị và hệ thống phân tích kinh doanh. Các trang Admin/Monitoring của frontend hiện dùng dữ liệu mô phỏng. Đồng hồ đếm ngược trên giao diện chưa phải cơ chế cưỡng chế thời gian bán tại backend.
+Chưa đưa vào phạm vi: thanh toán thật, vận chuyển, tài khoản khách hàng production, backend quản trị và hệ thống phân tích kinh doanh. Trong mã nguồn tham chiếu của Workshop manual, cần kiểm tra các trang Admin/Monitoring để nhận diện dữ liệu mô phỏng. Các tính năng bổ sung của môi trường lab khác được đánh giá riêng. Đồng hồ đếm ngược trên giao diện chưa phải cơ chế cưỡng chế thời gian bán tại backend.
 
 ## 4. Kiến trúc đề xuất
 

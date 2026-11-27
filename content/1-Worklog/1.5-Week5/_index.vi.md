@@ -1,18 +1,17 @@
 ---
 title: "Worklog Tuần 5"
-date: 2026-09-21
 weight: 5
 chapter: false
-pre: " <b> 1.5. </b> "
+pre: "<b>1.5. </b> "
 ---
 
-# Tuần 5: Phân tích DropIt và đề xuất kiến trúc FitJoy
+## Tuần 5: Phân tích DropIt và đề xuất kiến trúc FitJoy
 
 **Thời gian:** 19/10/2026–24/10/2026.
 
 ### Mục tiêu
 
-Phân tích DropIt và đề xuất kiến trúc FitJoy.
+Liên hệ AWS với DropIt; đề xuất kiến trúc cho FitJoy và đánh giá quyền, giám sát, khả năng mở rộng, chi phí trong phạm vi thiết kế.
 
 ### Nội dung công việc
 
@@ -25,12 +24,45 @@ Phân tích DropIt và đề xuất kiến trúc FitJoy.
 | 23/10/2026 | So sánh phương án Lightsail của DropIt với phương án Serverless đề xuất cho FitJoy về vận hành, mở rộng, bảo mật và chi phí.<br>Tổng hợp kiến thức tuần 5; liên hệ hai dự án với đề cương blog Cognito, Serverless và workshop S3 VPC Endpoint; cập nhật nhật ký, sơ đồ và câu hỏi kỹ thuật. |
 | 24/10/2026 | Không bố trí buổi thực tập theo kế hoạch. |
 
-### Kết quả tổng hợp
+### Nội dung chi tiết và hình ảnh
 
-Đã liên hệ kiến thức AWS với DropIt; hình thành phương án AWS đề xuất cho FitJoy và các tiêu chí về bảo mật, mở rộng, giám sát và chi phí.
+#### 1. Đọc log ứng dụng bằng CloudWatch
 
-### Bài viết và hoạt động liên quan
+Ảnh thực hành nhóm dùng làm ví dụ đọc log; không phải bằng chứng DropIt đã triển khai giám sát.
 
-- [Blog 3 Amazon Cognito](/vi/3-blogsposted/3.3-blog3/)
+![Đọc log ứng dụng bằng CloudWatch](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-03.png)
 
-Các mục nghiên cứu, phác thảo và đề xuất phản ánh mức độ ghi nhận trong nhật ký; không đồng nghĩa đã triển khai hoặc hoàn thành toàn bộ bài lab.
+*Nguồn: ảnh thực hành do nhóm cung cấp.*
+
+#### 2. Theo dõi trạng thái alarm
+
+Đối chiếu metric, threshold và action khi phân tích phương án giám sát cho ứng dụng.
+
+![Theo dõi trạng thái alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-14.png)
+
+*Nguồn: ảnh thực hành do nhóm cung cấp.*
+
+#### 3. Phương án xác thực ứng dụng
+
+Liên hệ sơ đồ Cognito với phương án DropIt và FitJoy. Kiến trúc AWS cho FitJoy là đề xuất.
+
+![Phương án xác thực ứng dụng](/images/3-BlogsPosted/blog4-cognito-architecture.png)
+
+*Sơ đồ minh họa kiến thức, không phải ảnh kết quả triển khai.*
+
+### Kết quả
+
+Đã phân tích DropIt và đề xuất AWS cho FitJoy; chưa ghi nhận FitJoy đã triển khai AWS.
+
+### Bài học và điểm cần tiếp tục
+
+Phương án kiến trúc cần xuất phát từ tải, kết nối và cách vận hành của ứng dụng. Giữ rõ FitJoy là đề xuất, ảnh CloudWatch nhóm chỉ bổ trợ phương pháp giám sát.
+
+### Kế hoạch tiếp theo
+
+Tiếp tục với [Lambda và tự động hóa hạ tầng](../1.6-week6/).
+
+### Tài liệu liên quan
+
+- [Blog Cognito]({{< relref "/3-BlogsPosted/3.3-Blog3/" >}})
+- [Tài liệu Amazon Lightsail](https://docs.aws.amazon.com/lightsail/)

@@ -1,18 +1,17 @@
 ---
 title: "Blog 1"
-date: 2024-01-01
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
 ---
 
-# TỰ ĐỘNG MỞ RỘNG HẠ TẦNG KUBERNETES TRÊN AWS VỚI KARPENTER VÀ AMAZON EKS
+## Tự động mở rộng hạ tầng Kubernetes trên AWS với Karpenter và Amazon EKS
 
 Khi vận hành Kubernetes trên AWS, một bài toán quen thuộc là: làm sao để cluster có đủ máy chủ khi lưu lượng tăng đột biến, nhưng không phải trả tiền cho những máy chủ chạy không tải khi lưu lượng giảm?
 
-Trước đây, hầu hết các cụm Amazon EKS dùng **Cluster Autoscaler** kết hợp **Auto Scaling Groups (ASG)**. Cách này hoạt động được nhưng khá chậm, thường mất vài phút để thêm node mới, và đòi hỏi duy trì nhiều Node Group cho từng loại máy chủ.
+Trước đây, hầu hết các cụm Amazon EKS dùng **Cluster Autoscaler** kết hợp **Auto Scaling Groups (ASG)**. Cách này mở rộng theo các nhóm node đã cấu hình; nhóm vận hành cần quản lý lựa chọn instance và tham số Auto Scaling. So sánh thời gian cấp node cần đo trên cấu hình tương đương.
 
-**Karpenter** là công cụ tự động cấp phát node mã nguồn mở do AWS phát triển, đã đạt phiên bản ổn định v1.0. Thay vì mở rộng theo từng nhóm máy chủ cố định, Karpenter tạo đúng loại EC2 instance phù hợp với nhu cầu của các pod đang chờ, ngay tại thời điểm cần.
+**Karpenter** là công cụ tự động cấp phát node mã nguồn mở do AWS phát triển, có API ổn định v1 từ phiên bản 1.0; cần chọn bản phát hành đang được hỗ trợ khi triển khai. Thay vì mở rộng theo từng nhóm máy chủ cố định, Karpenter tạo đúng loại EC2 instance phù hợp với nhu cầu của các pod đang chờ, ngay tại thời điểm cần.
 
 Vậy Karpenter hoạt động như thế nào và khác gì so với cách làm truyền thống?
 
@@ -38,7 +37,7 @@ Trong kiến trúc này, mỗi thành phần đảm nhận một vai trò riêng
 
 Khi lưu lượng tăng, Kubernetes tạo thêm pod. Nếu các node hiện có không còn đủ tài nguyên, những pod mới sẽ rơi vào trạng thái `Pending`.
 
-Karpenter phát hiện các pod này, tổng hợp yêu cầu CPU, RAM, GPU và các ràng buộc như AZ hay kiến trúc chip của chúng, rồi chọn loại EC2 instance phù hợp và rẻ nhất tại thời điểm đó. Sau đó Karpenter gọi trực tiếp EC2 API để tạo instance. Node mới tham gia cluster và các pod được xếp lịch chạy, thường chỉ trong khoảng dưới một phút thay vì vài phút như Cluster Autoscaler.
+Karpenter phát hiện các pod này, tổng hợp yêu cầu CPU, RAM, GPU và các ràng buộc như AZ hay kiến trúc chip của chúng, rồi lựa chọn EC2 instance theo ràng buộc NodePool, nhu cầu Pod và khả năng cung ứng. Sau đó Karpenter gọi trực tiếp EC2 API để tạo instance. Node mới tham gia cluster và các pod được xếp lịch chạy, với thời gian phụ thuộc khả năng cung ứng EC2, AMI, bootstrap và mạng; cần đo trong môi trường thực tế.
 
 Khi lưu lượng giảm, Karpenter liên tục kiểm tra xem có thể dồn các pod về ít node hơn hoặc thay bằng instance nhỏ hơn không. Nếu có, Karpenter sẽ di chuyển pod và tắt các node dư thừa cơ chế này gọi là **Consolidation**, giúp giảm đáng kể chi phí EC2.
 
@@ -48,15 +47,17 @@ Khi lưu lượng giảm, Karpenter liên tục kiểm tra xem có thể dồn c
 
 **Luôn đặt giới hạn tài nguyên trong NodePool**
 
-Karpenter sẵn sàng tạo rất nhiều node nếu có quá nhiều pod đang chờ, kể cả khi nguyên nhân là lỗi ứng dụng. Đặt `limits` cho tổng CPU và RAM giúp tránh hóa đơn tăng vọt ngoài kiểm soát.
+Karpenter sẵn sàng tạo rất nhiều node nếu có quá nhiều pod đang chờ, kể cả khi nguyên nhân là lỗi ứng dụng. Đặt `limits` cho tổng CPU và RAM giúp giới hạn phạm vi cấp phát; đây không phải mức trần chi phí cứng và có thể vượt tạm thời khi mở rộng đồng thời.
 
 **Cấu hình Pod Disruption Budget cho ứng dụng quan trọng**
 
-Vì Karpenter thường xuyên dọn dẹp và thay thế node, các ứng dụng quan trọng cần có Pod Disruption Budget (PDB) để luôn có ít nhất một số pod hoạt động trong lúc di chuyển.
+Vì Karpenter thường xuyên dọn dẹp và thay thế node, các ứng dụng quan trọng cần có Pod Disruption Budget (PDB) để giới hạn gián đoạn tự nguyện theo cấu hình; PDB không bảo vệ khỏi mọi loại lỗi hoặc gián đoạn bắt buộc.
 
 **Hạn chế gián đoạn vào giờ cao điểm**
 
-Karpenter hỗ trợ Disruption Budgets theo lịch, cho phép cấm việc tắt node trong những khung giờ quan trọng, ví dụ thời gian diễn ra sự kiện hoặc khuyến mãi.
+Karpenter hỗ trợ Disruption Budgets theo lịch, cho phép giới hạn các gián đoạn tự nguyện được hỗ trợ trong những khung giờ quan trọng, ví dụ thời gian diễn ra sự kiện hoặc khuyến mãi.
+
+Disruption Budget không chặn mọi lần tắt node: interruption, expiration và các phương thức bắt buộc có quy tắc riêng.
 
 **Chú ý số lượng IP trong subnet**
 

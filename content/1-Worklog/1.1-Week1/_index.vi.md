@@ -1,18 +1,17 @@
 ---
 title: "Worklog Tuần 1"
-date: 2026-09-21
 weight: 1
 chapter: false
-pre: " <b> 1.1. </b> "
+pre: "<b>1.1. </b> "
 ---
 
-# Tuần 1: Nền tảng AWS và làm quen chương trình
+## Tuần 1: Nền tảng AWS và làm quen chương trình
 
 **Thời gian:** 21/09/2026–26/09/2026.
 
 ### Mục tiêu
 
-Nền tảng AWS và làm quen chương trình.
+Hiểu Region, Availability Zone và trách nhiệm bảo mật; làm quen IAM, quản lý tài khoản, chi phí và cách ghi nhật ký thực tập.
 
 ### Nội dung công việc
 
@@ -25,12 +24,39 @@ Nền tảng AWS và làm quen chương trình.
 | 25/09/2026 | Nghiên cứu Command Line Operations with AWS CLI: cài đặt, cấu hình Region, hồ sơ truy cập và cú pháp lệnh cơ bản.<br>Tổng hợp kiến thức tuần đầu; xây dựng khung nhật ký, danh mục nguồn tham khảo và tiêu chí chọn chủ đề blog/workshop. |
 | 26/09/2026 | Tham gia Buildrathon Kickoff với CMC Global; hệ thống hóa định hướng Cloud & AI, prompt engineering, RAG và AI Agent Challenge. |
 
-### Kết quả tổng hợp
+### Nội dung chi tiết và hình ảnh
 
-Đã hệ thống hóa nhóm dịch vụ AWS, trách nhiệm bảo mật, quản lý tài khoản và chi phí; xác định cách ghi chép, chủ đề blog và workshop cần nghiên cứu.
+#### 1. Quản lý danh tính trên IAM Dashboard
 
-### Bài viết và hoạt động liên quan
+Kiểm tra các nhóm tài nguyên IAM để phân biệt user, group, role và policy.
 
-- [Event 1 Buildrathon Kickoff](/vi/4-eventparticipated/4.1-event1/)
+![Quản lý danh tính trên IAM Dashboard](/images/1-Worklog/aws-practice/week01-iam.png)
 
-Các mục nghiên cứu, phác thảo và đề xuất phản ánh mức độ ghi nhận trong nhật ký; không đồng nghĩa đã triển khai hoặc hoàn thành toàn bộ bài lab.
+*Ảnh Console bổ sung theo chủ đề tuần; không dùng để xác nhận ngày thực hiện của nhật ký gốc.*
+
+#### 2. Cài đặt tài khoản IAM
+
+Đọc chính sách mật khẩu và thông tin endpoint STS. Lần kiểm tra này chỉ đọc cấu hình, không thay đổi mật khẩu hoặc quyền.
+
+![Cài đặt tài khoản IAM](/images/1-Worklog/aws-practice/iam-account.png)
+
+### Sơ đồ kiến thức
+
+![Sơ đồ kiến thức](/images/1-Worklog/diagrams/week01-vi.svg)
+
+### Kết quả
+
+Đã hệ thống hóa dịch vụ AWS, quản lý danh tính và quy trình học; ảnh bổ sung giúp đối chiếu cấu hình thực tế.
+
+### Bài học và điểm cần tiếp tục
+
+IAM Dashboard chỉ phản ánh danh tính và cấu hình hiện có. Cần tiếp tục thực hành Budget/MFA theo phạm vi được phép; chưa coi ảnh IAM là bằng chứng đã hoàn thành các phần đó.
+
+### Kế hoạch tiếp theo
+
+Tiếp tục với [IAM, VPC và hoạt động cộng đồng](../1.2-week2/).
+
+### Tài liệu liên quan
+
+- [Buildrathon Kickoff]({{< relref "/4-EventParticipated/4.1-Event1/" >}})
+- [Lộ trình Cloud Journey](https://cloudjourney.awsstudygroup.com/)

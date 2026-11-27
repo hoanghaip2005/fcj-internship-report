@@ -1,18 +1,17 @@
 ---
 title: "Blog 1"
-date: 2024-01-01
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
 ---
 
-# AUTOSCALING KUBERNETES INFRASTRUCTURE ON AWS WITH KARPENTER AND AMAZON EKS
+## Autoscaling Kubernetes infrastructure on AWS with Karpenter and Amazon EKS
 
 When running Kubernetes on AWS, a familiar challenge is: how do you make sure the cluster has enough nodes during traffic spikes, without paying for idle servers when traffic drops?
 
-Traditionally, most Amazon EKS clusters relied on **Cluster Autoscaler** with **Auto Scaling Groups (ASG)**. It works, but it is fairly slow — adding a node often takes several minutes — and it requires maintaining many Node Groups for different instance types.
+Traditionally, most Amazon EKS clusters relied on **Cluster Autoscaler** with **Auto Scaling Groups (ASG)**. This scales configured node groups, requiring the team to manage instance choices and Auto Scaling settings. Provisioning-time comparisons require measurements on comparable configurations.
 
-**Karpenter** is an open-source node provisioning tool built by AWS, now stable at v1.0. Instead of scaling fixed groups of servers, Karpenter launches exactly the EC2 instance types that pending pods need, right when they need them.
+**Karpenter** is an open-source node provisioning tool built by AWS, with stable v1 APIs introduced in version 1.0; select a currently supported release for deployment. Instead of scaling fixed groups of servers, Karpenter launches exactly the EC2 instance types that pending pods need, right when they need them.
 
 So how does Karpenter work, and how is it different from the traditional approach?
 
@@ -38,9 +37,9 @@ In this architecture, each component has a distinct role:
 
 When traffic grows, Kubernetes creates more pods. If existing nodes do not have enough capacity, the new pods stay in the `Pending` state.
 
-Karpenter detects these pods, aggregates their CPU, RAM and GPU requests along with constraints such as AZ or CPU architecture, and picks the most suitable and cheapest EC2 instance available at that moment. It then calls the EC2 API directly. The new node joins the cluster and the pods are scheduled — usually in under a minute, compared with several minutes for Cluster Autoscaler.
+Karpenter detects these pods, aggregates their CPU, RAM and GPU requests along with constraints such as AZ or CPU architecture, and selects EC2 capacity according to NodePool constraints, Pod requirements and availability. It then calls the EC2 API directly. The new node joins the cluster and the pods are scheduled: with timing dependent on EC2 availability, AMI, bootstrap and networking; measure it in the target environment.
 
-When traffic drops, Karpenter continuously checks whether pods can be packed onto fewer nodes or moved to smaller instances. If so, it moves the pods and terminates the extra nodes — a mechanism called **Consolidation** that significantly reduces EC2 costs.
+When traffic drops, Karpenter continuously checks whether pods can be packed onto fewer nodes or moved to smaller instances. If so, it moves the pods and terminates the extra nodes: a mechanism called **Consolidation** that significantly reduces EC2 costs.
 
 ---
 
@@ -48,15 +47,17 @@ When traffic drops, Karpenter continuously checks whether pods can be packed ont
 
 **Always set resource limits on the NodePool**
 
-Karpenter will happily create many nodes if many pods are pending, even when the cause is an application bug. Setting `limits` on total CPU and RAM prevents runaway bills.
+Karpenter will happily create many nodes if many pods are pending, even when the cause is an application bug. Setting `limits` on total CPU and RAM constrains provisioning; these are not hard spending caps and concurrent scale-out can temporarily exceed limits.
 
 **Configure Pod Disruption Budgets for critical apps**
 
-Because Karpenter regularly cleans up and replaces nodes, critical applications need a Pod Disruption Budget (PDB) so that a minimum number of pods stays available during moves.
+Because Karpenter regularly cleans up and replaces nodes, critical applications need a Pod Disruption Budget (PDB) to limit voluntary disruption; PDBs do not protect against every failure or forceful disruption.
 
 **Limit disruption during peak hours**
 
-Karpenter supports scheduled Disruption Budgets, letting you block node termination during critical windows such as events or sales campaigns.
+Karpenter supports scheduled Disruption Budgets, letting you constrain supported voluntary disruptions during critical windows such as events or sales campaigns.
+
+Disruption budgets do not block every termination: interruptions, expiration and other forceful methods have separate rules.
 
 **Watch subnet IP capacity**
 

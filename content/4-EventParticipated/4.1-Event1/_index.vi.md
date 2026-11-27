@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4.1. </b> "
 ---
 
-# Bài thu hoạch Buildrathon Kickoff Code the Future with CMC Global
+## Bài thu hoạch Buildrathon Kickoff Code the Future with CMC Global
 
 ### Thông tin sự kiện
 

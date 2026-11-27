@@ -1,18 +1,17 @@
 ---
 title: "Worklog Tuần 2"
-date: 2026-09-21
 weight: 2
 chapter: false
-pre: " <b> 1.2. </b> "
+pre: "<b>1.2. </b> "
 ---
 
-# Tuần 2: IAM, VPC và hoạt động cộng đồng
+## Tuần 2: IAM, VPC và hoạt động cộng đồng
 
 **Thời gian:** 28/09/2026–03/10/2026.
 
 ### Mục tiêu
 
-IAM, VPC và hoạt động cộng đồng.
+Phân biệt IAM User, Group, Role và Policy; giải thích subnet, định tuyến và kiểm soát lưu lượng VPC; tổng hợp hoạt động cộng đồng.
 
 ### Nội dung công việc
 
@@ -25,13 +24,44 @@ IAM, VPC và hoạt động cộng đồng.
 | 02/10/2026 | Đọc Networking on AWS Workshop; hệ thống hóa các bước chuẩn bị mạng, định tuyến và kiểm tra kết nối.<br>Khảo sát chủ đề workshop truy cập S3 an toàn qua VPC Endpoint; phác thảo sơ đồ, phạm vi và danh sách dịch vụ cần tìm hiểu.<br>Tham gia Fireside Chat with Dr. Werner; ghi chép các chủ đề Cloud, AI, hệ thống quy mô lớn và học tập cộng đồng. |
 | 03/10/2026 | Không bố trí buổi thực tập theo kế hoạch. |
 
-### Kết quả tổng hợp
+### Nội dung chi tiết và hình ảnh
 
-Đã tổng hợp IAM và mạng VPC; liên hệ quyền truy cập với ứng dụng, cập nhật bài thu hoạch Cloud and AI Day và Fireside Chat.
+#### 1. Permissions của execution role API
 
-### Bài viết và hoạt động liên quan
+Đối chiếu các policy của role API với trách nhiệm truy cập dữ liệu và gửi message.
 
-- [Event 2 AWS Cloud and AI Day Hanoi](/vi/4-eventparticipated/4.2-event2/)
-- [Event 4 Fireside Chat with Dr. Werner](/vi/4-eventparticipated/4.4-event4/)
+![Permissions của execution role API](/images/1-Worklog/aws-practice/week02-roles.png)
 
-Các mục nghiên cứu, phác thảo và đề xuất phản ánh mức độ ghi nhận trong nhật ký; không đồng nghĩa đã triển khai hoặc hoàn thành toàn bộ bài lab.
+*Ảnh Console bổ sung theo chủ đề tuần; không dùng để xác nhận ngày thực hiện của nhật ký gốc.*
+
+#### 2. Trust relationship của role API
+
+Kiểm tra service principal được phép sử dụng role; phân biệt trust policy với policy cấp quyền thao tác tài nguyên.
+
+![Trust relationship của role API](/images/1-Worklog/aws-practice/iam-trust.png)
+
+#### 3. Hoạt động AWS Cloud and AI Day
+
+Ảnh hoạt động cộng đồng liên quan bài thu hoạch Event 2.
+
+![Hoạt động AWS Cloud and AI Day](/images/4-EventParticipated/event2/group-photo.jpg)
+
+*Nguồn: ảnh tham gia sự kiện trong hồ sơ cá nhân.*
+
+### Kết quả
+
+Đã phân biệt các loại danh tính và policy, hệ thống hóa mạng VPC và ghi nhận hoạt động cộng đồng.
+
+### Bài học và điểm cần tiếp tục
+
+Trust policy xác định ai được assume role; permission policy xác định role được làm gì. Với VPC, cần kiểm tra cả route, Security Group và Network ACL khi phân tích kết nối.
+
+### Kế hoạch tiếp theo
+
+Tiếp tục với [EC2, S3 và kiến trúc ứng dụng](../1.3-week3/).
+
+### Tài liệu liên quan
+
+- [AWS Cloud and AI Day]({{< relref "/4-EventParticipated/4.2-Event2/" >}})
+- [Fireside Chat with Dr. Werner]({{< relref "/4-EventParticipated/4.4-Event4/" >}})
+- [Tổng quan IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)

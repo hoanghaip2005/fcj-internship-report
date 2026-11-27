@@ -6,11 +6,11 @@ chapter: false
 pre: " <b> 4.4. </b> "
 ---
 
-# Reflection on Fireside Chat with Dr. Werner
+## Reflection on Fireside Chat with Dr. Werner
 
 ### 1. Event information
 
-- **Speaker:** Dr. Werner Vogels — Chief Technology Officer, Amazon.
+- **Speaker:** Dr. Werner Vogels: Chief Technology Officer, Amazon.
 - **Date and time:** October 2, 2026, 08:30–12:00, Vietnam time.
 - **Venue:** Bitexco Financial Tower, 2 Hai Trieu, Ho Chi Minh City.
 - **Listed host on Luma:** Huỳnh Hoàng Long.

@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-# Bài thu hoạch AWS Cloud and AI Day Hanoi
+## Bài thu hoạch AWS Cloud and AI Day Hanoi
 
 ### 1. Thông tin sự kiện
 
@@ -42,7 +42,7 @@ Về hướng vận dụng, em phân biệt việc tạo câu trả lời với 
 
 #### 3.3. Nền tảng dữ liệu cho AI
 
-Phiên **Build and AI-ready data foundation ANT202**, do **AWS** giới thiệu, được xếp lúc 11:00 tại phòng Ho Tay. Nội dung này liên hệ trực tiếp với việc chuẩn bị dữ liệu trước khi xây dựng các chức năng hỏi đáp hoặc hỗ trợ ra quyết định.
+Phiên **Build an AI-ready data foundation ANT202**, do **AWS** giới thiệu, được xếp lúc 11:00 tại phòng Ho Tay. Nội dung này liên hệ trực tiếp với việc chuẩn bị dữ liệu trước khi xây dựng các chức năng hỏi đáp hoặc hỗ trợ ra quyết định.
 
 Bài học em hệ thống hóa là dữ liệu phục vụ AI cần có cấu trúc, ý nghĩa và phạm vi sử dụng rõ ràng. Với tài liệu, cần biết tên, phiên bản, thời điểm cập nhật và người được phép đọc. Với chỉ số, cần thống nhất cách tính và đơn vị đo. Nếu dữ liệu thiếu ngữ cảnh, câu trả lời có thể diễn đạt trôi chảy nhưng không phù hợp với nghiệp vụ.
 
@@ -96,4 +96,8 @@ AWS Cloud and AI Day Hanoi giúp em hình thành góc nhìn liên kết giữa p
 
 ![Thẻ tham dự AWS Cloud and AI Day Hanoi](/images/4-EventParticipated/event2/evidence-02.jpg)
 
-*Thẻ tham dự có tên AWS Cloud and AI Day Hanoi. Ảnh được chuyển từ Event 1 sang đúng bài sự kiện.*
+*Thẻ tham dự có tên AWS Cloud and AI Day Hanoi.*
+
+![Ảnh chụp cùng các bạn tại AWS Cloud and AI Day](/images/4-EventParticipated/event2/group-photo.jpg)
+
+*Ảnh chụp cùng các bạn tham dự AWS Cloud and AI Day.*

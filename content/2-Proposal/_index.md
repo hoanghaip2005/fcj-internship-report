@@ -5,7 +5,7 @@ chapter: false
 pre: "<b>2. </b> "
 ---
 
-# FLASHRUSH Serverless Flash Sale System on AWS
+## FLASHRUSH Serverless Flash Sale System on AWS
 
 ## 1. Executive summary
 
@@ -13,7 +13,7 @@ FLASHRUSH demonstrates order processing during a sale with limited inventory. Th
 
 The project supports the First Cloud AI Journey learning activities of **Phạm Hoàng Hải, student ID 2302700162, class IT2307V, Cloud AI Intern**. Implementation instructions are available in the [FLASHRUSH Workshop]({{< relref "/5-Workshop/" >}}).
 
-The Console workshop has source code, configuration instructions and screenshots covering nine AWS services. Acceptance requires configuration checks and evidence of the complete ordering flow. This proposal describes the manual workshop; additional features in other deployments require separate validation.
+The Console workshop has source code, configuration instructions and screenshots covering nine AWS services. Acceptance requires configuration checks and evidence of the complete ordering flow. This proposal describes the manual workshop; additional features in other deployments require separate validation. The nine-service images document configuration and selected checks, not acceptance of the complete ordering flow.
 
 ## 2. Problem and objectives
 
@@ -29,6 +29,8 @@ The objectives are to:
 - Document configuration, test results and resource cleanup.
 
 ## 3. Implementation scope
+
+This proposal describes the AWS Console workshop using `flashrush-manual-*`; it is separate from the `flashrush-lab` CloudFormation environment and other project extensions.
 
 | Capability | Expected behavior |
 |---|---|

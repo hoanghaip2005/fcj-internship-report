@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4.1. </b> "
 ---
 
-# Reflection on Buildrathon Kickoff Code the Future with CMC Global
+## Reflection on Buildrathon Kickoff Code the Future with CMC Global
 
 ### Event information
 
@@ -60,6 +60,18 @@ This section connects the published agenda to AWS documentation and a CMC Global
 #### Prompt engineering: define a testable task
 
 For a documentation assistant, a useful prompt identifies the task, permitted context, constraints and output format. For example: explain S3 object read permissions using only retrieved documentation; avoid guessing account settings; ask for missing information; return a concise explanation, verification steps and supporting sources. Prompt instructions help structure responses, while application code must still enforce permissions. Compare prompt versions against the same questions instead of judging a single impressive answer.
+
+Example research prompt:
+
+```text
+Task: explain how to grant read access to an S3 object.
+Context: use only the retrieved documentation passages below.
+Constraints: do not infer account configuration; state missing
+             information and ask for clarification when needed.
+Output: a short answer, verification steps and a source for each conclusion.
+```
+
+Compare prompt versions on the same question set for correctness and output-format compliance. Prompt instructions do not replace application authorization.
 
 #### RAG: separate ingestion from answering
 

@@ -1,112 +1,82 @@
 ---
 title: "Blog 3"
-date: 2024-01-01
 weight: 3
 chapter: false
-pre: " <b> 3.3. </b> "
+pre: "<b>3.3. </b> "
 ---
 
-# XÁC THỰC VÀ PHÂN QUYỀN ỨNG DỤNG TRÊN AWS VỚI AMAZON COGNITO
+## Xác thực và phân quyền ứng dụng trên AWS với Amazon Cognito
 
-Trong phát triển ứng dụng Web và Mobile hiện đại, việc quản lý người dùng không chỉ dừng lại ở tính năng đăng ký hay đăng nhập. Hệ thống còn phải xử lý các bài toán phức tạp như xác thực đa yếu tố (MFA), đăng nhập qua mạng xã hội (Google, Apple), phân quyền gọi API backend và kiểm soát quyền truy cập dữ liệu người dùng trên Cloud.
-
-Trên AWS, **Amazon Cognito** là giải pháp Serverless chuyên dụng giúp đơn giản hóa toàn bộ quá trình này. Thay vì phải tự quản lý cơ sở dữ liệu lưu mật khẩu, tự viết mã mã hóa JWT token hay vận hành cụm máy chủ xác thực riêng, Cognito cho phép lập trình viên tập trung vào trải nghiệm ứng dụng, trong khi AWS đảm nhận phần bảo mật, mã hóa và tự động mở rộng theo lưu lượng người dùng.
-
-Vậy các dịch vụ AWS phối hợp với nhau như thế nào để một hệ thống xác thực và phân quyền có thể vận hành ổn định và bảo mật trên môi trường Cloud?
-
----
+Quản lý người dùng bao gồm đăng ký, đăng nhập, MFA, liên kết danh tính, quyền gọi API và quyền truy cập dữ liệu. Amazon Cognito cung cấp dịch vụ định danh được quản lý; ứng dụng vẫn chịu trách nhiệm cấu hình, bảo vệ token và kiểm tra quyền nghiệp vụ.
 
 ### 1. Tổng quan các thành phần trong kiến trúc
 
-Sơ đồ kiến trúc xác thực và phân quyền với Amazon Cognito:
+![Sơ đồ xác thực và phân quyền với Amazon Cognito](/images/3-BlogsPosted/blog4-cognito-architecture.png)
 
-![Sơ đồ kiến trúc xác thực và phân quyền với Amazon Cognito](/images/3-BlogsPosted/blog4-cognito-architecture.png)
+- **User Pool:** quản lý người dùng, xác thực và phát hành ID token, access token; refresh token được cấp trong các luồng phù hợp. Các tính năng MFA, liên kết mạng xã hội và đăng nhập phụ thuộc cấu hình.
+- **Identity Pool:** liên kết danh tính đã xác thực với IAM role và cấp credentials AWS tạm thời qua STS để client truy cập dịch vụ AWS trong phạm vi được cấp.
+- **API Gateway:** kiểm tra token trước khi chuyển yêu cầu đến backend. REST API dùng Cognito User Pool authorizer; HTTP API dùng JWT authorizer với issuer, audience và scopes phù hợp.
+- **Lambda và DynamoDB:** thực thi nghiệp vụ, kiểm tra quyền đối với dữ liệu và lưu hồ sơ ứng dụng. Lambda Triggers có thể tùy biến các bước Cognito hỗ trợ.
+- **S3:** lưu object riêng tư; client có thể dùng credentials tạm thời để ký request SigV4 thay vì gửi mọi file qua backend.
+- **AWS WAF:** có thể bổ sung kiểm soát request tại các điểm tích hợp được hỗ trợ. WAF không thay thế xác thực, phân quyền hay xử lý lỗi trong ứng dụng.
 
-Trong kiến trúc này, mỗi dịch vụ đảm nhận một vai trò riêng:
-
-* **Amazon Cognito User Pool:** Đóng vai trò là thư mục người dùng (User Directory). Quản lý việc đăng ký, đăng nhập, xác thực qua email/SMS OTP hoặc tài khoản mạng xã hội, và cấp phát bộ ba OIDC Token (`ID Token`, `Access Token`, `Refresh Token`).
-* **Amazon Cognito Identity Pool:** Đảm nhận việc ủy quyền (Authorization). Đổi ID Token lấy thông tin xác thực AWS tạm thời (`AWS Temporary Credentials` gồm AccessKey, SecretKey và SessionToken) để cấp quyền truy cập tài nguyên AWS.
-* **Amazon API Gateway:** Cổng tiếp nhận các yêu cầu API từ người dùng. Tích hợp sẵn bộ lọc `Cognito User Pool Authorizer` để tự động kiểm tra chữ ký token trước khi chuyển tiếp request vào backend.
-* **AWS Lambda:** Thực thi logic nghiệp vụ cho các API hoặc đóng vai trò Lambda Triggers để can thiệp vào các bước trong vòng đời người dùng (như xác thực email công ty, tùy biến claims).
-* **Amazon DynamoDB:** Cơ sở dữ liệu NoSQL lưu trữ hồ sơ chi tiết và dữ liệu nghiệp vụ của ứng dụng.
-* **Amazon S3:** Nơi lưu trữ tài liệu, hình ảnh riêng tư của từng người dùng, hỗ trợ client upload/download trực tiếp mà không cần trung chuyển qua server.
-* **AWS WAF:** Tấm lá chắn gắn trước cổng đăng nhập, ngăn chặn các cuộc tấn công Brute-force, Credential Stuffing và Botnet.
-
-Một điểm đáng chú ý là Cognito tách bạch rõ ràng giữa hai khái niệm: **User Pool chịu trách nhiệm xác thực danh tính người dùng ứng dụng (Authentication)**, còn **Identity Pool chịu trách nhiệm cấp quyền cho người dùng đó truy cập vào các tài nguyên đám mây của AWS (Authorization)**.
-
----
+User Pool phục vụ danh tính ứng dụng; Identity Pool cấp quyền truy cập tài nguyên AWS thông qua IAM. Không phải ứng dụng dùng User Pool nào cũng cần Identity Pool.
 
 ### 2. Luồng hoạt động của hệ thống
 
-Quá trình hoạt động bắt đầu từ phía Client (ứng dụng Web hoặc Mobile). Khi người dùng thực hiện đăng nhập, thông tin được gửi đến **Amazon Cognito User Pool**. Sau khi xác thực thông tin đăng nhập và kiểm tra MFA (nếu có), User Pool sẽ trả về bộ ba Token chuẩn OIDC: `ID Token` (chứa hồ sơ user), `Access Token` (dùng để gọi API) và `Refresh Token` (dùng để gia hạn phiên làm việc).
+1. Client đăng nhập qua User Pool theo luồng đã cấu hình, thực hiện MFA khi được yêu cầu.
+2. Client nhận token và lưu theo mô hình bảo mật phù hợp. ID token mô tả danh tính; access token biểu thị quyền truy cập theo scopes; refresh token dùng để yêu cầu token mới theo chính sách phiên.
+3. Client gọi API Gateway với token trong header `Authorization`. Authorizer kiểm tra chữ ký và claims theo loại API; backend tiếp tục kiểm tra quyền đọc/ghi đối tượng cụ thể.
+4. Nếu client cần truy cập S3 trực tiếp, Identity Pool có thể trao đổi danh tính được hỗ trợ để nhận credentials tạm thời. Client ký SigV4; IAM, bucket policy và các kiểm soát S3 quyết định request có được phép hay không.
 
-Khi người dùng cần gọi các tính năng nghiệp vụ, Client gửi request đến **Amazon API Gateway** kèm Access Token trong header `Authorization`. API Gateway sẽ tự động tải và cache bộ khóa công khai (JWKS) từ Cognito để xác minh tính hợp lệ của token ngay tại Edge mà không phát sinh thêm chi phí compute, sau đó chuyển tiếp request hợp lệ đến **AWS Lambda** để xử lý và đọc/ghi dữ liệu vào **Amazon DynamoDB**.
-
-Đối với các tác vụ lưu trữ tệp dữ liệu lớn (như ảnh đại diện, tệp tài liệu), Client không cần gửi dữ liệu qua Lambda hay API Gateway để tránh quá tải. Thay vào đó, Client gửi ID Token sang **Cognito Identity Pool** để đổi lấy một bộ khóa tạm thời từ **AWS STS**. Client sử dụng bộ khóa này để ký chữ ký AWS SigV4 và tải file trực tiếp lên **Amazon S3**. Dữ liệu được bảo vệ an toàn tuyệt đối nhờ chính sách IAM Policy cô lập thư mục theo ID của từng người dùng.
-
----
+Với HTTP API, cấu hình scope trên route để kiểm soát access token thay vì dựa vào việc token có chữ ký hợp lệ. Với REST API, hành vi sử dụng ID/access token phụ thuộc cấu hình OAuth scopes của method. Không coi mọi token từ cùng User Pool là có thể thay thế cho nhau.
 
 ### 3. Những điểm cần chú ý khi triển khai
 
-#### Phân biệt rõ vai trò User Pool và Identity Pool
-Rất nhiều kỹ sư mới bắt đầu thường nhầm lẫn giữa hai thành phần này. Cần nhớ nguyên tắc:
-* **User Pool:** Dùng khi bạn cần tạo form đăng ký/đăng nhập, quản lý mật khẩu và bảo vệ các API của riêng bạn.
-* **Identity Pool:** Dùng khi bạn muốn cấp quyền cho client gọi trực tiếp đến các dịch vụ của AWS như tải file lên S3, đọc bảng DynamoDB hay gửi dữ liệu vào IoT Core.
+#### Phân biệt xác thực và quyền nghiệp vụ
 
-#### Quản lý vòng đời Token hợp lý
-Để cân bằng giữa tính bảo mật và trải nghiệm người dùng:
-* Nên cấu hình thời gian sống của `Access Token` và `ID Token` ngắn (khoảng 15 đến 60 phút) để hạn chế rủi ro nếu token bị lộ.
-* Sử dụng `Refresh Token` với thời hạn dài hơn (vài ngày đến vài tuần) được lưu trong bộ nhớ an toàn (Secure Storage/Keystore) của thiết bị để tự động gia hạn token mà không bắt người dùng đăng nhập lại liên tục.
+Token hợp lệ không tự cho phép người dùng đọc mọi hồ sơ. Backend cần liên kết danh tính với chủ sở hữu dữ liệu hoặc vai trò nghiệp vụ và từ chối truy cập ngoài phạm vi. Identity Pool role cũng cần giới hạn actions và resources.
 
-#### Cấp quyền S3 theo nguyên tắc Đặc quyền tối thiểu (Least Privilege)
-Khi cấp quyền cho người dùng truy cập trực tiếp vào S3, không nên dùng một bucket riêng cho mỗi người. Thay vào đó, sử dụng tính năng thay thế biến ngữ cảnh động của IAM:
+#### Quản lý vòng đời token
+
+Chọn thời hạn token theo mức rủi ro và trải nghiệm; 15–60 phút có thể là khoảng tham khảo cho access/ID token, không phải quy tắc bắt buộc cho mọi ứng dụng. Refresh token có thời hạn và chính sách thu hồi riêng.
+
+Trên mobile, sử dụng cơ chế lưu trữ bảo mật của nền tảng. Trên web, lựa chọn cách lưu theo kiến trúc ứng dụng và mô hình đe dọa; chú ý XSS, CSRF và xử lý đăng xuất/thu hồi. Không mặc định trình duyệt có hardware enclave như thiết bị mobile.
+
+#### Cấp quyền S3 theo nguyên tắc tối thiểu
+
+Ví dụ phạm vi object:
+
 `arn:aws:s3:::my-bucket/users/${cognito-identity.amazonaws.com:sub}/*`
-Biến `${cognito-identity.amazonaws.com:sub}` sẽ tự động khớp với ID duy nhất của người dùng, đảm bảo mỗi người chỉ có thể đọc và ghi vào đúng thư mục của chính mình.
 
-#### Tối ưu hóa xác thực trên API Gateway
-Nên ưu tiên sử dụng tính năng **Cognito User Pool Authorizer** tích hợp sẵn của API Gateway thay vì tự viết Lambda Authorizer. Cơ chế tích hợp sẵn này thực hiện xác thực chữ ký token ngay trong bộ nhớ với độ trễ cực thấp (< 2ms) và hoàn toàn miễn phí.
+Biến này là Identity Pool identity ID, không phải trực tiếp User Pool `sub`. Policy phải cấp đúng actions cho object; quyền liệt kê bucket cần statement và điều kiện prefix riêng khi cần. Cấu hình bucket và role cùng quyết định tính cô lập, không chỉ riêng chuỗi ARN.
 
----
+#### Chọn authorizer đúng loại API
 
-### 4. Giám sát và tối ưu chi phí
+Ưu tiên authorizer tích hợp khi đáp ứng yêu cầu. API Gateway có thể cache khóa JWKS; cache miss và tải mạng có thể ảnh hưởng độ trễ. Không có cơ sở để cam kết mọi request đều dưới 2 ms hoặc toàn bộ đường xác thực miễn phí. Lambda authorizer phù hợp khi cần logic tùy biến ngoài khả năng của authorizer tích hợp.
 
-Sau khi hệ thống đi vào hoạt động, việc theo dõi định danh và tối ưu chi phí là yếu tố quan trọng:
+### 4. Giám sát và chi phí
 
-* **Amazon CloudWatch:** Thu thập các chỉ số về số lượt đăng nhập thành công/thất bại, độ trễ xác thực và log lỗi từ các Lambda Triggers.
-* **Cognito Advanced Security Features (ASF):** Tính năng bảo mật nâng cao hỗ trợ phát hiện hành vi đăng nhập bất thường từ các IP lạ, phát hiện mật khẩu đã bị lộ lọt trên môi trường Internet và tự động kích hoạt xác thực đa yếu tố thích ứng (Adaptive MFA).
-* **Về chi phí:**
-  * **Amazon Cognito User Pool:** Miễn phí cho **50.000 người dùng hoạt động hàng tháng (MAU)** đầu tiên trong Free Tier, rất tiết kiệm cho các dự án vừa và nhỏ.
-  * **Cognito Identity Pool:** Hoàn toàn miễn phí khi sử dụng.
-  * **Amazon API Gateway & AWS Lambda:** Chi phí chỉ phát sinh theo số lượng request thực tế và thời gian thực thi (Pay-as-you-go).
-  * **AWS WAF:** Tính phí theo số lượng Web ACL và số triệu request kiểm tra, cần cân nhắc cấu hình rule phù hợp với ngân sách dự án.
-
----
+- Theo dõi metrics được dịch vụ cung cấp và logs của Lambda Triggers; kiểm tra tính năng và cấu hình trước khi kết luận có đầy đủ log đăng nhập.
+- Xem xét threat protection, MFA và WAF theo tier, khả năng hỗ trợ và yêu cầu ứng dụng. Các kiểm soát này giảm rủi ro, không bảo đảm an toàn tuyệt đối.
+- Giá User Pool phụ thuộc tier, cách đăng nhập, MAU và điều kiện tài khoản. Bảng giá hiện hành nêu free tier 10.000 MAU cho một số cách đăng nhập ở Lite/Essentials; Plus và các trường hợp khác có điều kiện riêng. Không áp dụng mặc định 50.000 MAU cho mọi pool.
+- Identity Pool được cung cấp không tính phí theo bảng giá Cognito; dịch vụ AWS được truy cập vẫn có phí riêng. SMS, email, API Gateway, Lambda và WAF cũng cần được đưa vào dự toán phù hợp.
 
 ### 5. Tổng kết
 
-Qua kiến trúc này, có thể thấy việc xây dựng hệ thống quản lý định danh trên AWS không chỉ dừng lại ở một bảng tài khoản trong cơ sở dữ liệu, mà là sự phối hợp nhịp nhàng giữa nhiều dịch vụ Serverless:
-
-**Cognito User Pool** quản lý danh tính và cấp phát token, **Cognito Identity Pool** kết nối quyền hạn với hạ tầng AWS, **API Gateway** bảo vệ các API microservices, và **Amazon S3** hỗ trợ lưu trữ dữ liệu người dùng trực tiếp một cách an toàn.
-
-Mô hình này giúp loại bỏ gánh nặng vận hành máy chủ xác thực, đảm bảo hệ thống tự động mở rộng khi lượng người dùng tăng trưởng, đồng thời tuân thủ các chuẩn mực an toàn thông tin khắt khe trên nền tảng đám mây.
-
----
+Cognito giúp giảm công việc vận hành dịch vụ định danh. Một thiết kế hoàn chỉnh vẫn cần chọn đúng loại authorizer, bảo vệ token và giới hạn quyền dữ liệu. Sơ đồ minh họa cách tích hợp; không xác nhận một ứng dụng đã được kiểm thử hoặc đáp ứng tiêu chuẩn bảo mật cụ thể.
 
 ### Tài liệu tham khảo
 
-* Amazon Cognito Developer Guide AWS:
-  [https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html)
-* Getting Started with Amazon Cognito User Pools:
-  [https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html)
-* Controlling Access to S3 with Amazon Cognito:
-  [https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-user-pools-with-identity-pools.html](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-user-pools-with-identity-pools.html)
-
-#AWS #AmazonCognito #CyberSecurity #CloudComputing #Serverless #OAuth2 #AmazonAPIGateway #AmazonS3 #awsstudygroup #FCAJ
-
----
+- [Amazon Cognito](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html)
+- [User Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html)
+- [Identity Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-user-pools-with-identity-pools.html)
+- [HTTP API JWT authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+- [REST API Cognito authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html)
+- [Cognito pricing](https://aws.amazon.com/cognito/pricing/)
 
 ### Minh chứng bài viết đã đăng
 
-Bài viết về Amazon Cognito được chia sẻ trong nhóm AWS Study Group VN.
+Bài viết được chia sẻ trong nhóm AWS Study Group VN.
 
-![Bài viết về Amazon Cognito được chia sẻ trong nhóm AWS Study Group VN.](/images/3-BlogsPosted/evidence/blog3-cognito-published.png)
+![AWS Study Group VN](/images/3-BlogsPosted/evidence/blog3-cognito-published.png)

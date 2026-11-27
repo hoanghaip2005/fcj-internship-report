@@ -1,18 +1,17 @@
 ---
 title: "Worklog Tuần 4"
-date: 2026-09-21
 weight: 4
 chapter: false
-pre: " <b> 1.4. </b> "
+pre: "<b>1.4. </b> "
 ---
 
-# Tuần 4: Cơ sở dữ liệu, container và đề cương blog
+## Tuần 4: Cơ sở dữ liệu, container và đề cương blog
 
 **Thời gian:** 12/10/2026–17/10/2026.
 
 ### Mục tiêu
 
-Cơ sở dữ liệu, container và đề cương blog.
+So sánh RDS, DynamoDB và ElastiCache; hiểu khóa dữ liệu, cập nhật có điều kiện và các kiến thức nền tảng về container, DNS.
 
 ### Nội dung công việc
 
@@ -25,13 +24,43 @@ Cơ sở dữ liệu, container và đề cương blog.
 | 16/10/2026 | Tìm hiểu Amazon Route 53, hosted zone, bản ghi DNS và cách trỏ tên miền đến ứng dụng; tổng hợp quan hệ giữa DNS, máy chủ và dữ liệu.<br>Rà soát ba chủ đề blog hiện tại: Karpenter/EKS, S3 Express One Zone và Amazon Cognito; bổ sung câu hỏi cần nghiên cứu. |
 | 17/10/2026 | Không bố trí buổi thực tập theo kế hoạch. |
 
-### Kết quả tổng hợp
+### Nội dung chi tiết và hình ảnh
 
-Đã phân biệt RDS, DynamoDB và cache; hệ thống hóa DNS, container, các đề cương blog Karpenter, S3 Express One Zone và Cognito.
+#### 1. Cấu hình bảng DynamoDB thực hành
 
-### Bài viết và hoạt động liên quan
+Bảng fcj-worklog-practice dùng partition key id kiểu String và capacity On-demand.
 
-- [Blog 1 Karpenter/EKS](/vi/3-blogsposted/3.1-blog1/)
-- [Blog 3 Amazon Cognito](/vi/3-blogsposted/3.3-blog3/)
+![Cấu hình bảng DynamoDB thực hành](/images/1-Worklog/aws-practice/week04-dynamodb.png)
 
-Các mục nghiên cứu, phác thảo và đề xuất phản ánh mức độ ghi nhận trong nhật ký; không đồng nghĩa đã triển khai hoặc hoàn thành toàn bộ bài lab.
+*Ảnh Console bổ sung theo chủ đề tuần; không dùng để xác nhận ngày thực hiện của nhật ký gốc.*
+
+#### 2. Kết quả cập nhật tồn kho có điều kiện
+
+Stock ban đầu 2 giảm còn 1. Yêu cầu giảm tiếp 2 bị ConditionalCheckFailedException; đọc nhất quán xác nhận stock vẫn là 1.
+
+![Kết quả cập nhật tồn kho có điều kiện](/images/1-Worklog/aws-practice/week04-dynamodb-items.png)
+
+#### 3. Liên hệ chủ đề container với Karpenter
+
+Sơ đồ từ bài blog dùng để giải thích cách mở rộng node theo nhu cầu Pod; chưa xác nhận triển khai EKS.
+
+![Liên hệ chủ đề container với Karpenter](/images/3-BlogsPosted/blog2-karpenter-eks.png)
+
+*Sơ đồ minh họa kiến thức, không phải ảnh kết quả triển khai.*
+
+### Kết quả
+
+Đã phân biệt cơ sở dữ liệu và cache; kiểm chứng cập nhật có điều kiện DynamoDB trên dữ liệu riêng.
+
+### Bài học và điểm cần tiếp tục
+
+Đọc rồi ghi riêng lẻ vẫn có thể tạo race condition; điều kiện phải nằm trong thao tác ghi. Bài thử một item chưa chứng minh transaction nhiều bảng hoặc kiểm thử tải.
+
+### Kế hoạch tiếp theo
+
+Tiếp tục với [Phân tích DropIt và đề xuất kiến trúc FitJoy](../1.5-week5/).
+
+### Tài liệu liên quan
+
+- [Blog Karpenter/EKS]({{< relref "/3-BlogsPosted/3.1-Blog1/" >}})
+- [Điều kiện ghi DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html)

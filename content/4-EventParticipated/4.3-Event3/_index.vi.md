@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Bài thu hoạch sự kiện AWS for Software & Financial Services Companies Day
+## Bài thu hoạch sự kiện AWS for Software & Financial Services Companies Day
 
 ### 1. Thông tin chung
 
@@ -27,7 +27,7 @@ Mục tiêu của em là nhận diện được những yêu cầu thường ch�
 
 #### 3.1. Đưa AI Agent từ demo đến vận hành thực tế
 
-Chuyên đề **From Demo to Deployment: Solving Agentic AI's Toughest Challenges**, do **Dzung Ha Solutions Architect, AWS** trình bày, đặt ra câu hỏi: một agent trả lời được trong môi trường thử nghiệm đã đủ điều kiện phục vụ người dùng thật hay chưa? Bộ slide phân tích bốn nhóm yêu cầu: vận hành, dữ liệu và ngữ cảnh, độ tin cậy, niềm tin và bảo mật.
+Chuyên đề **From Demo to Deployment: Solving Agentic AI's Toughest Challenges**, do **Dzung Ha, Solutions Architect, AWS** trình bày, đặt ra câu hỏi: một agent trả lời được trong môi trường thử nghiệm đã đủ điều kiện phục vụ người dùng thật hay chưa? Bộ slide phân tích bốn nhóm yêu cầu: vận hành, dữ liệu và ngữ cảnh, độ tin cậy, niềm tin và bảo mật.
 
 Về **vận hành**, hệ thống cần theo dõi được chuỗi xử lý thay vì chỉ ghi nhận câu trả lời cuối cùng. Nếu agent phản hồi chậm, cần xác định thời gian nằm ở bước gọi mô hình, truy xuất dữ liệu hay sử dụng công cụ. Chi phí, độ trễ và độ chính xác cũng phải được xem xét cùng nhau; lựa chọn mô hình cần xuất phát từ yêu cầu của từng tác vụ.
 
@@ -39,7 +39,7 @@ Từ chuyên đề, em rút ra rằng “chạy được” mới là bước đ
 
 #### 3.2. Dữ liệu sẵn sàng cho AI cần có ý nghĩa và trách nhiệm rõ ràng
 
-Trong chuyên đề **Building High-Quality Data Products for AI Agents**, **Binh Tran Senior Solutions Architect, AWS** trình bày năm thuộc tính của dữ liệu phục vụ agent: **đáng tin cậy, có ngữ cảnh, truy vết được, được quản trị và có thể phục vụ hành động**.
+Trong chuyên đề **Building High-Quality Data Products for AI Agents**, **Binh Tran, Senior Solutions Architect, AWS** trình bày năm thuộc tính của dữ liệu phục vụ agent: **đáng tin cậy, có ngữ cảnh, truy vết được, được quản trị và có thể phục vụ hành động**.
 
 Ví dụ về chỉ số chi tiêu trong slide giúp em hiểu rõ vấn đề: nếu pipeline cộng các giao dịch đã thanh toán nhưng bỏ qua hoàn tiền và giao dịch đảo, số tổng vẫn có thể trông hợp lệ. Agent sử dụng con số đó để đề xuất tăng hạn mức sẽ biến lỗi dữ liệu thành một hành động nghiệp vụ. Vì vậy, kiểm tra ở bước trả lời là chưa đủ; cần chặn lỗi tại nguồn và trong pipeline.
 
@@ -53,7 +53,7 @@ Bài học em rút ra là cần xem dữ liệu như một sản phẩm có ngư
 
 #### 3.3. Di chuyển và hiện đại hóa cần kế hoạch, kiểm chứng và phê duyệt
 
-Chuyên đề **Migration at scale with agentic AI: AWS Transform and beyond**, do **Taiki Dang Solutions Architect, Migration & Modernize | Security, AWS** trình bày, mô tả cách kết hợp AWS Transform, Kiro và Amazon Bedrock AgentCore trong quá trình di chuyển hệ thống.
+Chuyên đề **Migration at scale with agentic AI: AWS Transform and beyond**, do **Taiki Dang, Solutions Architect, Migration & Modernize | Security, AWS** trình bày, mô tả cách kết hợp AWS Transform, Kiro và Amazon Bedrock AgentCore trong quá trình di chuyển hệ thống.
 
 Nội dung giúp em phân biệt các lựa chọn như đưa máy chủ lên EC2, chuyển ứng dụng sang container hoặc tái cấu trúc để sử dụng dịch vụ được quản lý. Mỗi lựa chọn có mức thay đổi và yêu cầu kiểm thử khác nhau. Việc di chuyển vì thế không chỉ là sao chép máy chủ: còn có khảo sát phụ thuộc, đánh giá chi phí, chuẩn bị môi trường đích, chuyển đổi cấu hình mạng, chạy thử và lập kế hoạch chuyển vận hành.
 

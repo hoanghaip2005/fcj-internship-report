@@ -1,112 +1,82 @@
 ---
 title: "Blog 3"
-date: 2024-01-01
 weight: 3
 chapter: false
-pre: " <b> 3.3. </b> "
+pre: "<b>3.3. </b> "
 ---
 
-# APPLICATION AUTHENTICATION AND AUTHORIZATION ON AWS WITH AMAZON COGNITO
+## Application authentication and authorization on AWS with Amazon Cognito
 
-In modern web and mobile application development, user management extends well beyond basic sign-up and sign-in functionality. Production systems must address complex requirements including Multi-Factor Authentication (MFA), federated social identity (Google, Apple), API route authorization, and secure cloud resource access.
+User management includes registration, sign-in, MFA, federation, API access and data permissions. Amazon Cognito provides managed identity services; applications remain responsible for configuration, token protection and business authorization.
 
-On AWS, **Amazon Cognito** serves as the dedicated serverless CIAM platform to streamline this entire process. Instead of provisioning credential databases, managing JWT signing algorithms, or operating self-hosted authentication servers, developers can focus on application features while AWS manages security, encryption, and automatic scaling behind the scenes.
+### 1. Architectural components
 
-How do AWS services collaborate to deliver a secure, resilient authentication and authorization workflow in the cloud?
+![Authentication and authorization with Amazon Cognito](/images/3-BlogsPosted/blog4-cognito-architecture.png)
 
----
+- **User Pool:** manages users, authenticates them and issues ID/access tokens; refresh tokens are issued in supported flows. MFA, social federation and sign-in behavior depend on configuration.
+- **Identity Pool:** maps supported authenticated identities to IAM roles and provides temporary AWS credentials through STS for scoped client access to AWS services.
+- **API Gateway:** validates tokens before forwarding requests. REST APIs use Cognito User Pool authorizers; HTTP APIs use JWT authorizers with appropriate issuer, audience and scopes.
+- **Lambda and DynamoDB:** execute business logic, enforce data authorization and store application profiles. Lambda Triggers can customize supported Cognito lifecycle steps.
+- **S3:** stores private objects; clients can sign SigV4 requests with temporary credentials rather than proxying every file through the backend.
+- **AWS WAF:** can add request controls at supported integration points. It does not replace authentication, authorization or application error handling.
 
-### 1. Architectural Components Overview
+User Pools serve application identity; Identity Pools delegate AWS resource access through IAM. An application using a User Pool does not necessarily need an Identity Pool.
 
-Architectural diagram of authentication and authorization with Amazon Cognito:
+### 2. System workflow
 
-![Architectural diagram of authentication and authorization with Amazon Cognito](/images/3-BlogsPosted/blog4-cognito-architecture.png)
+1. The client signs in through the configured User Pool flow and completes MFA when required.
+2. The client receives tokens and stores them according to its security architecture. ID tokens describe identity; access tokens carry access scopes; refresh tokens request new tokens under the session policy.
+3. The client calls API Gateway with an `Authorization` token. The authorizer checks signatures and claims according to the API type; the backend still enforces access to individual data objects.
+4. For direct S3 access, an Identity Pool can exchange a supported identity for temporary AWS credentials. The client signs SigV4 requests; IAM, bucket policies and S3 controls determine whether requests are permitted.
 
-In this architecture, each service fulfills a designated role:
+For HTTP APIs, configure route scopes to enforce access-token permissions instead of relying only on a valid signature. For REST APIs, ID/access-token behavior depends on method OAuth scopes. Tokens issued by the same pool are not automatically interchangeable.
 
-* **Amazon Cognito User Pool:** Acts as the user directory. Manages sign-up, sign-in, MFA verification, social federation, and emits standard OIDC tokens (`ID Token`, `Access Token`, and `Refresh Token`).
-* **Amazon Cognito Identity Pool:** Governs cloud authorization. Exchanges ID Tokens for temporary, scoped AWS credentials (`AWS Temporary Credentials` via STS) to delegate direct AWS resource access.
-* **Amazon API Gateway:** Serves as the central API entry point. Employs the built-in `Cognito User Pool Authorizer` to verify token signatures at the edge before dispatching requests to backend compute.
-* **AWS Lambda:** Executes business microservices and provides Lambda Triggers to customize lifecycle events (such as domain whitelisting or token claims enrichment).
-* **Amazon DynamoDB:** NoSQL database storing user profile metadata and core application records.
-* **Amazon S3:** Provides dedicated object storage for private user files, enabling direct upload and download via IAM SigV4 without intermediate proxy servers.
-* **AWS WAF:** Protects identity entry points against brute-force attacks, credential stuffing, and malicious bots.
+### 3. Implementation considerations
 
-A defining feature of this design is the strict separation of concerns: **User Pools handle user authentication (AuthN)**, whereas **Identity Pools govern AWS cloud infrastructure authorization (AuthZ)**.
+#### Authentication versus business authorization
 
----
+A valid token does not grant access to every profile. Backends must associate identity with data ownership or business roles and reject out-of-scope access. Identity Pool roles also need restricted actions and resources.
 
-### 2. System Workflow
+#### Token lifecycle
 
-The process originates at the Client (Web or Mobile application). When a user signs in, credentials or social tokens are transmitted to the **Amazon Cognito User Pool**. Upon successful verification and optional MFA validation, the User Pool issues three standard OIDC tokens: the `ID Token` (user profile data), `Access Token` (API access permissions), and `Refresh Token` (session continuity).
+Choose expiry based on risk and usability. A 15–60 minute access/ID-token lifetime can be a starting point rather than a universal rule. Refresh tokens have separate expiry and revocation policies.
 
-When invoking backend APIs, the Client submits requests to **Amazon API Gateway** with the Access Token in the `Authorization` header. API Gateway automatically validates the cryptographic signature against Cognito's cached JSON Web Key Set (JWKS) in-memory without incurring compute charges, subsequently routing valid requests to **AWS Lambda** and **Amazon DynamoDB**.
+On mobile, use the platform's secure storage. On the web, choose storage according to the architecture and threat model, considering XSS, CSRF, logout and revocation. Do not assume browser storage has a mobile-style hardware enclave.
 
-For high-volume storage operations (such as profile pictures or private documents), the Client avoids routing payloads through Lambda or API Gateway. Instead, the Client presents its ID Token to **Cognito Identity Pool**, which issues temporary AWS credentials via **AWS STS**. The Client uses these temporary keys to sign SigV4 requests and upload directly to **Amazon S3**. Data isolation is strictly enforced through dynamic IAM policies keyed to the user's unique identity ID.
+#### Least-privilege S3 access
 
----
+An example object scope is:
 
-### 3. Key Implementation Considerations
-
-#### Distinguishing Between User Pools and Identity Pools
-A common architectural pitfall is conflating these two components:
-* **User Pool:** Use when building authentication forms, managing passwords, and securing your custom backend APIs.
-* **Identity Pool:** Use when granting clients scoped permissions to interact directly with AWS services (such as direct S3 uploads or DynamoDB queries).
-
-#### Designing Practical Token Lifecycles
-To balance robust security with a smooth user experience:
-* Configure short expiration windows for `Access Token` and `ID Token` (typically 15 to 60 minutes) to mitigate risk if a token is intercepted.
-* Rely on `Refresh Token` with longer lifespans (several days to weeks), stored within the client's secure hardware enclave, to renew sessions without prompting repeated logins.
-
-#### Enforcing Least Privilege with Dynamic S3 IAM Policies
-When delegating direct S3 access to authenticated users, avoid creating separate buckets per user. Instead, leverage dynamic IAM policy variable substitution:
 `arn:aws:s3:::my-bucket/users/${cognito-identity.amazonaws.com:sub}/*`
-The `${cognito-identity.amazonaws.com:sub}` variable is automatically populated by AWS STS, ensuring each user can strictly access only their personal folder.
 
-#### Optimizing API Gateway Authorization
-Always favor the native **Cognito User Pool Authorizer** over custom Lambda Authorizers for standard JWT verification. The native authorizer executes in-memory with sub-millisecond latency and incurs zero execution charges.
+This variable represents the Identity Pool identity ID, not directly the User Pool `sub`. Policies must grant the appropriate object actions; listing a bucket requires a separate statement and prefix condition where needed. Isolation depends on role and bucket configuration together, not the ARN string alone.
 
----
+#### Match the authorizer to the API type
 
-### 4. Monitoring and Cost Optimization
+Prefer a built-in authorizer when it meets the requirements. API Gateway can cache JWKS keys; cache misses and network fetches can affect latency. Do not promise every request completes below 2 ms or that the whole authentication path is free. Lambda authorizers remain useful for custom logic outside built-in capabilities.
 
-Operational visibility and budget governance are essential for production workloads:
+### 4. Monitoring and cost
 
-* **Amazon CloudWatch:** Tracks authentication success and failure rates, authorizer latency, and Lambda Trigger execution logs.
-* **Cognito Advanced Security Features (ASF):** Provides adaptive risk-based authentication to challenge anomalous logins from unfamiliar IP addresses and blocks credentials exposed in dark-web breaches.
-* **Cost Structure:**
-  * **Cognito User Pool:** Generous Free Tier covering **50,000 Monthly Active Users (MAU)** perpetually.
-  * **Cognito Identity Pool:** Free of charge.
-  * **API Gateway & Lambda:** Purely usage-based pricing metered per request and compute duration.
-  * **AWS WAF:** Billed per Web ACL and inspected requests; rules should be tailored to project budgets.
-
----
+- Use available service metrics and Lambda Trigger logs; inspect feature availability and settings before assuming complete sign-in logging.
+- Evaluate threat protection, MFA and WAF according to tier, support and application needs. These reduce risk without guaranteeing absolute security.
+- User Pool pricing depends on tier, sign-in method, MAU and account eligibility. Current pricing lists a 10,000-MAU free tier for some Lite/Essentials sign-in methods; Plus and other cases have different conditions. Do not apply 50,000 free MAUs universally.
+- Cognito pricing provides Identity Pools at no charge, while accessed AWS services have separate costs. Include applicable SMS, email, API Gateway, Lambda and WAF charges in estimates.
 
 ### 5. Summary
 
-This architecture demonstrates that identity management on AWS is far more than a simple database table — it is an orchestrated serverless ecosystem:
-
-**Cognito User Pool** manages identity lifecycles and token issuance, **Cognito Identity Pool** bridges applications to AWS IAM permissions, **API Gateway** shields backend microservices, and **Amazon S3** provides secure, direct data storage.
-
-This pattern eliminates server maintenance overhead, ensures seamless auto-scaling as user traffic grows, and maintains compliance with rigorous enterprise security standards.
-
----
+Cognito reduces identity-service operations. A complete design still requires the correct authorizer type, protected tokens and restricted data access. The diagram illustrates integration; it does not establish tested behavior or compliance with a particular security standard.
 
 ### References
 
-* Amazon Cognito Developer Guide - AWS:
-  [https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html)
-* Getting Started with Amazon Cognito User Pools:
-  [https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html)
-* Controlling Access to S3 with Amazon Cognito:
-  [https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-user-pools-with-identity-pools.html](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-user-pools-with-identity-pools.html)
-
-#AWS #AmazonCognito #CyberSecurity #CloudComputing #Serverless #OAuth2 #AmazonAPIGateway #AmazonS3 #awsstudygroup #FCAJ
-
----
+- [Amazon Cognito](https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html)
+- [User Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html)
+- [Identity Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-integrating-user-pools-with-identity-pools.html)
+- [HTTP API JWT authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+- [REST API Cognito authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html)
+- [Cognito pricing](https://aws.amazon.com/cognito/pricing/)
 
 ### Publication evidence
 
-The article about Amazon Cognito shared in the AWS Study Group VN community.
+The article was shared in the AWS Study Group VN community.
 
-![The article about Amazon Cognito shared in the AWS Study Group VN community.](/images/3-BlogsPosted/evidence/blog3-cognito-published.png)
+![AWS Study Group VN](/images/3-BlogsPosted/evidence/blog3-cognito-published.png)

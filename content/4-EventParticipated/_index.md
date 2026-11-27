@@ -1,6 +1,5 @@
 ---
 title: "Events Participated"
-date: 2024-01-01
 weight: 4
 chapter: false
 pre: " <b> 4. </b> "
@@ -10,7 +9,7 @@ Throughout the **Workforce Bootcamp - First Cloud AI Journey** internship, I had
 
 ---
 
-### [Event 1 - Buildrathon Kickoff: Code the Future with CMC Global](4.1-Event1/)
+### [Event 1 Buildrathon Kickoff: Code the Future with CMC Global](4.1-Event1/)
 
 **Time:** September 26, 2026, 09:00–12:00 (Vietnam time).
 
@@ -20,7 +19,7 @@ Throughout the **Workforce Bootcamp - First Cloud AI Journey** internship, I had
 
 ---
 
-### [Event 2 - AWS Cloud and AI Day Hanoi](4.2-Event2/)
+### [Event 2 AWS Cloud and AI Day Hanoi](4.2-Event2/)
 
 **Date:** September 29, 2026, 07:30–17:00.
 
@@ -30,7 +29,7 @@ Throughout the **Workforce Bootcamp - First Cloud AI Journey** internship, I had
 
 ---
 
-### [Event 3 - AWS for Software & Financial Services Companies Day](4.3-Event3/)
+### [Event 3 AWS for Software & Financial Services Companies Day](4.3-Event3/)
 &emsp;**Event Name:** AWS for Software & Financial Services Companies Day
 
 &emsp;**Time:** 08/10/2026, 09:00–18:00 (UTC+7)
@@ -43,7 +42,7 @@ Throughout the **Workforce Bootcamp - First Cloud AI Journey** internship, I had
 
 ---
 
-### [Event 4 - Fireside Chat with Dr. Werner](4.4-Event4/)
+### [Event 4 Fireside Chat with Dr. Werner](4.4-Event4/)
 
 **Date:** October 2, 2026, 08:30–12:00.
 

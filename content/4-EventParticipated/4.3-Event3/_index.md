@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Reflection on AWS for Software & Financial Services Companies Day
+## Reflection on AWS for Software & Financial Services Companies Day
 
 ### 1. Event information
 
@@ -35,11 +35,11 @@ The most useful principle for me is to use deterministic code for calculations, 
 
 **Building High-Quality Data Products for AI Agents**, presented by **Binh Tran, Senior Solutions Architect, AWS**, describes five attributes: trusted, contextual, traceable, governed and operational.
 
-A spending example illustrates how a plausible total can be wrong if reversals and chargebacks are omitted. An agent may then turn that data error into an incorrect credit-limit action. This makes source and pipeline validation essential.
+A spending example illustrates how a plausible total can be wrong if refunds and reversals are omitted. An agent may then turn that data error into an incorrect credit-limit action. This makes source and pipeline validation essential.
 
-A data contract specifies ownership, schema, metric definitions, quality rules, freshness, versions and access. Defining `net_spend` explicitly prevents consumers from interpreting the same field differently. The comparison between vector and graph retrieval also shows that relevant answers can depend on business relationships beyond textual similarity.
+A data contract specifies ownership, schema, metric definitions, quality rules, freshness, versions and access. Define `net_spend` as settled spending minus refunds and reversals so consumers interpret the field consistently. The comparison between vector and graph retrieval also shows that relevant answers can depend on business relationships beyond textual similarity.
 
-For write-back, slide 57 lists narrow tools, external hard limits, human approval for high-impact changes, safe retries and traced writes. Its 15% limit is an illustrative business rule, not a universal threshold. My takeaway is to treat data as a maintained product whose correctness and permitted use can be explained.
+For write-back, the slides list narrow tools, external hard limits, human approval for high-impact changes, safe retries and traced writes. Its 15% limit is an illustrative business rule, not a universal threshold. My takeaway is to treat data as a maintained product whose correctness and permitted use can be explained.
 
 #### 3.3. Migration requires planning and verification
 
@@ -49,7 +49,7 @@ Rehosting on EC2, moving to containers and refactoring onto managed services inv
 
 The presented approach uses AWS Transform for assessment and transformation workflows, Kiro as a conversational interface connected through MCP, and AgentCore agents for coordination tasks such as change requests and status updates. People retain responsibility for goals and approvals.
 
-The FPT Retail and MoMo examples on slide 88 link generated code or infrastructure to build, test and security checks. Their reported outcomes apply to those cases; they are not guarantees for another project. At my internship level, I can first apply dependency mapping, incremental changes, validation and recovery planning.
+The FPT Retail and MoMo examples in the slides link generated code or infrastructure to build, test and security checks. Their reported outcomes apply to those cases; they are not guarantees for another project. At my internship level, I can first apply dependency mapping, incremental changes, validation and recovery planning.
 
 #### 3.4. Developing from a specification with Kiro
 
