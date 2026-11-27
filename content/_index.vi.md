@@ -17,11 +17,13 @@ chapter: false
 
 &emsp; **Ngành:** Công nghệ thông tin
 
-&emsp; **Lớp:** 2302700162
+&emsp; **Lớp:** IT2307V
+
+&emsp; **Mã số sinh viên:** 2302700162
 
 &emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Viet Nam
 
-&emsp; **Vị trí thực tập:** Workforce Bootcamp First Cloud AI Journey
+&emsp; **Vị trí thực tập:** Cloud AI Intern
 
 &emsp; **Thời gian thực tập:** Từ ngày 12/08/2026 đến ngày 12/12/2026
 

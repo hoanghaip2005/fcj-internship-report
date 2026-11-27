@@ -19,11 +19,13 @@ chapter: false
 
 &emsp; **Major:** Information Technology
 
-&emsp; **Class:** 2302700162
+&emsp; **Class:** IT2307V
+
+&emsp; **Student ID:** 2302700162
 
 &emsp; **Internship Company:** Amazon Web Services Viet Nam Company Limited
 
-&emsp; **Internship Position:** Workforce Bootcamp - First Cloud AI Journey
+&emsp; **Internship Position:** Cloud AI Intern
 
 &emsp; **Internship Duration:** From 12/08/2026 to 12/12/2026
 
