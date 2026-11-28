@@ -162,3 +162,18 @@ DynamoDB → Tables → Create table → tên flashrush-manual-campaigns, partit
 ```
 
 REPLACE_* là placeholder phải thay trước khi lưu; ví dụ format 2026-12-01T01:00:00Z, không phải lịch cố định. Đặt saleStartsAt/saleEndsAt của product cùng khoảng. Giá và stock dùng DynamoDB Number. Tạo fixture test thì thêm ID vào campaign. API/Worker cần CAMPAIGNS_TABLE và quyền theo mục IAM. Ảnh chỉ hai bảng là ảnh lịch sử.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+DynamoDB → Create table, On-demand, encryption bật; chờ ACTIVE. Tạo thêm hai bảng ngoài Products/Orders/Campaigns:
+
+| Tên manual | Partition key | Sort key |
+|---|---|---|
+| flashrush-manual-customers | userId (String) | recordId (String) |
+| flashrush-manual-business | id (String) | không |
+
+Không seed record customer giả để vượt Cognito, không lưu password/token. API tự tạo profile/cart/history và voucher wallet record theo người xác thực. Business chứa voucher, redemption và movement; không sửa usedCount/stock bằng tay khi còn đơn đang xử lý. Chỉ seed voucher qua admin hoặc quy trình owner duyệt. Ghi screenshot key schema/ACTIVE, không chụp dữ liệu cá nhân của Users.

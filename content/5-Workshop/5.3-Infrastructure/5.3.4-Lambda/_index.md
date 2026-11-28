@@ -142,3 +142,26 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 30](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-30.png)
 
 *Figure 30. Historical Console evidence; verify the saved configuration against the steps above.*
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+Both API and Worker packages must include app.py, business.py, customer.py, monitoring.py and vouchers.py at package root from one reviewed revision. Handlers remain app.api/app.worker. Configure both functions from the manual inventory:
+
+```dotenv
+PRODUCTS_TABLE=flashrush-manual-products
+ORDERS_TABLE=flashrush-manual-orders
+CAMPAIGNS_TABLE=flashrush-manual-campaigns
+CUSTOMERS_TABLE=flashrush-manual-customers
+BUSINESS_TABLE=flashrush-manual-business
+QUEUE_URL=YOUR_MANUAL_MAIN_QUEUE_URL
+USER_POOL_ID=YOUR_MANUAL_POOL_ID
+USER_POOL_CLIENT_ID=YOUR_MANUAL_PUBLIC_CLIENT_ID
+CUSTOMER_CLIENT_ID=YOUR_MANUAL_PUBLIC_CLIENT_ID
+CUSTOMER_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/YOUR_MANUAL_POOL_ID
+```
+
+API also needs MONITORING_API_FUNCTION, MONITORING_WORKER_FUNCTION, MONITORING_QUEUE_NAME, MONITORING_DLQ_NAME and MONITORING_ALARM_NAMES for the manual namespace. Environment names do not grant IAM permissions. Do not enable legacy API-key bypass to avoid JWT, or place secrets in VITE variables. Retain SQS partial batch failures and visibility settings.

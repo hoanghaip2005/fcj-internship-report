@@ -1,5 +1,5 @@
 ---
-title: "5.3 Hạ tầng AWS: 9 dịch vụ"
+title: "5.3 Hạ tầng AWS: 10 dịch vụ"
 weight: 3
 draft: false
 ---
@@ -10,7 +10,7 @@ draft: false
 
 | Bài | Dịch vụ | Tài nguyên/chức năng | Hướng dẫn |
 |---|---|---|---|
-| 5.3.1 | **Amazon DynamoDB** | Hai bảng Products và Orders, tạo dữ liệu sản phẩm | [Thực hành 5.3.1]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.1-DynamoDB/" >}}) |
+| 5.3.1 | **Amazon DynamoDB** | Năm bảng Products/Orders/Campaigns/Customers/Business cho project đầy đủ | [Thực hành 5.3.1]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.1-DynamoDB/" >}}) |
 | 5.3.2 | **Amazon SQS** | Standard Queue, DLQ, redrive policy | [Thực hành 5.3.2]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.2-SQS/" >}}) |
 | 5.3.3 | **AWS IAM** | Hai execution roles và quyền truy cập tối thiểu | [Thực hành 5.3.3]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.3-IAM/" >}}) |
 | 5.3.4 | **AWS Lambda** | Order API, Order Worker và SQS trigger | [Thực hành 5.3.4]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.4-Lambda/" >}}) |
@@ -19,6 +19,7 @@ draft: false
 | 5.3.7 | **Amazon CloudFront** | OAC, HTTPS, bucket policy và SPA Function | [Thực hành 5.3.7]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.7-CloudFront/" >}}) |
 | 5.3.8 | **Amazon SNS** | Topic và email subscription | [Thực hành 5.3.8]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.8-SNS/" >}}) |
 | 5.3.9 | **Amazon CloudWatch** | Logs, metrics và alarms | [Thực hành 5.3.9]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.9-CloudWatch/" >}}) |
+| 5.3.10 | **Amazon Cognito** | User Pool, app client, groups, JWT authorizer, feature extensions | [Thực hành Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}) |
 
 ## Checklist trước khi bắt đầu
 
@@ -34,12 +35,12 @@ draft: false
 
 | Dịch vụ | Nội dung đối chiếu | Tên ảnh gợi ý |
 |---|---|---|
-| DynamoDB | Hai bảng ACTIVE và kiểu khóa | `5.3-01-dynamodb-tables.png` |
+| DynamoDB | Ba bảng ACTIVE và kiểu khóa | `5.3-01-dynamodb-tables.png` |
 | SQS | Main Queue, DLQ, redrive policy | `5.3-02-sqs-dlq.png` |
 | IAM | Hai execution roles và quyền theo ARN | `5.3-03-iam-roles.png` |
 | Lambda | API/Worker, handler và environment | `5.3-04-lambda-config.png` |
 | Lambda/SQS | Event source mapping Enabled | `5.3-05-sqs-trigger.png` |
-| API Gateway | Bốn routes, `$default`, CORS | `5.3-06-http-api.png` |
+| API Gateway | Public routes guest + JWT routes mở rộng, `$default`, CORS | `5.3-06-http-api.png` |
 | S3 | Bucket private, Block Public Access | `5.3-07-private-s3.png` |
 | CloudFront | Distribution, OAC, Function LIVE | `5.3-08-cloudfront-oac.png` |
 | SNS | Subscription Confirmed | `5.3-09-sns-subscription.png` |
@@ -47,8 +48,10 @@ draft: false
 
 Ảnh từ tài liệu thực hành đã được bổ sung ở từng bài dịch vụ. Các cấu hình chưa xuất hiện đầy đủ trong ảnh vẫn cần được xác minh trực tiếp.
 
-**Checkpoint cuối 5.3:** Các resource có tên `flashrush-manual-*` tồn tại đúng tài khoản/vùng; hai Lambda hoạt động với API Lambda Test; API Gateway GET `/products` trả JSON; chưa bắt buộc frontend xuất hiện.
+**Checkpoint cuối 5.3:** Các resource có tên `flashrush-manual-*` tồn tại đúng tài khoản/vùng; hai Lambda hoạt động và Cognito extension đã được đối chiếu với API Lambda Test; API Gateway GET `/products` trả JSON; chưa bắt buộc frontend xuất hiện.
 
 ---
 
 [← 5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) · [5.4 Triển khai ứng dụng →]({{< relref "/5-Workshop/5.4-Application-deployment/" >}})
+
+**Thứ tự phụ thuộc phần đầy đủ:** DynamoDB/SQS → Cognito pool/client/groups (5.3.10) → IAM → Lambda → API/JWT → S3/CloudFront → SNS/CloudWatch → kiểm thử. Cognito đánh số thứ 10 nhưng phải hoàn tất trước tích hợp Lambda/API.

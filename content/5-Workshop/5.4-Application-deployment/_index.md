@@ -37,3 +37,23 @@ These Remove-Item commands only clear process environment variables, not files. 
 S3 Console → bucket → Upload contents of dist at bucket root: assets/images first, index last; check MIME types and encryption. Keep a backup of previous overwritten objects and old hashed assets. CloudFront → Invalidations → /* → wait Completed. Add exact domain to API CORS, Save.
 
 Visit CloudFront home, product, Buy now while signed out, /checkout and /orders. Network must show the chosen HTTP API, not mock/local endpoints. Refresh deep links; test a missing .js returns error; direct S3 stays private. Check stock/order in Console after an authorized test. Do not claim customer cart/voucher/admin support from the guest deployment. Changing API URL requires a rebuild. Roll back using backed-up build objects, index last, followed by invalidation.
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+A full-feature frontend requires the Cognito public client from the **same target** as its API:
+
+```dotenv
+VITE_ORDER_MODE=http
+VITE_API_BASE_URL=https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com
+VITE_COGNITO_REGION=us-east-1
+VITE_COGNITO_CLIENT_ID=YOUR_PUBLIC_CLIENT_ID
+VITE_DEMO_SERVICE_ERROR=false
+```
+
+Never put client secrets, passwords or access tokens in frontend environment variables. Rebuild after API/client changes. Run npm ci, lint, tests and build; do not upload .env files. Customers/staff share /auth; server /auth/me roles route owner/manager/support to /admin, warehouse to inventory and customers to /account. APIs still enforce endpoint permissions.
+
+Current main-push automation publishes **lab frontend only** after checks. It does not provision infrastructure or deploy backend. A separate manual group's bucket is not updated by that workflow. Release compatible backend before dependent frontend, and record commits/artifacts; successful UI deployment does not prove migrations or schema setup.

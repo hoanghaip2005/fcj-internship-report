@@ -37,3 +37,21 @@ For metric→alarm→SNS: with permission send one tagged notification-only mess
 If PENDING exceeds a reference 300 seconds, inspect enqueueState/attempts/lease, trigger Enabled, IAM, queue, DLQ and logs. This threshold is operational guidance, not a business SLA. Retry only original intent/key; do not edit stock/status or send arbitrary messages. DLQ does not auto-fail orders. No automatic reconciliation scheduler is provisioned by this track.
 
 Acceptance requires six public routes, three tables, five Lambda modules/four env vars, trigger partial failure, confirmed subscription, correct alarm dimensions, one verified confirmed purchase/replay and recorded alert result. Use the test evidence checklist. Historical 100-order reports do not prove the current deployment.
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+## Additional feature acceptance
+
+Start read-only: public products/campaigns 200, anonymous protected profile 401, correct JWT scope and CORS. Login/logout changes authentication sessions; purchases change data. Use owner-approved accounts and isolated fixtures.
+
+- Verified customer signs in at /auth and reaches /account; profile/cart/history remain owner-private.
+- Owner uses the same form and reaches /admin. Warehouse cannot edit products/campaigns, support cannot manage staff and customers cannot write admin endpoints.
+- Add cart, quote vouchers, checkout with exact same key/payload on retry; compare server subtotal/discount/net and saved order.
+- Last voucher use: competing intents consume at most one redemption; failed orders do not consume quota/stock and replay does not decrement again.
+- Logout clears both customer/staff sessions; monitoring uses actual CloudWatch source/region and does not fabricate zeros for missing data.
+
+Do not send registration/invitation email or create real orders merely for screenshots without an approved scope. Capture redacted evidence with commit/time/namespace and expected/actual.

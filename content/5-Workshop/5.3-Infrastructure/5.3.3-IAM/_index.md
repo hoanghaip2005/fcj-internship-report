@@ -90,3 +90,13 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 18](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/update-010.png)
 
 *Figure 18. Historical Console evidence; verify the saved configuration against the steps above.*
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+Use the [complete API policy](/downloads/flashrush-extended/api-role-policy.json) and [complete Worker policy](/downloads/flashrush-extended/worker-role-policy.json), replacing YOUR_AWS_ACCOUNT_ID and YOUR_USER_POOL_ID before saving. These policies target manual resources, not stack-managed lab roles.
+
+API needs Customers Query/Get/Put/Update and Business Get/Put/Scan; inventory transactions require Products Update and Business Put. Staff identity/management requires scoped Cognito user/group actions for the chosen pool. Worker needs Customers Update, Business Get/Put/Update and Campaigns ConditionCheckItem. Monitoring requires CloudWatch GetMetricData (no individual resource ARN restriction for this action) plus prefix-scoped DescribeAlarms. Human IAM provisioning permissions differ from runtime permissions. A JWT scope does not replace backend RBAC.

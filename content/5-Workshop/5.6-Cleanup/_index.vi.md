@@ -66,3 +66,15 @@ Không dùng **Delete CloudFormation stack**: bộ manual được tạo bằng 
 - [ ] Billing/Cost Explorer được kiểm tra sau độ trễ cập nhật.
 
 [Quay lại mục kiểm thử và giám sát]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}})
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+## Cleanup phần mở rộng Cognito
+
+Đây là hướng dẫn xóa cho **manual rebuild được duyệt**, không thực hiện trong lần cập nhật tài liệu. Bổ sung Customers/Business, Cognito pool/client/groups, JWT authorizer và log liên quan vào inventory trước demo. Lưu dữ liệu cần giữ, dừng UI/test và giải quyết PENDING trước khi xóa. Khi API đã dừng, xóa route/authorizer/API, Lambda, mapping, queues và các bảng theo phụ thuộc; xóa Cognito app client/pool chỉ sau khi xác nhận không còn frontend/ứng dụng khác dùng chung.
+
+Xóa User Pool làm mất user/group và không phải thao tác có thể khôi phục thông thường. Không xóa pool lab `us-east-1_mIpzTH61t`, IAM users hoặc dữ liệu nhóm khác. Xác minh owner, sao lưu và có duyệt trước thao tác phá hủy. Gỡ CI target/role riêng nếu chủ tài khoản yêu cầu; không vô hiệu hóa pipeline nhóm khác. COST cần cộng Cognito MAU theo loại tài khoản/Free Tier, hai bảng mới và log/requests mới; dùng estimate thực tế, không suy từ con số guest cũ.

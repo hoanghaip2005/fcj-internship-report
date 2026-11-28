@@ -197,3 +197,67 @@ Tiếp bước 11: http://127.0.0.1:5173 đang nằm trong ô nhập; phải nh�
 *Hình 5.3.5.21. UI có đơn mã demo-* “Đã xác nhận”; Network hiện document orders status 200.*
 
 > **Baseline hiện tại:** tạo đủ 6 public routes gồm GET /products, GET /products/{productId}, GET /campaigns, GET /campaigns/{campaignId}, POST /orders và GET /orders/{orderId}. Ảnh cũ có bốn route không chứng minh đã cấu hình Campaigns. Track guest không tạo route admin hoặc /me; không bật JWT cho guest routes.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+Tạo JWT authorizer theo 5.3.10: issuer pool, audience public client, identity source `$request.header.Authorization`. Các route JWT bắt buộc scope `aws.cognito.signin.user.admin`. Đây là scope chuẩn để dùng access token của Cognito; **không có nghĩa mọi khách là admin**. Backend đọc live group membership và kiểm tra role từng endpoint.
+
+Sau khi chọn Authorizer → gắn vào từng route JWT → Save/Deploy. Payload integration 2.0, đúng Lambda API. CORS: đúng origin CloudFront và headers `content-type`, `authorization`, `idempotency-key`, `x-order-token`; methods GET, POST, PUT, PATCH, DELETE, OPTIONS. Không dùng token để gán vào route NONE rồi coi là protected.
+
+Bảng sau là route inventory đọc từ lab ngày 28/11, dùng làm mẫu tạo tên/path tương ứng trên manual; không phải bằng chứng manual đã tạo:
+
+| Method | Path | Authorization |
+|---|---|---|
+| DELETE | `/admin/campaigns/{campaignId}` | JWT |
+| GET | `/admin/customers` | JWT |
+| GET | `/admin/inventory` | JWT |
+| GET | `/admin/inventory/movements` | JWT |
+| GET | `/admin/monitoring` | JWT |
+| GET | `/admin/orders` | JWT |
+| GET | `/admin/overview` | JWT |
+| GET | `/admin/users` | JWT |
+| GET | `/admin/vouchers` | JWT |
+| GET | `/auth/me` | JWT |
+| GET | `/campaigns` | NONE |
+| GET | `/campaigns/{campaignId}` | NONE |
+| GET | `/me/cart` | JWT |
+| GET | `/me/checkout-quote` | JWT |
+| GET | `/me/checkouts/{checkoutId}` | JWT |
+| GET | `/me/orders` | JWT |
+| GET | `/me/orders/{orderId}` | JWT |
+| GET | `/me/profile` | JWT |
+| GET | `/me/vouchers` | JWT |
+| GET | `/orders/{orderId}` | NONE |
+| GET | `/products` | NONE |
+| GET | `/products/{productId}` | NONE |
+| PATCH | `/admin/campaigns/{campaignId}` | JWT |
+| PATCH | `/admin/customers` | JWT |
+| PATCH | `/admin/products/{productId}` | JWT |
+| PATCH | `/admin/users` | JWT |
+| PATCH | `/admin/vouchers` | JWT |
+| POST | `/admin/campaigns` | JWT |
+| POST | `/admin/inventory/adjustments` | JWT |
+| POST | `/admin/products` | JWT |
+| POST | `/admin/users` | JWT |
+| POST | `/admin/vouchers` | JWT |
+| POST | `/auth/confirm` | NONE |
+| POST | `/auth/forgot-password` | NONE |
+| POST | `/auth/login` | NONE |
+| POST | `/auth/logout` | JWT |
+| POST | `/auth/new-password` | NONE |
+| POST | `/auth/register` | NONE |
+| POST | `/auth/reset-password` | NONE |
+| POST | `/me/checkout-quote` | JWT |
+| POST | `/me/checkouts` | JWT |
+| POST | `/me/vouchers` | JWT |
+| POST | `/me/vouchers/quote` | JWT |
+| POST | `/me/vouchers/save` | JWT |
+| POST | `/orders` | NONE |
+| PUT | `/me/cart` | JWT |
+| PUT | `/me/profile` | JWT |
+
+Anonymous route protected phải 401; customer thiếu role admin phải 403. Nút ẩn trong frontend không phải kiểm soát truy cập. Không dùng AWS_IAM cho browser bearer nếu không có SigV4 signing path.

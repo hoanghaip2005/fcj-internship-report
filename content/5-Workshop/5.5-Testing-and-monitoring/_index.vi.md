@@ -272,3 +272,22 @@ Ghi lại mã sản phẩm và số lượng tồn trước/sau, `orderId`, tr�
 Mẫu ghi nhận: thời gian UTC, namespace/account/region, ca kiểm thử, stock trước/sau, orderId, HTTP/status, log xác nhận, PASS/FAIL/chưa chạy. Lưu riêng token; không đưa vào báo cáo công khai.
 
 > Mỗi fixture mới phải được thêm vào productIds của chiến dịch đang hiệu lực, maxQtyPerOrder=1; chỉ tạo Products mà không có Campaigns sẽ bị từ chối. Bài test tuần tự không chứng minh tải đồng thời.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+## Bổ sung nghiệm thu feature
+
+Chỉ đọc trước: anonymous products/campaigns 200, protected `/me/profile` 401; JWT route/scope/CORS đúng. Test có login/logout làm thay đổi phiên xác thực, test mua làm thay đổi dữ liệu: dùng tài khoản/fixture được owner duyệt.
+
+- Khách xác minh email → `/auth` → `/account`; profile/cart/history chỉ của chủ tài khoản.
+- Owner login cùng màn → `/admin`; warehouse không sửa campaign/product, support không quản lý user, customer không ghi admin.
+- Thêm cart, quote voucher, checkout cùng key/payload khi retry; đối chiếu subtotal/discount/net tại server và order.
+- Với voucher quota cuối: hai intent cạnh tranh tối đa một redemption; stock/usedCount không đổi nếu đơn thất bại; replay không trừ thêm.
+- Đăng xuất xóa cả phiên khách/staff; không để session còn quyền ở cửa sổ vừa đăng xuất.
+- Monitoring hiển thị source CloudWatch và đúng region; thiếu datapoint không gọi là 0.
+
+Không gửi email đăng ký/invite hoặc tạo đơn thật chỉ để chụp ảnh khi chưa có phạm vi duyệt. Lưu ảnh màn hình đã che thông tin nhạy cảm cùng commit/time/namespace và expected/actual.

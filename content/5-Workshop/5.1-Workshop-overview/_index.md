@@ -44,3 +44,13 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 1](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
 
 *Figure 1. Historical Console evidence; verify the saved configuration against the steps above.*
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+The full project uses ten services: the nine serverless services plus Cognito. Five DynamoDB tables are Products, Orders, Campaigns, Customers (userId+recordId) and Business (id). Cognito authenticates customers/staff; Gateway JWT and backend RBAC enforce access. Customers stores profile/cart/history; Business stores vouchers/redemption and stock adjustments. Worker transactions protect stock, checkout state and redemption. Client-supplied role fields never grant access.
+
+The student must update the older two-table/guest architecture with Cognito/JWT/Customers/Business; a generated replacement image is not setup evidence.

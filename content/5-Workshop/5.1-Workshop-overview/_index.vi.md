@@ -70,3 +70,13 @@ Sơ đồ v1.1 đi kèm vẫn mang nhãn thiết kế đề xuất. Khi thực h
 - Worker xử lý lỗi kỹ thuật bằng partial batch failure. Không tự chuyển `FAILED`; DLQ không đồng nghĩa đơn thất bại nghiệp vụ.
 - S3 private/OAC, SPA Function, ba alarms là cấu hình đã có trong implementation; ảnh đề xuất không chứng minh trạng thái AWS hiện tại.
 - Source có backend quản trị/monitoring/Cognito; không mô tả các tính năng đó là mock. Guest workshop chưa provision Cognito/Customers/Business; chỉ nghiệm thu sáu route công khai và quan sát CloudWatch trên Console.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+Project đầy đủ dùng 10 dịch vụ: 9 dịch vụ serverless cơ bản và Cognito. Năm bảng DynamoDB gồm Products, Orders, Campaigns, Customers (userId+recordId), Business (id). Cognito xác thực khách/nhân viên; API Gateway JWT và backend RBAC kiểm tra quyền. Giỏ, profile và history dùng Customers; voucher/redemption và lịch sử điều chỉnh kho dùng Business. Worker cập nhật tồn kho, trạng thái checkout và redemption trong transaction; không dựa vào role client tự gửi.
+
+Sơ đồ cũ hai bảng/guest cần được người vẽ cập nhật Cognito, JWT, Customers và Business. Không thay ảnh cũ bằng hình tổng hợp rồi gọi đó là bằng chứng setup.

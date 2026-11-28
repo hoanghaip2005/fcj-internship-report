@@ -142,3 +142,13 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 29](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-029.png)
 
 *Figure 29. Historical Console evidence; verify the saved configuration against the steps above.*
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+SPA rewrite must cover /auth, /staff/login, /cart, /cart/checkout, /account/* and /admin/* in addition to products/orders/checkout. Publish LIVE and associate Viewer request; saving alone is insufficient. Keep missing assets as errors. /staff/login now redirects in React to /auth?next=/admin, with no separate admin login view.
+
+Publish assets before index, invalidate /* and wait Completed. Verify home/auth/account/orders/admin/cart-checkout receive the new index. HTTP 200 only proves SPA serving, not authentication. API CORS must match the released domain.

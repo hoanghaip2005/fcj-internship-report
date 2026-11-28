@@ -1,0 +1,102 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Scan"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-products",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-orders",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-campaigns",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-customers",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-business"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-products",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-orders",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-campaigns",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-customers",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-business"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-products",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-orders",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-customers",
+        "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-business"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-campaigns"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:Query"
+      ],
+      "Resource": "arn:aws:dynamodb:us-east-1:YOUR_AWS_ACCOUNT_ID:table/flashrush-manual-customers"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:SendMessage"
+      ],
+      "Resource": "arn:aws:sqs:us-east-1:YOUR_AWS_ACCOUNT_ID:flashrush-manual-orders"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:ListUsers",
+        "cognito-idp:AdminGetUser",
+        "cognito-idp:AdminListGroupsForUser",
+        "cognito-idp:AdminCreateUser",
+        "cognito-idp:AdminAddUserToGroup",
+        "cognito-idp:AdminRemoveUserFromGroup",
+        "cognito-idp:AdminEnableUser",
+        "cognito-idp:AdminDisableUser",
+        "cognito-idp:AdminUpdateUserAttributes"
+      ],
+      "Resource": "arn:aws:cognito-idp:us-east-1:YOUR_AWS_ACCOUNT_ID:userpool/YOUR_USER_POOL_ID"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:GetMetricData"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:DescribeAlarms"
+      ],
+      "Resource": "arn:aws:cloudwatch:us-east-1:YOUR_AWS_ACCOUNT_ID:alarm:flashrush-manual-*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:YOUR_AWS_ACCOUNT_ID:log-group:/aws/lambda/flashrush-manual-api:*"
+    }
+  ]
+}

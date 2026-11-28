@@ -94,3 +94,18 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 17](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/update-005.png)
 
 *Figure 17. Historical Console evidence; verify the saved configuration against the steps above.*
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+Console → DynamoDB → Create table, on-demand and encryption, then wait ACTIVE. In addition to Products/Orders/Campaigns create:
+
+| Manual table | Partition key | Sort key |
+|---|---|---|
+| flashrush-manual-customers | userId (String) | recordId (String) |
+| flashrush-manual-business | id (String) | none |
+
+Do not forge customer records to bypass Cognito or store passwords/tokens. API writes authenticated profile/cart/history/wallet data. Business contains vouchers, redemptions and movements; never edit usedCount/stock manually while orders are pending. Seed vouchers only through approved admin operations. Capture ACTIVE/key schemas without personal records.

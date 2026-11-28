@@ -30,3 +30,13 @@ Use flashrush-manual-products/orders/campaigns tables; flashrush-manual-orders/d
 Both functions require app.py, business.py, customer.py, monitoring.py and vouchers.py at the ZIP/editor root from this revision. Dependencies must not be taken from another revision. Guest baseline requires PRODUCTS_TABLE, ORDERS_TABLE, CAMPAIGNS_TABLE and QUEUE_URL. Do not provision Cognito/Customers/Business unless following a separate extension guide.
 
 Operator permissions include the nine services and IAM role creation/PassRole; execution policies are narrower. Check permission boundaries/SCPs with the owner, not by granting unrestricted policies to runtime roles. Cost notifications are not spending caps. Record resources for cleanup.
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+Pin frontend unified-login source at commit `a870b73`; record its full SHA with git rev-parse. Read release notes: scoped lab releases do not imply every deployed module equals main.
+
+Add UserPoolId, UserPoolClientId, JWT authorizer ID, CustomersTable and BusinessTable to inventory. Never hardcode the reference lab IDs into a manual rebuild. Dependency order: DynamoDB/SQS → Cognito pool/client/groups (5.3.10 steps 1–6) → IAM → Lambda → API/JWT → S3/CloudFront → SNS/CloudWatch → tests. Cognito is numbered 5.3.10 as an added service but must exist before integration.

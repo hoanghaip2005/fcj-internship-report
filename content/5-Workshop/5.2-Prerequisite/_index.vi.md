@@ -84,3 +84,13 @@ Hai Test-Path phải True. Thư mục bên trong là application root; không fl
 Chạy Node.js 22.12+ và npm ci theo package-lock. Python 3.12 là runtime Lambda. Git/Node chỉ dùng lấy source/build; hạ tầng vẫn tạo trên AWS Console. Source cần ba bảng Products/Orders/Campaigns, sáu public routes và đủ module Lambda. Không tạo Cognito/Customers/Business cho bài guest; muốn trình diễn đăng nhập/voucher/admin phải dùng một hướng dẫn mở rộng riêng.
 
 Tên tài nguyên cùng prefix flashrush-manual. Nếu dùng account chung, thống nhất namespace với owner trước khi tạo. Không chạy scripts/deploy/deploy.py hoặc xóa stack để thay cho các bước Console.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+Chốt source tại commit `a870b73` cho frontend đăng nhập chung và các module hiện tại; dùng full SHA từ git rev-parse để bàn giao. Đọc release notes: deployment lab có các scoped release, không mặc định mọi module trên AWS bằng main.
+
+Inventory đầy đủ cần thêm: UserPoolId, UserPoolClientId, JWT authorizer ID, CustomersTable, BusinessTable. Không hardcode ID lab vào bản dựng manual. Thứ tự: DynamoDB/SQS → tạo Cognito pool/client/groups (5.3.10 bước 1–6) → IAM → Lambda → API/JWT → S3/CloudFront → SNS/CloudWatch → test. Cognito được đánh số 5.3.10 theo dịch vụ bổ sung nhưng phải có trước khi tích hợp Lambda/API.

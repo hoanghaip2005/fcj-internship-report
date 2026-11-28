@@ -282,3 +282,13 @@ Kiểm tra sau khi lưu và triển khai
 Nếu bucket S3 chưa có bản build hoặc website trả HTTP 403, kiểm tra nội dung triển khai trước khi kết luận cấu hình phân phối sai. Phối hợp bước triển khai frontend: đặt nội dung bản build ở gốc bucket private, tải assets trước index.html, giữ Block Public Access bật, sau đó invalidate /* và chờ Completed.
 
 Sau khi frontend được triển khai và origin của website đã được cho phép trong API Gateway CORS, kiểm tra trang chủ HTTPS, trang sản phẩm, refresh /orders và phản hồi API trong Network → Fetch/XHR.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+SPA rewrite phải bao gồm `/auth`, `/staff/login`, `/cart`, `/cart/checkout`, `/account/*`, `/admin/*` ngoài products/orders/checkout. Publish Function LIVE và associate Viewer request; chỉ Save chưa đủ. Không rewrite missing assets thành HTML 200. `/staff/login` nay là redirect React sang `/auth?next=/admin`, không còn view admin riêng.
+
+Sau upload dist: assets trước, index cuối, invalidation `/*`, chờ Completed; kiểm tra homepage, `/auth`, `/account/orders`, `/admin`, `/cart/checkout` cùng index mới. HTTP 200 chỉ xác nhận SPA phục vụ được; login/JWT phải kiểm tra riêng. CORS origin phải trùng domain vừa phát hành.

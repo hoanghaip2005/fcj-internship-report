@@ -111,3 +111,67 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 21](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-21.png)
 
 *Figure 21. Historical Console evidence; verify the saved configuration against the steps above.*
+
+
+## Required full-project configuration — 28 November 2026
+
+Earlier guest screenshots/steps on this page are the foundation only. A full-feature rebuild must apply the configuration below and [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Do not mix the reference lab pool/client/tables with another manual deployment.
+
+
+Create the JWT authorizer from 5.3.10: pool issuer, public-client audience, identity source `$request.header.Authorization`. Protected routes require scope `aws.cognito.signin.user.admin`; this is an access-token scope, **not an admin role grant**. Backend verifies live group membership and per-endpoint roles.
+
+Attach the authorizer to each JWT route, Save/Deploy, and use payload 2.0 integration with the API Lambda. CORS: exact CloudFront origin; content-type, authorization, idempotency-key, x-order-token headers; GET/POST/PUT/PATCH/DELETE/OPTIONS methods. Sending a token to a NONE route does not make it protected.
+
+Read-only reference lab route inventory, 28 Nov 2026; reproduce equivalent paths in your approved manual target and verify them independently:
+
+| Method | Path | Authorization |
+|---|---|---|
+| DELETE | `/admin/campaigns/{campaignId}` | JWT |
+| GET | `/admin/customers` | JWT |
+| GET | `/admin/inventory` | JWT |
+| GET | `/admin/inventory/movements` | JWT |
+| GET | `/admin/monitoring` | JWT |
+| GET | `/admin/orders` | JWT |
+| GET | `/admin/overview` | JWT |
+| GET | `/admin/users` | JWT |
+| GET | `/admin/vouchers` | JWT |
+| GET | `/auth/me` | JWT |
+| GET | `/campaigns` | NONE |
+| GET | `/campaigns/{campaignId}` | NONE |
+| GET | `/me/cart` | JWT |
+| GET | `/me/checkout-quote` | JWT |
+| GET | `/me/checkouts/{checkoutId}` | JWT |
+| GET | `/me/orders` | JWT |
+| GET | `/me/orders/{orderId}` | JWT |
+| GET | `/me/profile` | JWT |
+| GET | `/me/vouchers` | JWT |
+| GET | `/orders/{orderId}` | NONE |
+| GET | `/products` | NONE |
+| GET | `/products/{productId}` | NONE |
+| PATCH | `/admin/campaigns/{campaignId}` | JWT |
+| PATCH | `/admin/customers` | JWT |
+| PATCH | `/admin/products/{productId}` | JWT |
+| PATCH | `/admin/users` | JWT |
+| PATCH | `/admin/vouchers` | JWT |
+| POST | `/admin/campaigns` | JWT |
+| POST | `/admin/inventory/adjustments` | JWT |
+| POST | `/admin/products` | JWT |
+| POST | `/admin/users` | JWT |
+| POST | `/admin/vouchers` | JWT |
+| POST | `/auth/confirm` | NONE |
+| POST | `/auth/forgot-password` | NONE |
+| POST | `/auth/login` | NONE |
+| POST | `/auth/logout` | JWT |
+| POST | `/auth/new-password` | NONE |
+| POST | `/auth/register` | NONE |
+| POST | `/auth/reset-password` | NONE |
+| POST | `/me/checkout-quote` | JWT |
+| POST | `/me/checkouts` | JWT |
+| POST | `/me/vouchers` | JWT |
+| POST | `/me/vouchers/quote` | JWT |
+| POST | `/me/vouchers/save` | JWT |
+| POST | `/orders` | NONE |
+| PUT | `/me/cart` | JWT |
+| PUT | `/me/profile` | JWT |
+
+Protected anonymous requests must return 401; customer attempts at admin writes must return 403. Hidden UI controls are not authorization. Do not require AWS_IAM from a bearer-only browser unless a deliberate SigV4 path exists.

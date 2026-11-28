@@ -1,5 +1,5 @@
 ---
-title: "5.3 Configure nine AWS services"
+title: "5.3 Configure ten AWS services"
 weight: 3
 draft: false
 ---
@@ -17,5 +17,8 @@ Create resources through AWS Console only. Complete prerequisites and verify acc
 7. [CloudFront]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.7-CloudFront/" >}})
 8. [SNS]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.8-SNS/" >}})
 9. [CloudWatch]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.9-CloudWatch/" >}})
+10. [Cognito and feature extensions]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}})
 
 Checkpoint: owned resources exist, both handlers use the correct source/modules, public GET /products returns JSON, and Campaigns contains a currently active fixture campaign. Website publication follows in 5.4. A screenshot of a form before Save is not proof of persisted configuration. Use the service pages for current settings and capture missing saved-state evidence.
+
+**Full-project dependency order:** DynamoDB/SQS → Cognito pool/client/groups (5.3.10) → IAM → Lambda → API/JWT → S3/CloudFront → SNS/CloudWatch → tests. The added service is numbered 10 but must exist before Lambda/API integration.

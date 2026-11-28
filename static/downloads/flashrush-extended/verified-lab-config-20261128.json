@@ -1,0 +1,338 @@
+{
+  "checkedAtUTC": "2026-11-28T09:11:17.785309+00:00",
+  "verification": "READ_ONLY_CONFIGURATION_NOT_SETUP_EXECUTION",
+  "target": "lab",
+  "region": "us-east-1",
+  "userPoolId": "us-east-1_mIpzTH61t",
+  "clientId": "5h7dn6hr6iub9ghat5jiir4ipg",
+  "routes": [
+    {
+      "RouteKey": "PATCH /admin/customers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /me/vouchers/save",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /me/profile",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /me/vouchers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /me/orders/{orderId}",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /me/checkout-quote",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /me/checkouts/{checkoutId}",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /admin/monitoring",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /auth/forgot-password",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "GET /admin/inventory",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /admin/vouchers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /auth/register",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "POST /admin/users",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /me/cart",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /products/{productId}",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "GET /auth/me",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /me/checkouts",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "PATCH /admin/users",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /admin/overview",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /admin/users",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "PATCH /admin/campaigns/{campaignId}",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /admin/products",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /me/checkout-quote",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /auth/login",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "POST /auth/reset-password",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "GET /me/orders",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "PATCH /admin/vouchers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /admin/campaigns",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "DELETE /admin/campaigns/{campaignId}",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /auth/logout",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /auth/confirm",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "POST /me/vouchers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /admin/inventory/movements",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /admin/inventory/adjustments",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /admin/orders",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /campaigns",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "GET /orders/{orderId}",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "POST /admin/vouchers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "PUT /me/profile",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "GET /campaigns/{campaignId}",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "GET /products",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "PATCH /admin/products/{productId}",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /orders",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "GET /admin/customers",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "POST /auth/new-password",
+      "AuthorizationType": "NONE",
+      "AuthorizationScopes": []
+    },
+    {
+      "RouteKey": "POST /me/vouchers/quote",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    },
+    {
+      "RouteKey": "PUT /me/cart",
+      "AuthorizationType": "JWT",
+      "AuthorizationScopes": [
+        "aws.cognito.signin.user.admin"
+      ]
+    }
+  ],
+  "cors": {
+    "AllowHeaders": [
+      "content-type",
+      "idempotency-key",
+      "x-order-token",
+      "x-admin-key",
+      "authorization"
+    ],
+    "AllowMethods": [
+      "GET",
+      "POST",
+      "PATCH",
+      "OPTIONS",
+      "PUT",
+      "DELETE"
+    ],
+    "AllowOrigins": [
+      "https://d1jcrzj4650vey.cloudfront.net",
+      "http://localhost:5173",
+      "http://127.0.0.1:5173"
+    ],
+    "MaxAge": 300
+  }
+}

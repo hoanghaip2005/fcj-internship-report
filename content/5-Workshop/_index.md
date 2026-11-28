@@ -16,7 +16,11 @@ Console screenshots are historical configuration evidence, not proof that every 
 
 1. [Overview]({{< relref "/5-Workshop/5.1-Workshop-overview/" >}})
 2. [Prerequisites]({{< relref "/5-Workshop/5.2-Prerequisite/" >}})
-3. [Nine AWS services]({{< relref "/5-Workshop/5.3-Infrastructure/" >}})
+3. [Ten AWS services (including Cognito)]({{< relref "/5-Workshop/5.3-Infrastructure/" >}})
 4. [Application build and publication]({{< relref "/5-Workshop/5.4-Application-deployment/" >}})
 5. [Testing and monitoring]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}})
 6. [Cleanup]({{< relref "/5-Workshop/5.6-Cleanup/" >}})
+
+## Current full-feature track
+
+Apply Cognito/Customers/Business and unified login/RBAC/cart/vouchers/real monitoring through [5.3.10]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}) and each service page's required full-project section. Legacy guest instructions alone do not configure the full project. Historical screenshots cover nine core services; Cognito screenshots await an authenticated Console session. [Evidence status]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}}).

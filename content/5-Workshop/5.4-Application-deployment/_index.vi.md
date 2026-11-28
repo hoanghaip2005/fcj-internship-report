@@ -119,3 +119,23 @@ Dùng application root ở commit đã khóa trong 5.2. Không dùng ZIP/snapsho
 Trong .env.local không cấu hình VITE_COGNITO_CLIENT_ID hoặc VITE_COGNITO_REGION của môi trường khác. Bỏ hai biến đó khỏi môi trường terminal trước build nếu đã có. Build mới khi đổi endpoint; không upload .env hoặc secrets lên S3.
 
 Khi upload lại: lưu dist cũ để rollback, upload assets trước và index cuối, kiểm tra hash/tên file và MIME, invalidate `/*`, chờ Completed. Không xóa assets cũ khi trình duyệt còn có thể giữ index cũ. Rollback bằng bộ dist đã lưu, upload theo cùng thứ tự rồi invalidate.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+Full-feature build cần Cognito public client của **cùng môi trường** với API:
+
+```dotenv
+VITE_ORDER_MODE=http
+VITE_API_BASE_URL=https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com
+VITE_COGNITO_REGION=us-east-1
+VITE_COGNITO_CLIENT_ID=YOUR_PUBLIC_CLIENT_ID
+VITE_DEMO_SERVICE_ERROR=false
+```
+
+Pool ID thuộc backend; không đặt client secret, password hoặc access token trong .env frontend. Đổi API/client thì build lại. `npm ci`, lint, test rồi build; không upload file .env. Đăng nhập khách/admin ở `/auth`; role check `/auth/me` quyết định `/admin` (owner/manager/support), `/admin/inventory` (warehouse) hoặc `/account` (khách). Phân quyền chi tiết vẫn do API thực thi.
+
+CI/CD hiện auto phát hành **frontend lab** sau push main/checks, không tự provision hạ tầng hay deploy backend. Nhóm manual dùng Console riêng không được mặc định pipeline sẽ cập nhật bucket của mình. Backend phải tương thích trước frontend phụ thuộc API mới. Ghi commit/artifact mỗi lần bàn giao; không dùng log pipeline thành công để kết luận dữ liệu hay schema đã được migrate.

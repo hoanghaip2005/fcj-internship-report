@@ -204,3 +204,13 @@ Sau đó đối chiếu Configuration → Permissions của từng Lambda để 
 ## Quyền Campaigns của baseline hiện tại
 
 API cần dynamodb:GetItem và dynamodb:Scan; Worker cần dynamodb:GetItem, dynamodb:Scan và dynamodb:ConditionCheckItem trên ARN bảng flashrush-manual-campaigns. Giữ các quyền Products/Orders/SQS/logs theo nhiệm vụ. Cấu hình biến môi trường theo mục Lambda; tham khảo [API policy](/downloads/flashrush-console/api-policy.json) và [Worker policy](/downloads/flashrush-console/worker-policy.json). Không gắn AdministratorAccess cho runtime role.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+Dùng [API role policy đầy đủ](/downloads/flashrush-extended/api-role-policy.json) và [Worker role policy đầy đủ](/downloads/flashrush-extended/worker-role-policy.json). Thay YOUR_AWS_ACCOUNT_ID và YOUR_USER_POOL_ID trước khi lưu. Policies này dành cho namespace manual, không dán lên role lab đang do stack quản lý.
+
+API cần Customers Query/Get/Put/Update và Business Get/Put/Scan; admin inventory transaction cần Products Update và Business Put. Staff identity/management cần các Cognito AdminGetUser, AdminListGroupsForUser và quyền quản lý user/group theo pool; không cấp Cognito * trên mọi pool. Worker cần Customers Update, Business Get/Put/Update để checkout/voucher, Campaigns ConditionCheckItem. Monitoring cần CloudWatch GetMetricData (action không hỗ trợ resource ARN riêng) và DescribeAlarms theo prefix. Quyền gán role của người tạo IAM riêng với role runtime. JWT scope không thay thế RBAC.

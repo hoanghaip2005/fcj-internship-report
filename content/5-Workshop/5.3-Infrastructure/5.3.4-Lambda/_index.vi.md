@@ -271,3 +271,26 @@ HTTP 202 chỉ chứng minh API tiếp nhận đơn. Trigger Enabled chỉ xác 
 *Hình 5.3.4.30. Kết quả bước 20–21: thực thi thành công, HTTP 202 và Order PENDING.*
 
 > **Ảnh lịch sử:** ảnh Environment variables có ba biến là baseline cũ. Cấu hình hiện tại phải thêm CAMPAIGNS_TABLE=flashrush-manual-campaigns ở cả hai Lambda. Các module app.py import phải tồn tại; không chỉ dán một file. Đối chiếu hướng dẫn IAM và Lambda trước khi test.
+
+
+## Cấu hình mở rộng bắt buộc — cập nhật 28/11/2026
+
+Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dựng **đầy đủ project hiện tại**, áp dụng cấu hình bên dưới và [5.3.10 Cognito]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}}). Không dùng User Pool/client/bảng của lab cho bộ manual khác.
+
+
+API và Worker đều cần `app.py`, `business.py`, `customer.py`, `monitoring.py`, `vouchers.py` ở ZIP/editor root, cùng version. Hai handler vẫn `app.api` và `app.worker`. Đặt đủ các biến theo inventory manual:
+
+```dotenv
+PRODUCTS_TABLE=flashrush-manual-products
+ORDERS_TABLE=flashrush-manual-orders
+CAMPAIGNS_TABLE=flashrush-manual-campaigns
+CUSTOMERS_TABLE=flashrush-manual-customers
+BUSINESS_TABLE=flashrush-manual-business
+QUEUE_URL=YOUR_MANUAL_MAIN_QUEUE_URL
+USER_POOL_ID=YOUR_MANUAL_POOL_ID
+USER_POOL_CLIENT_ID=YOUR_MANUAL_PUBLIC_CLIENT_ID
+CUSTOMER_CLIENT_ID=YOUR_MANUAL_PUBLIC_CLIENT_ID
+CUSTOMER_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/YOUR_MANUAL_POOL_ID
+```
+
+Đối với API thêm MONITORING_API_FUNCTION, MONITORING_WORKER_FUNCTION, MONITORING_QUEUE_NAME, MONITORING_DLQ_NAME và MONITORING_ALARM_NAMES theo tên manual. Biến có tên MONITORING_* không thay thế IAM CloudWatch. Không bật legacy API-key bypass để bỏ JWT; không thêm secret vào VITE. Giữ SQS partial batch failure và visibility timeout theo bài SQS.
