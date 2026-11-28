@@ -94,3 +94,7 @@ Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dự
 Chốt source tại commit `a870b73` cho frontend đăng nhập chung và các module hiện tại; dùng full SHA từ git rev-parse để bàn giao. Đọc release notes: deployment lab có các scoped release, không mặc định mọi module trên AWS bằng main.
 
 Inventory đầy đủ cần thêm: UserPoolId, UserPoolClientId, JWT authorizer ID, CustomersTable, BusinessTable. Không hardcode ID lab vào bản dựng manual. Thứ tự: DynamoDB/SQS → tạo Cognito pool/client/groups (5.3.10 bước 1–6) → IAM → Lambda → API/JWT → S3/CloudFront → SNS/CloudWatch → test. Cognito được đánh số 5.3.10 theo dịch vụ bổ sung nhưng phải có trước khi tích hợp Lambda/API.
+
+### Cognito mapping
+
+Inventory phải ghi AccountId, Region, UserPoolId, UserPoolClientId, issuer, API URL và CloudFront origin trước tích hợp. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

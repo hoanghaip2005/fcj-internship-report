@@ -57,3 +57,7 @@ VITE_DEMO_SERVICE_ERROR=false
 Never put client secrets, passwords or access tokens in frontend environment variables. Rebuild after API/client changes. Run npm ci, lint, tests and build; do not upload .env files. Customers/staff share /auth; server /auth/me roles route owner/manager/support to /admin, warehouse to inventory and customers to /account. APIs still enforce endpoint permissions.
 
 Current main-push automation publishes **lab frontend only** after checks. It does not provision infrastructure or deploy backend. A separate manual group's bucket is not updated by that workflow. Release compatible backend before dependent frontend, and record commits/artifacts; successful UI deployment does not prove migrations or schema setup.
+
+### Cognito mapping
+
+Use the same-environment VITE_API_BASE_URL, VITE_COGNITO_CLIENT_ID and VITE_COGNITO_REGION. The shared /auth view calls /auth/me for roles. Frontend-only CI does not update Cognito, API routes or Lambda configuration. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

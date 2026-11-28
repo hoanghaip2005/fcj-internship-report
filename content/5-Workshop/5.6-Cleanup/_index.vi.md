@@ -78,3 +78,7 @@ Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dự
 Đây là hướng dẫn xóa cho **manual rebuild được duyệt**, không thực hiện trong lần cập nhật tài liệu. Bổ sung Customers/Business, Cognito pool/client/groups, JWT authorizer và log liên quan vào inventory trước demo. Lưu dữ liệu cần giữ, dừng UI/test và giải quyết PENDING trước khi xóa. Khi API đã dừng, xóa route/authorizer/API, Lambda, mapping, queues và các bảng theo phụ thuộc; xóa Cognito app client/pool chỉ sau khi xác nhận không còn frontend/ứng dụng khác dùng chung.
 
 Xóa User Pool làm mất user/group và không phải thao tác có thể khôi phục thông thường. Không xóa pool lab `us-east-1_mIpzTH61t`, IAM users hoặc dữ liệu nhóm khác. Xác minh owner, sao lưu và có duyệt trước thao tác phá hủy. Gỡ CI target/role riêng nếu chủ tài khoản yêu cầu; không vô hiệu hóa pipeline nhóm khác. COST cần cộng Cognito MAU theo loại tài khoản/Free Tier, hai bảng mới và log/requests mới; dùng estimate thực tế, không suy từ con số guest cũ.
+
+### Cognito mapping
+
+Dùng mapping inventory để tìm mọi client/authorizer/Lambda/frontend dùng pool trước khi xóa. Xóa pool không dọn DynamoDB/S3; xóa IAM user không thuộc cleanup Cognito website. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

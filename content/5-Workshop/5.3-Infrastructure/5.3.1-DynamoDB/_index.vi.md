@@ -177,3 +177,7 @@ DynamoDB → Create table, On-demand, encryption bật; chờ ACTIVE. Tạo thê
 | flashrush-manual-business | id (String) | không |
 
 Không seed record customer giả để vượt Cognito, không lưu password/token. API tự tạo profile/cart/history và voucher wallet record theo người xác thực. Business chứa voucher, redemption và movement; không sửa usedCount/stock bằng tay khi còn đơn đang xử lý. Chỉ seed voucher qua admin hoặc quy trình owner duyệt. Ghi screenshot key schema/ACTIVE, không chụp dữ liệu cá nhân của Users.
+
+### Cognito mapping
+
+Customers.userId là sub Cognito đã xác minh, không phải email. Xóa user Cognito không tự xóa dữ liệu Customers/Business. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

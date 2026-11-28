@@ -292,3 +292,7 @@ Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dự
 SPA rewrite phải bao gồm `/auth`, `/staff/login`, `/cart`, `/cart/checkout`, `/account/*`, `/admin/*` ngoài products/orders/checkout. Publish Function LIVE và associate Viewer request; chỉ Save chưa đủ. Không rewrite missing assets thành HTML 200. `/staff/login` nay là redirect React sang `/auth?next=/admin`, không còn view admin riêng.
 
 Sau upload dist: assets trước, index cuối, invalidation `/*`, chờ Completed; kiểm tra homepage, `/auth`, `/account/orders`, `/admin`, `/cart/checkout` cùng index mới. HTTP 200 chỉ xác nhận SPA phục vụ được; login/JWT phải kiểm tra riêng. CORS origin phải trùng domain vừa phát hành.
+
+### Cognito mapping
+
+SPA rewrite phải phục vụ /auth, /account, /admin; không biến lỗi API thành HTML. Domain CloudFront phải khớp CORS API. Password auth trực tiếp không cần callback hosted login. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

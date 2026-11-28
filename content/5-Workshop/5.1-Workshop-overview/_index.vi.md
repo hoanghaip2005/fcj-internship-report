@@ -80,3 +80,7 @@ Các ảnh/bước guest cũ trên trang này chỉ là nền tảng. Để dự
 Project đầy đủ dùng 10 dịch vụ: 9 dịch vụ serverless cơ bản và Cognito. Năm bảng DynamoDB gồm Products, Orders, Campaigns, Customers (userId+recordId), Business (id). Cognito xác thực khách/nhân viên; API Gateway JWT và backend RBAC kiểm tra quyền. Giỏ, profile và history dùng Customers; voucher/redemption và lịch sử điều chỉnh kho dùng Business. Worker cập nhật tồn kho, trạng thái checkout và redemption trong transaction; không dựa vào role client tự gửi.
 
 Sơ đồ cũ hai bảng/guest cần được người vẽ cập nhật Cognito, JWT, Customers và Business. Không thay ảnh cũ bằng hình tổng hợp rồi gọi đó là bằng chứng setup.
+
+### Cognito mapping
+
+Project đầy đủ: 10 dịch vụ, 5 bảng, JWT từ User Pool; không cần Identity Pool/STS. Track guest là phạm vi riêng. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

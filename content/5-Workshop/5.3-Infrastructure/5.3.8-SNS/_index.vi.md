@@ -388,3 +388,7 @@ AWS Documentation Amazon SNS: https://docs.aws.amazon.com/sns/
 AWS Documentation Sending Amazon SNS messages to an email address: https://docs.aws.amazon.com/sns/latest/dg/sns-email-notifications.html
 
 AWS Documentation Amazon CloudWatch alarm notifications: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/US_SetupSNS.html
+
+### Cognito mapping
+
+Xác nhận email SNS alarm khác xác minh email Cognito. Xác nhận một loại không thay thế loại kia hoặc cấp role ứng dụng. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

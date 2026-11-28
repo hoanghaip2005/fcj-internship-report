@@ -55,3 +55,7 @@ Start read-only: public products/campaigns 200, anonymous protected profile 401,
 - Logout clears both customer/staff sessions; monitoring uses actual CloudWatch source/region and does not fabricate zeros for missing data.
 
 Do not send registration/invitation email or create real orders merely for screenshots without an approved scope. Capture redacted evidence with commit/time/namespace and expected/actual.
+
+### Cognito mapping
+
+Separate 401 token/email/client failures from 403 role failures and 5xx IAM/config failures. Verify owner, customer and restricted staff independently; a 200 SPA deep link proves no authorization result. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

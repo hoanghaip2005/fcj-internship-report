@@ -100,3 +100,7 @@ Earlier guest screenshots/steps on this page are the foundation only. A full-fea
 Use the [complete API policy](/downloads/flashrush-extended/api-role-policy.json) and [complete Worker policy](/downloads/flashrush-extended/worker-role-policy.json), replacing YOUR_AWS_ACCOUNT_ID and YOUR_USER_POOL_ID before saving. These policies target manual resources, not stack-managed lab roles.
 
 API needs Customers Query/Get/Put/Update and Business Get/Put/Scan; inventory transactions require Products Update and Business Put. Staff identity/management requires scoped Cognito user/group actions for the chosen pool. Worker needs Customers Update, Business Get/Put/Update and Campaigns ConditionCheckItem. Monitoring requires CloudWatch GetMetricData (no individual resource ARN restriction for this action) plus prefix-scoped DescribeAlarms. Human IAM provisioning permissions differ from runtime permissions. A JWT scope does not replace backend RBAC.
+
+### Cognito mapping
+
+Replace YOUR_USER_POOL_ID with the same pool used by Lambda USER_POOL_ID. Scope Cognito Admin*/ListUsers actions to that pool ARN. Browser users receive no IAM runtime credentials. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

@@ -40,3 +40,7 @@ Earlier guest screenshots/steps on this page are the foundation only. A full-fea
 Pin frontend unified-login source at commit `a870b73`; record its full SHA with git rev-parse. Read release notes: scoped lab releases do not imply every deployed module equals main.
 
 Add UserPoolId, UserPoolClientId, JWT authorizer ID, CustomersTable and BusinessTable to inventory. Never hardcode the reference lab IDs into a manual rebuild. Dependency order: DynamoDB/SQS → Cognito pool/client/groups (5.3.10 steps 1–6) → IAM → Lambda → API/JWT → S3/CloudFront → SNS/CloudWatch → tests. Cognito is numbered 5.3.10 as an added service but must exist before integration.
+
+### Cognito mapping
+
+Inventory must record AccountId, Region, UserPoolId, UserPoolClientId, issuer, API URL and CloudFront origin before integration. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

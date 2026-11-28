@@ -88,3 +88,7 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 18](/images/5-Workshop/FLASHRUSH/evidence/5.3.2-SQS/image-16.png)
 
 *Figure 18. Historical Console evidence; verify the saved configuration against the steps above.*
+
+### Cognito mapping
+
+Do not pass access/refresh tokens through queue messages. Worker uses its execution role and stored order/customer references; no browser JWT authorizer attaches to SQS. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

@@ -44,3 +44,7 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 7](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-07.png)
 
 *Figure 7. Historical Console evidence; verify the saved configuration against the steps above.*
+
+### Cognito mapping
+
+Keep the website bucket private behind CloudFront OAC. Cognito login does not require public S3, Identity Pools or direct browser AWS credentials. Do not upload .env or session artifacts. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

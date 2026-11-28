@@ -54,3 +54,7 @@ Earlier guest screenshots/steps on this page are the foundation only. A full-fea
 The full project uses ten services: the nine serverless services plus Cognito. Five DynamoDB tables are Products, Orders, Campaigns, Customers (userId+recordId) and Business (id). Cognito authenticates customers/staff; Gateway JWT and backend RBAC enforce access. Customers stores profile/cart/history; Business stores vouchers/redemption and stock adjustments. Worker transactions protect stock, checkout state and redemption. Client-supplied role fields never grant access.
 
 The student must update the older two-table/guest architecture with Cognito/JWT/Customers/Business; a generated replacement image is not setup evidence.
+
+### Cognito mapping
+
+Full project: 10 services, five tables, User Pool JWT; no Identity Pool/STS is required. Guest track remains a separate scope. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

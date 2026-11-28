@@ -23,7 +23,7 @@ The current extended FLASHRUSH adds Cognito as service 10, customer/staff shared
 
 ## Screenshot acceptance
 
-Required: saved pool overview, sign-in/password policy, public app client and auth flows, groups, Gateway JWT, redacted Lambda env and Customers/Business key schemas. Also capture shared /auth and role-correct destination. No authenticated Console screenshots were available at this checkpoint; the CLI session cannot substitute for a browser session. Images remain PENDING, not PASS. Existing-resource screenshots must not be described as creation wizard execution. Never fabricate evidence.
+Required: saved pool overview, sign-in/password policy, public app client and auth flows, groups, Gateway JWT, redacted Lambda env and Customers/Business key schemas. Also capture shared /auth and role-correct destination. Console captures now exist for pool overview, sign-in, sign-up, app client and groups; Gateway JWT, Lambda env, DynamoDB schemas and browser role routing remain PENDING. Existing-resource screenshots must not be described as creation wizard execution. Never fabricate evidence.
 
 ## Cost and diagram acceptance
 
@@ -34,3 +34,26 @@ Architecture needs editable source, student author/date, official AWS icon prove
 ## Demo and cleanup
 
 Reference extended website: https://d1jcrzj4650vey.cloudfront.net . Each manual team must record and verify its own domain, not reuse lab evidence. Check /auth, /account/orders, /admin and /cart/checkout deep links, then authorized role flows. New registrations/invites/purchases require an approved test scope. Deletion of Cognito/users/data is destructive: preserve data and verify ownership/dependencies first.
+
+## Cognito cross-section mapping
+
+The lab references below are for comparison only. Record your own pool/client/issuer in one manual inventory and use it consistently across every section.
+
+| Source | Consumer / equality rule | Reference lab |
+|---|---|---|
+| User Pool ID | USER_POOL_ID; IAM userpool ARN | us-east-1_mIpzTH61t |
+| Public client ID | USER_POOL_CLIENT_ID = CUSTOMER_CLIENT_ID = VITE_COGNITO_CLIENT_ID = JWT audience | 5h7dn6hr6iub9ghat5jiir4ipg |
+| Issuer | CUSTOMER_ISSUER = API JWT issuer | https://cognito-idp.us-east-1.amazonaws.com/us-east-1_mIpzTH61t |
+| Region | VITE_COGNITO_REGION; Cognito SDK/Lambda region; issuer region | us-east-1 |
+| Access token scope | JWT route scopes; business.identity checks | aws.cognito.signin.user.admin |
+| Groups | Live AdminListGroupsForUser; backend authorize; frontend destination | owner / manager / warehouse / support |
+| Customer identity | Cognito sub = Customers.userId; not email or Identity Pool ID | Customers: userId + recordId |
+| Business storage | BUSINESS_TABLE; redemption/stock transactions | Business: id |
+
+Order: DynamoDB/SQS → Cognito pool/client/groups → IAM → Lambda → API JWT → frontend/CloudFront → tests → cleanup. API/JWT instructions in the Cognito page refer to later integration, not early API creation.
+
+Website sign-in uses User Pools, not Identity Pools/STS or IAM console users. The owner group does not grant AWS AdministratorAccess. Backend reads live groups; /admin/users is owner-only. Inventory: owner/manager/warehouse; customers: owner/manager/support; monitoring: owner/manager. Support may enter the admin UI without full access.
+
+For login 401, check email_verified, access rather than ID token, issuer/client/scope, Enabled state and revocation. For 403, check group/endpoint permissions; do not bypass RBAC using an API key or CORS changes. Missing IAM produces AccessDenied in CloudWatch, a different failure.
+
+[Cognito setup and Console evidence]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}})

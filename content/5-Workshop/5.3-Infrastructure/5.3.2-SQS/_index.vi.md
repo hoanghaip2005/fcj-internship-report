@@ -121,3 +121,7 @@ Visibility timeout 90 giây tương ứng 6 × timeout Worker 15 giây; nếu t�
 Standard queue có thể giao message nhiều lần. Chống trùng nằm trong logic Worker và điều kiện transaction; không được suy luận "một message chỉ chạy một lần" từ queue.
 
 **Điểm kiểm tra:** queue chính trỏ đúng DLQ, maxReceiveCount=5. Không bấm Send message với chuỗi tùy ý vào queue đang dùng để demo đơn; Worker cần payload hợp lệ và order đã được API tạo.
+
+### Cognito mapping
+
+Không đưa access/refresh token vào message. Worker dùng execution role và tham chiếu đơn/khách đã lưu; không gắn JWT authorizer trình duyệt vào SQS. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

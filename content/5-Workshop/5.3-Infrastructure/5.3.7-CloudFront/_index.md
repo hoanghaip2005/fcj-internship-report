@@ -152,3 +152,7 @@ Earlier guest screenshots/steps on this page are the foundation only. A full-fea
 SPA rewrite must cover /auth, /staff/login, /cart, /cart/checkout, /account/* and /admin/* in addition to products/orders/checkout. Publish LIVE and associate Viewer request; saving alone is insufficient. Keep missing assets as errors. /staff/login now redirects in React to /auth?next=/admin, with no separate admin login view.
 
 Publish assets before index, invalidate /* and wait Completed. Verify home/auth/account/orders/admin/cart-checkout receive the new index. HTTP 200 only proves SPA serving, not authentication. API CORS must match the released domain.
+
+### Cognito mapping
+
+SPA rewrites must serve /auth, /account and /admin without turning API errors into HTML. CloudFront origin must match API CORS. Direct password auth does not require a hosted-login callback URL. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

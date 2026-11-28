@@ -38,3 +38,7 @@ Earlier guest screenshots/steps on this page are the foundation only. A full-fea
 These deletion instructions apply only to an approved manual rebuild; no cleanup runs during documentation edits. Add Customers/Business, Cognito pool/client/groups, JWT authorizer and related logs to inventory. Preserve needed data, stop tests/UI and resolve PENDING first. Remove dependencies deliberately: stopped API/routes/authorizer, functions/mapping/queues/tables, then Cognito client/pool only after confirming no other frontend or app shares it.
 
 Deleting a User Pool removes users/groups and is not ordinarily reversible. Never delete the reference lab pool us-east-1_mIpzTH61t, IAM sign-in users or other teams' data. Verify ownership, backups and approval before destructive steps. Remove a dedicated CI target/role only at the account owner's request. Cost estimates must include Cognito MAU/pricing tier, two additional tables and extra logs/requests, not reuse the old guest total.
+
+### Cognito mapping
+
+Use the inventory mapping to find every client/authorizer/Lambda/frontend dependency before deleting a pool. Deleting the pool does not clean DynamoDB or S3; deleting an IAM user is unrelated to website Cognito cleanup. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

@@ -180,3 +180,7 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 39](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-41.png)
 
 *Figure 39. Historical Console evidence; verify the saved configuration against the steps above.*
+
+### Cognito mapping
+
+Monitoring API uses staff JWT plus backend permissions and API execution-role CloudWatch read permissions. Owner/manager can access monitoring; support is not automatically authorized. Never log passwords, bearer tokens or verification codes. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

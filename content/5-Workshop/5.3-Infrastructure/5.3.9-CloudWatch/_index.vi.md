@@ -630,3 +630,7 @@ AWS Documentation Missing data in CloudWatch alarms: https://docs.aws.amazon.com
 AWS Documentation Amazon SQS metrics: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html
 
 AWS Documentation Amazon CloudWatch Logs: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html
+
+### Cognito mapping
+
+Monitoring API cần JWT nhân viên, quyền backend và quyền đọc CloudWatch của execution role API. Owner/manager được monitoring; support không tự có quyền. Không log password, bearer token hoặc mã xác minh. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

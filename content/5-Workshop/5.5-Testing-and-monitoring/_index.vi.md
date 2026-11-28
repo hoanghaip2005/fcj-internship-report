@@ -291,3 +291,7 @@ Chỉ đọc trước: anonymous products/campaigns 200, protected `/me/profile`
 - Monitoring hiển thị source CloudWatch và đúng region; thiếu datapoint không gọi là 0.
 
 Không gửi email đăng ký/invite hoặc tạo đơn thật chỉ để chụp ảnh khi chưa có phạm vi duyệt. Lưu ảnh màn hình đã che thông tin nhạy cảm cùng commit/time/namespace và expected/actual.
+
+### Cognito mapping
+
+Tách 401 token/email/client, 403 role và 5xx IAM/config. Kiểm tra riêng owner, customer, nhân viên hạn quyền; deep link SPA 200 không chứng minh phân quyền. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

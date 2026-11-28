@@ -77,3 +77,7 @@ Cấu hình cần giữ cho luồng CloudFront: Static website hosting = Disable
 ![Bucket đã tồn tại; tab Permissions hiển thị Block all public access = On](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-07.png)
 
 *Hình 5.3.6.7. Bucket đã tồn tại; tab Permissions hiển thị Block all public access = On.*
+
+### Cognito mapping
+
+Giữ bucket website private sau CloudFront OAC. Login Cognito không cần public S3, Identity Pool hay AWS credentials trên browser. Không upload .env hoặc session artifacts. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

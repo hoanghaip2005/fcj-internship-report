@@ -294,3 +294,7 @@ CUSTOMER_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/YOUR_MANUAL_POOL_ID
 ```
 
 Đối với API thêm MONITORING_API_FUNCTION, MONITORING_WORKER_FUNCTION, MONITORING_QUEUE_NAME, MONITORING_DLQ_NAME và MONITORING_ALARM_NAMES theo tên manual. Biến có tên MONITORING_* không thay thế IAM CloudWatch. Không bật legacy API-key bypass để bỏ JWT; không thêm secret vào VITE. Giữ SQS partial batch failure và visibility timeout theo bài SQS.
+
+### Cognito mapping
+
+USER_POOL_CLIENT_ID và CUSTOMER_CLIENT_ID phải bằng client frontend/audience authorizer. CUSTOMER_ISSUER phải đúng issuer pool. Business identity đọc group Cognito thật; customer identity yêu cầu email đã xác minh. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

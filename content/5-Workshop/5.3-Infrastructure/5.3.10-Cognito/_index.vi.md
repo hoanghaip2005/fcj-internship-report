@@ -96,3 +96,7 @@ Scope aws.cognito.signin.user.admin cho phép hoạt động access-token của 
 ![05-groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/05-groups.png)
 
 ![Chi tiết app client Cognito: public client, flow, token](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/06-app-client-detail.png)
+
+### Cognito mapping
+
+Hoàn thành pool/client/groups trước, sau đó quay lại IAM, Lambda và API. Ảnh đã chụp là cấu hình lab hiện có, không chứng minh bản manual mới đã triển khai. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

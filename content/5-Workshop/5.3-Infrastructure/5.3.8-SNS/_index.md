@@ -100,3 +100,7 @@ These shared images document the original manual exercise. Settings before Save 
 ![Historical Console evidence 21](/images/5-Workshop/FLASHRUSH/evidence/5.3.8-SNS/update-021.png)
 
 *Figure 21. Historical Console evidence; verify the saved configuration against the steps above.*
+
+### Cognito mapping
+
+SNS alarm subscription confirmation is separate from Cognito email verification. Confirming either email does not confirm the other or grant application roles. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

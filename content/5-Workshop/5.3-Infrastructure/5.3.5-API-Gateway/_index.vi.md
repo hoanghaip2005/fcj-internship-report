@@ -261,3 +261,7 @@ Bảng sau là route inventory đọc từ lab ngày 28/11, dùng làm mẫu t�
 | PUT | `/me/profile` | JWT |
 
 Anonymous route protected phải 401; customer thiếu role admin phải 403. Nút ẩn trong frontend không phải kiểm soát truy cập. Không dùng AWS_IAM cho browser bearer nếu không có SigV4 signing path.
+
+### Cognito mapping
+
+Gắn JWT cho GET /auth/me, POST /auth/logout và từng route /me, /admin trong ma trận. Đăng ký/xác nhận/login/new-password vẫn public. Audience là public client ID, không phải pool ID. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

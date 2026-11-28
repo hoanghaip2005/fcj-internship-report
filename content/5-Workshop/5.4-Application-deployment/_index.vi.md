@@ -139,3 +139,7 @@ VITE_DEMO_SERVICE_ERROR=false
 Pool ID thuộc backend; không đặt client secret, password hoặc access token trong .env frontend. Đổi API/client thì build lại. `npm ci`, lint, test rồi build; không upload file .env. Đăng nhập khách/admin ở `/auth`; role check `/auth/me` quyết định `/admin` (owner/manager/support), `/admin/inventory` (warehouse) hoặc `/account` (khách). Phân quyền chi tiết vẫn do API thực thi.
 
 CI/CD hiện auto phát hành **frontend lab** sau push main/checks, không tự provision hạ tầng hay deploy backend. Nhóm manual dùng Console riêng không được mặc định pipeline sẽ cập nhật bucket của mình. Backend phải tương thích trước frontend phụ thuộc API mới. Ghi commit/artifact mỗi lần bàn giao; không dùng log pipeline thành công để kết luận dữ liệu hay schema đã được migrate.
+
+### Cognito mapping
+
+Dùng VITE_API_BASE_URL, VITE_COGNITO_CLIENT_ID, VITE_COGNITO_REGION cùng môi trường. Màn /auth chung gọi /auth/me để lấy role. CI chỉ frontend không cập nhật Cognito, route API hay Lambda. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

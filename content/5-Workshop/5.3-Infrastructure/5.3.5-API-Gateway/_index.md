@@ -175,3 +175,7 @@ Read-only reference lab route inventory, 28 Nov 2026; reproduce equivalent paths
 | PUT | `/me/profile` | JWT |
 
 Protected anonymous requests must return 401; customer attempts at admin writes must return 403. Hidden UI controls are not authorization. Do not require AWS_IAM from a bearer-only browser unless a deliberate SigV4 path exists.
+
+### Cognito mapping
+
+Apply JWT to GET /auth/me and POST /auth/logout as well as the explicit /me and /admin route matrix. Keep registration/confirmation/login/new-password public. Audience is the public client ID, not pool ID. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

@@ -109,3 +109,7 @@ Console → DynamoDB → Create table, on-demand and encryption, then wait ACTIV
 | flashrush-manual-business | id (String) | none |
 
 Do not forge customer records to bypass Cognito or store passwords/tokens. API writes authenticated profile/cart/history/wallet data. Business contains vouchers, redemptions and movements; never edit usedCount/stock manually while orders are pending. Seed vouchers only through approved admin operations. Capture ACTIVE/key schemas without personal records.
+
+### Cognito mapping
+
+Customers.userId is the verified Cognito sub, not email. Removing a Cognito user does not automatically delete Customers/Business records. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

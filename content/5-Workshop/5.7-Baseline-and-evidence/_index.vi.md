@@ -57,10 +57,33 @@ Chụp sau khi Console hiển thị trạng thái đã lưu:
 - DynamoDB Customers/Business ACTIVE + key schema.
 - Browser `/auth` và `/admin` sau login; không chụp password/token.
 
-Ảnh hiện **CHƯA XÁC MINH** vì phiên AWS Console chưa đăng nhập được bằng federated link. Không đánh dấu PASS hoặc dùng ảnh mô phỏng. Khi chụp, lưu tại `static/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/` và cập nhật tên file vào bảng trên.
+Đã có ảnh Console thật cho pool overview, sign-in, sign-up, app client và groups. Các ảnh Gateway JWT, biến môi trường Lambda, schema Customers/Business và điều hướng `/auth` → role vẫn **CHƯA XÁC MINH**. Ảnh resource hiện có không được mô tả là ảnh chạy wizard tạo mới; không dùng ảnh mô phỏng.
 
 ## COST và architecture
 
 COST chỉ PASS khi có AWS Pricing Calculator estimate URL/ID với workload, thời gian sống resource, Lambda/API, DynamoDB, S3/CloudFront, SQS/SNS, CloudWatch và Free Tier assumptions. Bảng USD 1.30/1.95/5 trong Proposal chỉ là planning allocation.
 
 Sơ đồ phải có file editable, tác giả/ngày, AWS official icons và mapping với Cognito, Customers, Business, API JWT và sáu guest routes. Hình nhóm cung cấp hiện chỉ là reference.
+
+## Mapping Cognito giữa các mục
+
+Các giá trị tham chiếu lab dưới đây chỉ để đối chiếu, không sao chép vào môi trường manual. Ghi pool/client/issuer của nhóm vào một inventory, rồi dùng cùng inventory cho tất cả mục.
+
+| Source | Consumer / equality rule | Reference lab |
+|---|---|---|
+| User Pool ID | USER_POOL_ID; IAM userpool ARN | us-east-1_mIpzTH61t |
+| Public client ID | USER_POOL_CLIENT_ID = CUSTOMER_CLIENT_ID = VITE_COGNITO_CLIENT_ID = JWT audience | 5h7dn6hr6iub9ghat5jiir4ipg |
+| Issuer | CUSTOMER_ISSUER = API JWT issuer | https://cognito-idp.us-east-1.amazonaws.com/us-east-1_mIpzTH61t |
+| Region | VITE_COGNITO_REGION; Cognito SDK/Lambda region; issuer region | us-east-1 |
+| Access token scope | JWT route scopes; business.identity checks | aws.cognito.signin.user.admin |
+| Groups | Live AdminListGroupsForUser; backend authorize; frontend destination | owner / manager / warehouse / support |
+| Customer identity | Cognito sub = Customers.userId; not email or Identity Pool ID | Customers: userId + recordId |
+| Business storage | BUSINESS_TABLE; redemption/stock transactions | Business: id |
+
+Thứ tự: DynamoDB/SQS → Cognito pool/client/groups → IAM → Lambda → API JWT → frontend/CloudFront → kiểm thử → cleanup. Bước API/JWT trong Cognito là tham chiếu bước tích hợp sau Lambda, không yêu cầu tạo API sớm.
+
+Không dùng Identity Pool/STS hoặc IAM user cho đăng nhập website. Group owner không tự cấp AdministratorAccess AWS. Backend đọc group thật; /admin/users chỉ owner. Inventory: owner/manager/warehouse; customers: owner/manager/support; monitoring: owner/manager. Support có thể vào trang admin nhưng không có toàn quyền.
+
+Khi login 401: kiểm tra email_verified, access token thay vì ID token, issuer/client/scope, trạng thái Enabled và phiên chưa bị thu hồi. Khi 403: kiểm tra group/quyền endpoint; không đổi CORS hoặc dùng API key để bỏ qua RBAC. Thiếu IAM sẽ hiện AccessDenied ở CloudWatch, khác lỗi JWT.
+
+[Cognito setup and Console evidence]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.10-Cognito/" >}})

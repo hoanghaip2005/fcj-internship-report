@@ -165,3 +165,7 @@ CUSTOMER_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/YOUR_MANUAL_POOL_ID
 ```
 
 API also needs MONITORING_API_FUNCTION, MONITORING_WORKER_FUNCTION, MONITORING_QUEUE_NAME, MONITORING_DLQ_NAME and MONITORING_ALARM_NAMES for the manual namespace. Environment names do not grant IAM permissions. Do not enable legacy API-key bypass to avoid JWT, or place secrets in VITE variables. Retain SQS partial batch failures and visibility settings.
+
+### Cognito mapping
+
+USER_POOL_CLIENT_ID and CUSTOMER_CLIENT_ID must equal frontend client ID and authorizer audience. CUSTOMER_ISSUER must be the exact pool issuer. Business identity reads live Cognito groups; customer identity requires verified email. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})

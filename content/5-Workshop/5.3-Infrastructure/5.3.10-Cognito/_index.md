@@ -91,3 +91,7 @@ Read-only captures from the existing lab. Remaining API/Lambda/DynamoDB integrat
 ![Cognito groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/05-groups.png)
 
 ![Cognito app client detail: public client, flows, token settings](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/06-app-client-detail.png)
+
+### Cognito mapping
+
+Complete pool/client/groups first, then return to IAM, Lambda and API integration. Captured images show existing lab configuration; they are not proof of a new manual deployment. [Mapping Cognito]({{< relref "/5-Workshop/5.7-Baseline-and-evidence/" >}})
