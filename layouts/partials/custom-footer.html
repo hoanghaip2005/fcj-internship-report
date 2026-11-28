@@ -22,3 +22,6 @@
   ga("create", "UA-158079754-2", "auto");
   ga("send", "pageview");
 </script>
+{{ if eq .Section "3-BlogsPosted" }}
+<script src="{{ "js/blog-copy.js" | relURL }}" defer></script>
+{{ end }}

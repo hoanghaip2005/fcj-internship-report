@@ -4,9 +4,6 @@ weight: 1
 draft: false
 ---
 
-
-
-
 **Mục tiêu:** Hai bảng Products và Orders, tạo dữ liệu sản phẩm.
 
 > **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
@@ -15,19 +12,15 @@ draft: false
 
 ### 5.3.1.1 Tạo bảng Products
 
-
 **Bước 1.** Console → DynamoDB → Tables → Create table.
 
 ![Mở chức năng tạo bảng DynamoDB](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/image-01.png)
 
 *Hình 5.3.1.1. Mở chức năng tạo bảng DynamoDB.*
 
-
 **Bước 2.** Table name: `flashrush-manual-products`.
 
-
 **Bước 3.** Partition key: `productId`, kiểu String.
-
 
 **Bước 4.** Không thêm sort key.
 
@@ -35,16 +28,13 @@ draft: false
 
 *Hình 5.3.1.2. Tên bảng Products và partition key productId kiểu String.*
 
-
 **Bước 5.** Chọn capacity On-demand, tương ứng PAY_PER_REQUEST.
-
 
 **Bước 6.** Giữ mã hóa do AWS quản lý; chưa cần customer managed KMS key cho bài lab.
 
 ![Chọn cấu hình bảng và capacity On-demand](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/image-03.png)
 
 *Hình 5.3.1.3. Chọn cấu hình bảng và capacity On-demand.*
-
 
 **Bước 7.** Tạo bảng, chờ status ACTIVE.
 
@@ -80,10 +70,13 @@ Lặp lại với tên `flashrush-manual-orders`, partition key `orderId` kiểu
 
 *Hình 5.3.1.10. Tạo bảng Orders với orderId kiểu String và kiểm tra hai bảng ACTIVE.*
 
+![Hai bảng flashrush-manual-products và flashrush-manual-orders ở trạng thái Active](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/update-003.png)
+
+*Hai bảng flashrush-manual-products và flashrush-manual-orders ở trạng thái Active.*
+
 Không khai báo stock, status, quantity thành key hay schema bắt buộc khi tạo bảng. Các thuộc tính này nằm trong từng item.
 
 ### 5.3.1.3 Thêm một sản phẩm đầu tiên
-
 
 **Bước 1.** Mở Products → Explore table items → Create item.
 
@@ -95,9 +88,7 @@ Không khai báo stock, status, quantity thành key hay schema bắt buộc khi 
 
 *Hình 5.3.1.12. Mở Explore table items và Create item.*
 
-
 **Bước 2.** Chọn chế độ JSON và **DynamoDB JSON**.
-
 
 **Bước 3.** Dán item dưới đây. Nếu thực hành sau ngày mẫu, đổi saleEndsAt thành thời điểm UTC trong tương lai.
 
@@ -122,14 +113,15 @@ Không khai báo stock, status, quantity thành key hay schema bắt buộc khi 
 
 *Hình 5.3.1.13. Nhập sản phẩm ở chế độ DynamoDB JSON.*
 
-
 **Bước 4.** Save, xác nhận stock là Number 10, không phải String "10".
 
 ![Sản phẩm manual-sku-001 xuất hiện trong bảng Products](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/image-14.png)
 
 *Hình 5.3.1.14. Sản phẩm manual-sku-001 xuất hiện trong bảng Products.*
 
+![Dữ liệu Products và thuộc tính stock kiểu Number](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/update-004.png)
 
+*Dữ liệu Products và thuộc tính stock kiểu Number.*
 
 Không tạo order giả trong Orders lúc này. Lambda API sẽ tạo order với đầy đủ hash và metadata cần cho Worker.
 
@@ -138,7 +130,6 @@ Không tạo order giả trong Orders lúc này. Lambda API sẽ tạo order v�
 ### Đồng bộ catalog với frontend thật
 
 Item `manual-sku-001` là fixture kiểm thử, không phải toàn bộ catalog website. Để giao diện có đúng danh mục/sản phẩm của dự án:
-
 
 **Bước 1.** Mở thư mục `examples` ở gốc ZIP. Mỗi file `*.dynamodb.json` là một item DynamoDB JSON xuất từ catalog frontend snapshot.
 
@@ -152,6 +143,12 @@ Item `manual-sku-001` là fixture kiểm thử, không phải toàn bộ catalog
 
 Bảng Orders không cần GSI, TTL hoặc sort key. `enqueueState`, `enqueueAttemptCount`, hash và lease được API tạo; không tự seed các trường này.
 
+### Kiểm tra đơn hàng sau khi chạy luồng ứng dụng
 
+**Bước 1.** Sau khi gửi đơn qua API, mở Explore table items của bảng Orders và kiểm tra đúng order ID.
 
+![Bản ghi đơn hàng hiển thị trạng thái CONFIRMED](/images/5-Workshop/FLASHRUSH/evidence/5.3.1-DynamoDB/update-005.png)
 
+*Bản ghi đơn hàng hiển thị trạng thái CONFIRMED.*
+
+**Bước 2.** Đối chiếu thay đổi stock trong Products với số lượng đơn được xác nhận. Một ảnh CONFIRMED chưa đủ kết luận đã kiểm thử hết hàng, retry hoặc chống overselling.

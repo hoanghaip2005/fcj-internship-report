@@ -5,13 +5,13 @@ chapter: false
 pre: "<b>7. </b> "
 ---
 
-# Chia sẻ và đóng góp ý kiến về chương trình
+## Chia sẻ và đóng góp ý kiến về chương trình
 
 ## 1. Cảm nhận về chương trình thực tập FCAJ
 
 Tham gia **First Cloud AI Journey** giúp em có cơ hội tiếp cận kiến thức điện toán đám mây theo một lộ trình gắn với bài viết, hoạt động sự kiện và sản phẩm thực hành. Với nền tảng sinh viên Công nghệ thông tin, em nhận thấy việc kết nối kiến thức về lập trình, mạng và cơ sở dữ liệu trong một kiến trúc AWS cụ thể giúp quá trình học có mục tiêu rõ ràng hơn.
 
-Qua quá trình biên soạn nhật ký 12 tuần, ba bài blog, bốn bài thu hoạch sự kiện và quá trình chuẩn bị FLASHRUSH, em rèn luyện cả việc tìm hiểu kỹ thuật lẫn trình bày kết quả. Những chia sẻ dưới đây tập trung vào trải nghiệm học và xây dựng báo cáo; các đề xuất là mong muốn cải thiện của cá nhân, không phải kết luận rằng chương trình đang thiếu những hoạt động đó.
+Qua quá trình biên soạn nhật ký 12 tuần, năm bài blog, bốn bài thu hoạch sự kiện và quá trình chuẩn bị FLASHRUSH, em rèn luyện cả việc tìm hiểu kỹ thuật lẫn trình bày kết quả. Những chia sẻ dưới đây tập trung vào trải nghiệm học và xây dựng báo cáo; các đề xuất là mong muốn cải thiện của cá nhân, không phải kết luận rằng chương trình đang thiếu những hoạt động đó.
 
 ### Mức độ hài lòng
 
@@ -29,7 +29,7 @@ Em nhận thấy cách học hiệu quả là chọn một yêu cầu nhỏ, tì
 
 ### 2.2. Viết blog và bài thu hoạch
 
-Việc viết blog buộc em sắp xếp kiến thức thành nội dung người khác có thể đọc hiểu. Các chủ đề Karpenter/EKS, S3 Express One Zone và Cognito có phạm vi khác nhau, giúp em rèn luyện cách xác định bài toán, mô tả luồng hoạt động và nêu điều kiện sử dụng.
+Việc viết blog buộc em sắp xếp kiến thức thành nội dung người khác có thể đọc hiểu. Các chủ đề Karpenter/EKS, S3 Express One Zone, Cognito, SQS/Lambda và idempotency với DynamoDB có phạm vi khác nhau, giúp em rèn luyện cách xác định bài toán, mô tả luồng hoạt động và nêu điều kiện sử dụng.
 
 Các bài thu hoạch sự kiện mở rộng góc nhìn về Cloud, AI và dữ liệu. Bài học đối với em là cần tách nội dung tiếp thu từ chương trình khỏi phân tích mở rộng và hướng áp dụng do bản thân đề xuất. Điều này giúp báo cáo rõ ràng và tránh diễn đạt một ý tưởng thành kết quả đã thực hiện.
 
@@ -65,7 +65,7 @@ Về phía bản thân, em cần chuẩn bị câu hỏi rõ ràng, đọc tài 
 
 ## 4. Đóng góp của bản thân
 
-Trong phạm vi hồ sơ hiện có, em đã biên soạn nhật ký chi tiết cho 12 tuần, phân biệt công việc đã thực hiện với kế hoạch của các tuần tiếp theo, chuẩn bị ba bài blog kỹ thuật và bốn bài thu hoạch sự kiện. Phần đề xuất FLASHRUSH và tài liệu Workshop được xây dựng để trình bày một luồng ứng dụng Serverless thống nhất, từ kiến trúc đến hướng dẫn cấu hình và kiểm thử.
+Trong phạm vi hồ sơ hiện có, em đã biên soạn nhật ký chi tiết cho 12 tuần, phân biệt công việc đã thực hiện với kế hoạch của các tuần tiếp theo, chuẩn bị năm bài blog kỹ thuật và bốn bài thu hoạch sự kiện. Phần đề xuất FLASHRUSH và tài liệu Workshop được xây dựng để trình bày một luồng ứng dụng Serverless thống nhất, từ kiến trúc đến hướng dẫn cấu hình và kiểm thử.
 
 Các nội dung này trước hết là sản phẩm học tập của cá nhân. Em chưa xem đây là tài liệu đã được chương trình nghiệm thu hoặc đã được sử dụng chính thức. Em mong muốn tiếp tục hoàn thiện tính chính xác, bổ sung bằng chứng thực tế và chia sẻ lại sau khi được rà soát phù hợp.
 
@@ -81,7 +81,9 @@ Những việc em có thể tiếp tục đóng góp gồm:
 
 Em mong có thêm cơ hội trình bày kiến trúc, nhận phản hồi kỹ thuật và thực hành một sản phẩm từ cấu hình đến kiểm thử, giám sát và cleanup. Với FLASHRUSH, ưu tiên tiếp theo là hoàn thiện bằng chứng cho luồng manual trong môi trường được phép, thay vì mở rộng chức năng khi các bước nền tảng chưa được xác minh đầy đủ.
 
-Nếu giới thiệu chương trình cho bạn bè, em sẽ giới thiệu với những bạn muốn học AWS có định hướng và sẵn sàng tự học, thực hành, viết tài liệu. Đồng thời, em sẽ chia sẻ rằng kết quả phụ thuộc vào việc chủ động học, kiểm chứng và tiếp nhận góp ý; chỉ đọc hướng dẫn hoặc hoàn thiện hình thức báo cáo chưa đủ để nắm chắc kỹ thuật.
+### Có giới thiệu chương trình cho bạn bè không?
+
+Em **có giới thiệu** chương trình với những bạn muốn học AWS có định hướng và sẵn sàng tự học, thực hành, viết tài liệu. Đồng thời, em sẽ chia sẻ rằng kết quả phụ thuộc vào việc chủ động học, kiểm chứng và tiếp nhận góp ý; chỉ đọc hướng dẫn hoặc hoàn thiện hình thức báo cáo chưa đủ để nắm chắc kỹ thuật.
 
 ## 6. Lời cảm ơn
 

@@ -4,178 +4,194 @@ weight: 5
 draft: false
 ---
 
+**Bước 5.** 5  Amazon API Gateway và kiểm tra
 
+Mục tiêu: Tạo và kiểm tra HTTP API, routes, $default stage, throttling, CORS, access logging và Invoke URL; test GET trên browser, POST từ frontend origin và kiểm tra trang Orders.
 
+Điều kiện: Đã có Lambda API/Worker, DynamoDB và SQS. Backend dùng Lambda flashrush-manual-api; frontend local khi test là http://localhost:5173.
 
-**Mục tiêu:** HTTP API, routes, CORS và access logs.
+Cách đọc: Khung xanh chỉ vùng thao tác hoặc giá trị cần kiểm tra. Vòng số xanh, số trắng dùng bước toàn cục 1–19; ảnh cùng bước dùng cùng số. Mỗi hình một trang ngang.
 
-> **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
+Giá trị cấu hình cần dùng
 
-**Điều kiện đầu vào:** Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước trang này. Region `us-east-1`; thay `YOUR_AWS_ACCOUNT_ID` bằng Account ID đúng của người thực hành.
+HTTP API: flashrush-manual-api · us-east-1 · Lambda flashrush-manual-api · payload format version 2.0.
 
-### 5.3.5.1 Tạo API và integration
+Routes: GET /products; GET /products/{productId}; POST /orders; GET /orders/{orderId}. Stage $default, Auto-deploy Enabled; dùng Invoke URL không có /prod.
 
+Throttling: Burst limit = 10; Rate limit = 5 requests/second.
 
-**Bước 1.** API Gateway → Create API → **HTTP API** → Build.
+CORS: origins http://localhost:5173, http://127.0.0.1:5173; methods GET, POST, OPTIONS; headers content-type, idempotency-key, x-order-token; Max age = 300; Allow credentials = NO.
 
-![Mở API Gateway và chọn HTTP API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-01.png)
+Access log destination quan sát được: /aws/apigateway/flashrush-manual.
 
-*Hình 5.3.5.1. Mở API Gateway và chọn HTTP API.*
+Giới hạn bằng chứng
 
-![Mở API Gateway và chọn HTTP API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-02.png)
+Ảnh CORS còn origin 127.0.0.1 trong ô nhập; cần Add rồi Save và chụp trạng thái đã lưu. HTTP 202/PENDING chỉ chứng minh tiếp nhận đơn. Trang Orders hiện đơn demo-* và document 200; chưa có request API Fetch/XHR tương ứng.
 
-*Hình 5.3.5.2. Mở API Gateway và chọn HTTP API.*
+**Bước 5.** 5.1 Mở Amazon API Gateway
 
+**Bước 1.** Mở API Gateway tại us-east-1 → trong Get started nhấn Create an API.
 
-**Bước 2.** Integration: Lambda, Region us-east-1, chọn `flashrush-manual-api`.
+![Nút Create an API trên trang API Gateway](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-01.png)
 
+*Hình 5.3.5.1. Nút Create an API trên trang API Gateway.*
 
-**Bước 3.** API name: `flashrush-manual-api`.
+**Bước 5.** 5.1 Chọn HTTP API
 
-![Ô nhập tên API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-03.png)
+**Bước 2.** Tại Choose an API type → tìm HTTP API → nhấn Build trong đúng card HTTP API.
 
-*Hình 5.3.5.3. Ô nhập tên API.*
+![HTTP API và nút Build tương ứng](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-02.png)
 
+*Hình 5.3.5.2. HTTP API và nút Build tương ứng.*
 
-**Bước 4.** Integration dùng Lambda proxy, payload format **2.0**; timeout 20.000 ms nếu cấu hình tùy chọn này.
+**Bước 5.** 5.1 Nhập tên API
 
-![Chọn Lambda integration và payload format 2.0](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-04.png)
+**Bước 3.** Nhập API name = flashrush-manual-api → giữ IPv4 → Add integration. Ảnh chụp trước khi nhập tên; giá trị đã điền xuất hiện ở hình 04.
 
-*Hình 5.3.5.4. Chọn Lambda integration và payload format 2.0.*
+![Ô API name còn trống, lựa chọn IPv4 và nút Add integration](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-03.png)
 
+*Hình 5.3.5.3. Ô API name còn trống, lựa chọn IPv4 và nút Add integration.*
 
-**Bước 5.** Tạo bốn routes bên dưới, cùng trỏ đến API Lambda.
+**Bước 5.** 5.1 Gắn Lambda integration
 
-![Bốn routes của HTTP API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-05.png)
+**Bước 4.** Chọn Lambda → region us-east-1 → Lambda function flashrush-manual-api → Version 2.0 → Next. Ô ARN bị rút gọn trong ảnh; kiểm tra tên đầy đủ ở hình 05/07.
 
-*Hình 5.3.5.5. Bốn routes của HTTP API.*
+![Loại integration, region, ô Lambda ARN, payload version và Next](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-04.png)
 
-| Method | Path | Kết quả |
-|---|---|---|
-| GET | /products | Danh sách sản phẩm |
-| GET | /products/{productId} | Một sản phẩm |
-| POST | /orders | Tiếp nhận đơn |
-| GET | /orders/{orderId} | Tra cứu đơn bằng token header |
+*Hình 5.3.5.4. Loại integration, region, ô Lambda ARN, payload version và Next.*
 
+**Bước 5.** 5.1 Tạo bốn routes
 
-**Bước 6.** Stage: `$default`, bật Auto-deploy. Với stage này API URL không có hậu tố /prod.
+**Bước 5.** Tạo GET /products; GET /products/{productId}; POST /orders; GET /orders/{orderId}. Đặt cả bốn Integration target = flashrush-manual-api → Next.
 
-![Tạo default stage tự triển khai và kiểm tra integrations](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-06.png)
+![Bốn cặp method/path cùng trỏ tới Lambda API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-05.png)
 
-*Hình 5.3.5.6. Tạo default stage tự triển khai và kiểm tra integrations.*
+*Hình 5.3.5.5. Bốn cặp method/path cùng trỏ tới Lambda API.*
 
-![Tạo default stage tự triển khai và kiểm tra integrations](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-07.png)
+**Bước 5.** 5.1 Giữ $default stage
 
-*Hình 5.3.5.7. Tạo default stage tự triển khai và kiểm tra integrations.*
+**Bước 6.** Giữ Stage name = $default → bật Auto-deploy → Next.
 
-![Tạo default stage tự triển khai và kiểm tra integrations](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-08.png)
+![$default stage và công tắc Auto-deploy đã bật](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-06.png)
 
-*Hình 5.3.5.8. Tạo default stage tự triển khai và kiểm tra integrations.*
+*Hình 5.3.5.6. $default stage và công tắc Auto-deploy đã bật.*
 
+**Bước 5.** 5.1 Kiểm tra và tạo API
 
-**Bước 7.** Stage throttling: rate 5 requests/second, burst 10 để khớp lab.
+**Bước 7.** Rà soát API name, Lambda integration, bốn routes và $default (Auto-deploy: enabled) → nhấn Create.
 
-![Cấu hình rate 5 và burst 10; ảnh đầu chưa cấu hình](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-10.png)
+![Giá trị tổng hợp trước khi tạo HTTP API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-07.png)
 
-*Hình 5.3.5.10. Cấu hình rate 5 và burst 10; ảnh đầu chưa cấu hình.*
+*Hình 5.3.5.7. Giá trị tổng hợp trước khi tạo HTTP API.*
 
-![Cấu hình rate 5 và burst 10; ảnh đầu chưa cấu hình](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-11.png)
+**Bước 5.** 5.1 Kiểm tra integrations sau khi tạo
 
-*Hình 5.3.5.11. Cấu hình rate 5 và burst 10; ảnh đầu chưa cấu hình.*
+**Bước 8.** Mở Integrations → kiểm tra các routes đang nhìn thấy có nhãn AWS Lambda. Đối chiếu tên backend flashrush-manual-api với hình 05/07; cuộn danh sách để kiểm tra route còn lại.
 
+![API đã tạo và các ánh xạ route/Lambda đang hiển thị](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-08.png)
 
-**Bước 8.** Kiểm tra Lambda → Configuration → Permissions → Resource-based policy có quyền invoke cho `apigateway.amazonaws.com`, giới hạn SourceArn thuộc API này. Console thường tạo khi gắn integration; nếu thiếu, thêm trigger API Gateway đúng API hoặc thêm invoke permission có giới hạn.
+*Hình 5.3.5.8. API đã tạo và các ánh xạ route/Lambda đang hiển thị.*
 
-![Đối chiếu resource-based policy cho API Gateway](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-09.png)
+**Bước 5.** 5.1 Kiểm tra quyền invoke Lambda
 
-*Hình 5.3.5.9. Đối chiếu resource-based policy cho API Gateway.*
+**Bước 9.** Mở Lambda flashrush-manual-api → Configuration → Permissions → Resource-based policy. Kiểm tra Principal apigateway.amazonaws.com, Action lambda:InvokeFunction, Resource đúng Lambda và SourceArn đúng API.
 
-### 5.3.5.2 Cấu hình CORS
+![Policy cho phép API Gateway invoke Lambda; cần test runtime riêng](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-09.png)
 
-**Minh họa thao tác**
+*Hình 5.3.5.9. Policy cho phép API Gateway invoke Lambda; cần test runtime riêng.*
 
+**Bước 5.** 5.1 Mở cấu hình throttling
 
-![Cấu hình CORS; origin 127.0.0.1 còn trong ô nhập cần Add và Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-12.png)
+**Bước 10.** Mở Throttling → chọn $default → tại Default route throttling nhấn Edit. Ảnh hiện Burst limit và Rate limit đều Not configured.
 
-*Hình 5.3.5.12. Cấu hình CORS; origin 127.0.0.1 còn trong ô nhập cần Add và Save.*
+![Throttling của $default trước khi cấu hình](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-10.png)
 
-![Cấu hình CORS; origin 127.0.0.1 còn trong ô nhập cần Add và Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-13.png)
+*Hình 5.3.5.10. Throttling của $default trước khi cấu hình.*
 
-*Hình 5.3.5.13. Cấu hình CORS; origin 127.0.0.1 còn trong ô nhập cần Add và Save.*
+**Bước 5.** 5.1 Nhập giới hạn throttling
 
-![Cấu hình CORS; origin 127.0.0.1 còn trong ô nhập cần Add và Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-14.png)
+Tiếp bước 10: Nhập Burst limit = 10; Rate limit = 5 requests/second → Save.
 
-*Hình 5.3.5.14. Cấu hình CORS; origin 127.0.0.1 còn trong ô nhập cần Add và Save.*
+![Burst 10, Rate 5 và nút Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-11.png)
 
-API → CORS → Configure:
+*Hình 5.3.5.11. Burst 10, Rate 5 và nút Save.*
 
-- Allow origins: `http://localhost:5173` và `http://127.0.0.1:5173`.
+**Bước 5.** 5.1 Mở cấu hình CORS
 
-- Allow methods: GET, POST, OPTIONS.
+**Bước 11.** Mở CORS → nhấn Configure. Ảnh chụp khi các danh sách origin, header và method còn rỗng.
 
-- Allow headers: content-type, idempotency-key, x-order-token.
+![Menu CORS và nút Configure trước khi nhập cấu hình](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-12.png)
 
-- Max age: 300 giây.
+*Hình 5.3.5.12. Menu CORS và nút Configure trước khi nhập cấu hình.*
 
-- Không bật credentials vì flow hiện không dùng cookie authentication.
+**Bước 5.** 5.1 Nhập các trường CORS
 
-Sau khi có CloudFront domain ở [mục 5.3.7 CloudFront]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.7-CloudFront/" >}}), thêm chính xác origin HTTPS của website, không có dấu / cuối. HTTP API tự xử lý preflight theo cấu hình CORS; không cần tạo Lambda OPTIONS riêng cho flow này. CORS là quy tắc trình duyệt, không thay cho xác thực API. [Nguồn cấu hình CORS](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html).
+Tiếp bước 11: http://127.0.0.1:5173 đang nằm trong ô nhập; phải nhấn Add để biến nó thành origin đã lưu trước khi Save. Giữ localhost:5173; headers content-type, idempotency-key, x-order-token; methods GET, POST, OPTIONS; Max age 300; credentials NO.
 
-### 5.3.5.3 Bật access logs
+![Origin localhost đã thành thẻ; origin 127.0.0.1 còn cần nhấn Add](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-13.png)
 
-**Minh họa thao tác**
+*Hình 5.3.5.13. Origin localhost đã thành thẻ; origin 127.0.0.1 còn cần nhấn Add.*
 
+**Bước 5.** 5.1 Đóng hộp Deploy API
 
-![Kiểm tra default stage và access logging](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-15.png)
+**Bước 12.** Với $default và Auto-deploy đã Enabled, không cần deploy thủ công. Đóng hoặc Cancel dialog và kiểm tra Stage details.
 
-*Hình 5.3.5.15. Kiểm tra default stage và access logging.*
+![Hộp Deploy API, dropdown Stage và nút Cancel](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-14.png)
 
-![Kiểm tra default stage và access logging](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-16.png)
+*Hình 5.3.5.14. Hộp Deploy API, dropdown Stage và nút Cancel.*
 
-*Hình 5.3.5.16. Kiểm tra default stage và access logging.*
+**Bước 5.** 5.1 Xác nhận Stage details
 
-Stage → Logs → Enable access logging → chọn log group `/aws/apigateway/flashrush-manual`. Dùng format:
+**Bước 13.** Mở Stages → chọn $default → kiểm tra Invoke URL và Automatic Deployment = Enabled.
 
-```json
-{"requestId":"$context.requestId","status":"$context.status","routeKey":"$context.routeKey","latency":"$context.responseLatency"}
-```
+![Stage $default, Invoke URL và trạng thái Automatic Deployment](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-15.png)
 
-Không ghi token hoặc body đơn vào access logs.
+*Hình 5.3.5.15. Stage $default, Invoke URL và trạng thái Automatic Deployment.*
 
+**Bước 5.** 5.1 Kiểm tra access logging
 
-**Bước 1.** API Gateway → Stages → $default → sao chép **Invoke URL/API endpoint**.
+**Bước 14.** Mở Monitor → Logging → kiểm tra Access logging enabled và log destination /aws/apigateway/flashrush-manual. Kiểm tra log format và bảo đảm không chủ động đưa body/token nhạy cảm vào log.
 
-![Sao chép Invoke URL](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-17.png)
+![Access logging đã bật, ARN log group và phần log format nhìn thấy](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-16.png)
 
-*Hình 5.3.5.17. Sao chép Invoke URL.*
+*Hình 5.3.5.16. Access logging đã bật, ARN log group và phần log format nhìn thấy.*
 
+**Bước 5.** 5.2 Sao chép Invoke URL
 
-**Bước 2.** Mở tab trình duyệt mới, dán endpoint rồi thêm `/products`.
+**Bước 15.** Quay lại Stages → $default → chọn và sao chép Invoke URL. Dùng base URL; không thêm /prod.
 
+![Invoke URL của $default được chọn để sao chép](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-17.png)
 
-**Bước 3.** Ví dụ: `https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/products`.
+*Hình 5.3.5.17. Invoke URL của $default được chọn để sao chép.*
 
+**Bước 5.** 5.2 Test GET /products trên trình duyệt
 
-**Bước 4.** Phải thấy JSON có items. Lưu endpoint không có /products để build React.
+**Bước 16.** Mở YOUR_INVOKE_URL/products → kiểm tra JSON có items và productId = manual-sku-001. stock = 9 tại thời điểm chụp; không coi đây là baseline cố định.
 
-![GET danh sách và chi tiết sản phẩm trả JSON](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-18.png)
+![GET /products trả JSON items qua API Gateway](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-18.png)
 
-*Hình 5.3.5.18. GET danh sách và chi tiết sản phẩm trả JSON.*
+*Hình 5.3.5.18. GET /products trả JSON items qua API Gateway.*
 
-![GET danh sách và chi tiết sản phẩm trả JSON](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-19.png)
+**Bước 5.** 5.2 Test GET /products/{productId}
 
-*Hình 5.3.5.19. GET danh sách và chi tiết sản phẩm trả JSON.*
+**Bước 17.** Mở YOUR_INVOKE_URL/products/manual-sku-001 → kiểm tra JSON trả về đúng sản phẩm manual-sku-001.
 
+![GET một sản phẩm theo productId](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-19.png)
 
-**Bước 5.** API kiểu HTTP không dùng quy trình nút Test của REST API. Kiểm tra POST bằng Lambda Test ở [mục 5.5.1 Lambda Test]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}}), rồi website ở [mục 5.5.2 Kiểm thử trình duyệt]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}}) để kiểm tra cả API Gateway.
+*Hình 5.3.5.19. GET một sản phẩm theo productId.*
 
-![POST nhận 202 PENDING; trang Orders có đơn demo, chưa chứng minh đơn thật](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-20.png)
+**Bước 5.** 5.2 Test POST /orders từ frontend origin
 
-*Hình 5.3.5.20. POST nhận 202 PENDING; trang Orders có đơn demo, chưa chứng minh đơn thật.*
+**Bước 18.** Mở http://localhost:5173 → F12 → Console → dùng fetch POST /orders với Content-Type, Idempotency-Key và body productId/quantity. HTTP 202 + PENDING chỉ chứng minh API đã tiếp nhận đơn.
 
-![POST nhận 202 PENDING; trang Orders có đơn demo, chưa chứng minh đơn thật](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-21.png)
+![POST từ origin localhost trả HTTP 202 và body PENDING](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-20.png)
 
-*Hình 5.3.5.21. POST nhận 202 PENDING; trang Orders có đơn demo, chưa chứng minh đơn thật.*
+*Hình 5.3.5.20. POST từ origin localhost trả HTTP 202 và body PENDING.*
 
-**Điểm kiểm tra:** GET trả items chứa manual-sku-001; gọi URL API từ trình duyệt không báo 500/503. Không mở frontend trước khi đọc sản phẩm qua HTTP hoạt động.
+**Bước 5.** 5.2 Kiểm tra trang Orders
 
+**Bước 19.** Mở /orders trên frontend. Ảnh chứng minh UI trang Orders tải được và có dữ liệu hiển thị. Nếu nghiệm thu API call từ frontend, chuyển Network sang Fetch/XHR và chụp request /orders hoặc /products.
+
+![UI có đơn mã demo-* “Đã xác nhận”; Network hiện document orders status 200](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-21.png)
+
+*Hình 5.3.5.21. UI có đơn mã demo-* “Đã xác nhận”; Network hiện document orders status 200.*

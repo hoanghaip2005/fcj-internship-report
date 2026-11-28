@@ -4,9 +4,6 @@ weight: 3
 draft: false
 ---
 
-
-
-
 **Mục tiêu:** Hai execution roles và quyền truy cập tối thiểu.
 
 > **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
@@ -43,7 +40,6 @@ Với mỗi group, đặt retention **7 days**. Execution role bên dưới ch�
 
 ### 5.3.3.2 Tạo execution role API
 
-
 **Bước 1.** IAM → Roles → Create role → AWS service → Lambda.
 
 ![Tạo role với trusted entity AWS service Lambda](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/image-05.png)
@@ -54,23 +50,19 @@ Với mỗi group, đặt retention **7 days**. Execution role bên dưới ch�
 
 *Hình 5.3.3.6. Tạo role với trusted entity AWS service Lambda.*
 
-
 **Bước 2.** Tên role `flashrush-manual-api-role`.
 
 ![Đặt tên execution role API](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/image-07.png)
 
 *Hình 5.3.3.7. Đặt tên execution role API.*
 
-
 **Bước 3.** Kiểm tra Trust relationships có nội dung sau.
-
 
 **Bước 4.** Permissions → Add permissions → Create inline policy → JSON, dán policy API ở [mục 5.3.3.3 IAM API role]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.3-IAM/" >}}).
 
 ![Mở chức năng tạo inline policy](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/image-08.png)
 
 *Hình 5.3.3.8. Mở chức năng tạo inline policy.*
-
 
 **Bước 5.** Nếu Console đã tự gắn AWSLambdaBasicExecutionRole, chỉ bỏ policy rộng đó sau khi log group và inline log permissions đã được tạo đúng.
 
@@ -175,3 +167,36 @@ DynamoDB transaction kiểm tra quyền của từng thao tác bên trong. Updat
 
 **Điểm kiểm tra:** hai role có trust Lambda, ARN resource đúng region/account, API không có quyền cập nhật Products, Worker không có quyền quản trị hạ tầng.
 
+### Kiểm tra roles và policies đã lưu
+
+**Bước 1.** Mở IAM Roles và kiểm tra hai execution role của API và Worker.
+
+![Mở IAM Roles và kiểm tra hai execution role của API và Worker](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/update-006.png)
+
+*Mở IAM Roles và kiểm tra hai execution role của API và Worker.*
+
+**Bước 2.** Mở API role, kiểm tra inline policy đã lưu.
+
+![Mở API role, kiểm tra inline policy đã lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/update-007.png)
+
+*Mở API role, kiểm tra inline policy đã lưu.*
+
+**Bước 3.** Kiểm tra trust policy API cho phép Lambda assume role.
+
+![Kiểm tra trust policy API cho phép Lambda assume role](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/update-008.png)
+
+*Kiểm tra trust policy API cho phép Lambda assume role.*
+
+**Bước 4.** Mở Worker role, kiểm tra inline policy đã lưu.
+
+![Mở Worker role, kiểm tra inline policy đã lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/update-009.png)
+
+*Mở Worker role, kiểm tra inline policy đã lưu.*
+
+**Bước 5.** Kiểm tra trust policy Worker cho phép Lambda assume role.
+
+![Kiểm tra trust policy Worker cho phép Lambda assume role](/images/5-Workshop/FLASHRUSH/evidence/5.3.3-IAM/update-010.png)
+
+*Kiểm tra trust policy Worker cho phép Lambda assume role.*
+
+Sau đó đối chiếu Configuration → Permissions của từng Lambda để xác nhận role được gắn đúng hàm; danh sách IAM role tồn tại không tự chứng minh liên kết này.

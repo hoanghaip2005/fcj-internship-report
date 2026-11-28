@@ -7,9 +7,8 @@ draft: false
 
 
 
-> **Trạng thái:** Bản hướng dẫn thực hành thủ công dựa trên source FLASHRUSH; **có ảnh thực hành từng dịch vụ, chưa đủ bằng chứng nghiệm thu toàn bộ luồng**. Không sử dụng CloudFormation/CLI để tạo hạ tầng. Các bước tạo/sửa/xóa tài nguyên AWS có thể phát sinh phí. Chỉ thực hiện trong môi trường demo có quyền hợp lệ; chụp ảnh thực tế khi làm, không thay bằng ảnh giả.
 
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`, đối chiếu cấu hình stack `flashrush-lab` trước đây. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
 
 ## 5.2.1 Chuẩn bị trên AWS Console
 
@@ -86,4 +85,3 @@ Snapshot lấy từ working tree trên nền commit `eef9a6fbc9930f3865a93681048
 Namespace manual chỉ thay tên, không thay nghiệp vụ. Nếu nhiều nhóm dùng chung account/region, phân công dùng chung một bộ hoặc thống nhất prefix riêng; đổi đồng bộ tên, ARN, policies, environment, alarms. Không để các nhóm cùng ghi đè một bộ tài nguyên.
 
 Không chạy `deploy.py`, `publish.py`, `verify.py`, `cleanup_inventory.py` của track CloudFormation cho bộ manual: các script đó phụ thuộc stack outputs/guards.
-

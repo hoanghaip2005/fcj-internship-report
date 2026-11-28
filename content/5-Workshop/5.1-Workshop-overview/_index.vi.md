@@ -7,9 +7,8 @@ draft: false
 
 
 
-> **Trạng thái:** Bản hướng dẫn thực hành thủ công dựa trên source FLASHRUSH; **có ảnh thực hành từng dịch vụ, chưa đủ bằng chứng nghiệm thu toàn bộ luồng**. Không sử dụng CloudFormation/CLI để tạo hạ tầng. Các bước tạo/sửa/xóa tài nguyên AWS có thể phát sinh phí. Chỉ thực hiện trong môi trường demo có quyền hợp lệ; chụp ảnh thực tế khi làm, không thay bằng ảnh giả.
 
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`, đối chiếu cấu hình stack `flashrush-lab` trước đây. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
 
 ## Mục tiêu
 
@@ -90,4 +89,3 @@ Sơ đồ v1.1 đi kèm vẫn mang nhãn thiết kế đề xuất. Khi thực h
 - Worker xử lý lỗi kỹ thuật bằng partial batch failure. Không tự chuyển `FAILED`; DLQ không đồng nghĩa đơn thất bại nghiệp vụ.
 - S3 private/OAC, SPA Function, ba alarms là cấu hình đã có trong implementation; ảnh đề xuất không chứng minh trạng thái AWS hiện tại.
 - Admin/Monitoring vẫn dùng dữ liệu mock, không có backend quản trị, đăng nhập, thanh toán hay vận chuyển.
-

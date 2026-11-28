@@ -4,221 +4,629 @@ weight: 9
 draft: false
 ---
 
+### Mục tiêu thực hành
 
+Trong phần này, người thực hành sẽ triển khai và cấu hình Amazon CloudWatch để giám sát hoạt động của hệ thống FLASHRUSH trên AWS.
 
+Amazon CloudWatch cung cấp các chức năng thu thập nhật ký hoạt động (Logs), theo dõi chỉ số hiệu năng (Metrics) và thiết lập cảnh báo (Alarms) khi hệ thống phát sinh sự cố.
 
-**Mục tiêu:** Logs, metrics và alarms.
+Sau khi hoàn thành, người thực hành có thể:
 
-> **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
+- Kiểm tra CloudWatch Logs của Lambda API, Lambda Worker và API Gateway.
+- Theo dõi các chỉ số hoạt động của Amazon SQS và AWS Lambda.
+- Tạo ba CloudWatch Alarms để phát hiện các tình huống bất thường.
+- Kết nối CloudWatch Alarms với Amazon SNS để gửi thông báo qua email.
+- Kiểm tra trạng thái các Alarms và thu thập bằng chứng triển khai.
 
-**Điều kiện đầu vào:** Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước trang này. Region `us-east-1`; thay `YOUR_AWS_ACCOUNT_ID` bằng Account ID đúng của người thực hành.
+Lưu ý: Hướng dẫn sử dụng namespace flashrush-manual trong Region us-east-1. Các thao tác được thực hiện thủ công bằng AWS Management Console và có thể phát sinh chi phí. Chỉ thao tác trên tài nguyên flashrush-manual của bài thực hành.
 
-### 5.3.9.1 Kiểm tra logs
+### Điều kiện tiên quyết
 
+Trước khi thực hiện, cần bảo đảm:
 
-**Bước 1.** CloudWatch → Log groups → API group → mở stream mới nhất.
+- Có tài khoản AWS và quyền truy cập Amazon CloudWatch.
+- Đã đăng nhập AWS Management Console.
+- Region đang sử dụng là US East (N. Virginia) us-east-1.
+- Đã triển khai Lambda API và Lambda Worker.
+- Đã tạo Amazon SQS Queue và Dead-Letter Queue (DLQ).
+- Đã cấu hình Amazon API Gateway và Access Logging.
+- Đã tạo Amazon SNS Topic flashrush-manual-alerts và xác nhận Email Subscription.
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-01.png)
+Các tài nguyên được sử dụng:
 
-*Hình 5.3.9.1. Mở CloudWatch, chọn log group API và đọc log stream.*
+| Thành phần | Tên tài nguyên |
+|---|---|
+| AWS Region | us-east-1 |
+| Lambda API | flashrush-manual-api |
+| Lambda Worker | flashrush-manual-worker |
+| SQS Queue | flashrush-manual-orders |
+| SQS DLQ | flashrush-manual-dlq |
+| SNS Topic | flashrush-manual-alerts |
+| Monitoring | Amazon CloudWatch |
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-02.png)
+### Quy trình triển khai
 
-*Hình 5.3.9.2. Mở CloudWatch, chọn log group API và đọc log stream.*
+### 5.3.9.1 Truy cập Amazon CloudWatch
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-03.png)
+**Bước 1.** Đăng nhập AWS Management Console tại https://console.aws.amazon.com/.
 
-*Hình 5.3.9.3. Mở CloudWatch, chọn log group API và đọc log stream.*
+![Mở AWS Console](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-001.png)
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-04.png)
+*Hình 5.3.9.1. Mở AWS Console.*
 
-*Hình 5.3.9.4. Mở CloudWatch, chọn log group API và đọc log stream.*
+**Bước 2.** Tại thanh tìm kiếm AWS, nhập từ khóa CloudWatch.
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-05.png)
+![Tìm CloudWatch](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-02.png)
 
-*Hình 5.3.9.5. Mở CloudWatch, chọn log group API và đọc log stream.*
+*Hình 5.3.9.2. Tìm CloudWatch.*
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-06.png)
+**Bước 3.** Chọn dịch vụ CloudWatch trong kết quả tìm kiếm.
 
-*Hình 5.3.9.6. Mở CloudWatch, chọn log group API và đọc log stream.*
+**Bước 4.** Kiểm tra Region ở góc trên bên phải, bảo đảm đang sử dụng us-east-1.
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-07.png)
+**Bước 5.** Quan sát thanh điều hướng bên trái của CloudWatch, xác định các nhóm chức năng:
 
-*Hình 5.3.9.7. Mở CloudWatch, chọn log group API và đọc log stream.*
+Logs
 
-![Mở CloudWatch, chọn log group API và đọc log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-08.png)
+Metrics
 
-*Hình 5.3.9.8. Mở CloudWatch, chọn log group API và đọc log stream.*
+Alarms
 
+![CloudWatch và menu Logs, Metrics, Alarms](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-003.png)
 
-**Bước 2.** Gọi GET products hoặc POST order để tạo hoạt động.
+*Hình 5.3.9.3. CloudWatch và menu Logs, Metrics, Alarms.*
 
+### 5.3.9.2 Kiểm tra CloudWatch Logs của Lambda API
 
-**Bước 3.** Mở Worker group, đối chiếu thời điểm nhận đơn và các thông báo lỗi/no-op nếu có.
+CloudWatch Logs được sử dụng để ghi nhận thông tin thực thi, lỗi và các sự kiện phát sinh trong quá trình Lambda hoạt động.
 
-![Log Worker ban đầu rỗng, sau đó có stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-09.png)
+**Bước 1.** Trong menu CloudWatch, chọn Logs → Log groups.
 
-*Hình 5.3.9.9. Log Worker ban đầu rỗng, sau đó có stream.*
+![Mở Log groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-004.png)
 
-![Log Worker ban đầu rỗng, sau đó có stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-10.png)
+*Hình 5.3.9.4. Mở Log groups.*
 
-*Hình 5.3.9.10. Log Worker ban đầu rỗng, sau đó có stream.*
+**Bước 2.** Trong danh sách Log groups, tìm:
 
+/aws/lambda/flashrush-manual-api
 
-**Bước 4.** Mở API Gateway access log group để xem status và requestId.
+![Chọn Lambda API log group](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-005.png)
 
-![Mở access log API Gateway và đọc sự kiện](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-11.png)
+*Hình 5.3.9.5. Chọn Lambda API log group.*
 
-*Hình 5.3.9.11. Mở access log API Gateway và đọc sự kiện.*
+**Bước 3.** Nhấn vào tên Log group.
 
-![Mở access log API Gateway và đọc sự kiện](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-12.png)
+**Bước 4.** Chọn một Log stream tương ứng với thời điểm Lambda được gọi gần nhất.
 
-*Hình 5.3.9.12. Mở access log API Gateway và đọc sự kiện.*
+![Chọn API log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-006.png)
 
-![Mở access log API Gateway và đọc sự kiện](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-13.png)
+*Hình 5.3.9.6. Chọn API log stream.*
 
-*Hình 5.3.9.13. Mở access log API Gateway và đọc sự kiện.*
+**Bước 5.** Kiểm tra các thông tin nhật ký.
 
+Một Lambda invocation thường có các dòng tương tự:
 
-**Bước 5.** Ghi thời gian UTC khi thu thập evidence. Giờ Việt Nam là UTC+7.
+START RequestId: ...
 
-Trong log group, chọn Search all log streams, đặt khoảng thời gian đúng lần test, tìm worker_retry hoặc worker_terminal_noop. Nếu chưa có logs, kiểm tra invocation, Deploy code và quyền ghi đúng log group.
+END RequestId: ...
 
-### 5.3.9.2 Tạo ba alarms đúng dimensions
+REPORT RequestId: ...
 
-**Minh họa thao tác**
+Các thông tin này hỗ trợ xác định thời gian thực thi, mức sử dụng bộ nhớ và trạng thái invocation.
 
+Tuy nhiên, Lambda invocation thành công không đồng nghĩa nghiệp vụ ứng dụng thành công. Cần đối chiếu thêm HTTP status và nội dung response của hệ thống.
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-14.png)
+**Bước 6.** Nếu chưa xuất hiện log, truy cập:
 
-*Hình 5.3.9.14. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+Lambda → Functions → flashrush-manual-api → Test.
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-15.png)
+Sử dụng Test Event GetProducts:
 
-*Hình 5.3.9.15. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+```json
+{
+"version": "2.0",
+"rawPath": "/products",
+"headers": {},
+"requestContext": {
+"requestId": "manual-read-test",
+"http": {
+"method": "GET",
+"path": "/products"
+}
+}
+}
+```
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-16.png)
+Nhấn Test để gọi Lambda.
 
-*Hình 5.3.9.16. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+Sau đó quay lại CloudWatch Logs, làm mới danh sách Log streams và kiểm tra bản ghi tương ứng.
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-17.png)
+![Log API sau Test Event](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-007.png)
 
-*Hình 5.3.9.17. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+*Hình 5.3.9.7. Log API sau Test Event.*
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-18.png)
+### 5.3.9.3 Kiểm tra CloudWatch Logs của Lambda Worker
 
-*Hình 5.3.9.18. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+Lambda Worker chịu trách nhiệm xử lý các đơn hàng được đưa vào hàng đợi SQS.
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-19.png)
+**Bước 1.** Quay lại CloudWatch → Logs → Log groups.
 
-*Hình 5.3.9.19. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+**Bước 2.** Tìm Log group:
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-20.png)
+/aws/lambda/flashrush-manual-worker
 
-*Hình 5.3.9.20. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+**Bước 3.** Nhấn vào Log group và mở Log stream phù hợp với thời điểm kiểm thử đơn hàng.
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-21.png)
+**Bước 4.** Kiểm tra các thông tin thực thi và thông báo lỗi nếu có.
 
-*Hình 5.3.9.21. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+Trong FLASHRUSH, cần chú ý những sự kiện:
 
-![Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-22.png)
+worker_retry: Worker cần thử xử lý lại do gặp lỗi.
 
-*Hình 5.3.9.22. Tạo alarm DLQ; đối chiếu metric, dimension, threshold và SNS action.*
+worker_terminal_noop: Worker nhận lại message của đơn hàng đã ở trạng thái kết thúc và không thực hiện giảm tồn kho lần nữa.
 
-CloudWatch → Alarms → Create alarm → Select metric. Với từng dòng dưới, chọn namespace và dimension chính xác; không chọn metric tổng hợp cho tất cả queues/functions.
+**Bước 5.** Sử dụng chức năng Search all log streams để tìm kiếm các thông báo trên.
 
-| Alarm name | Namespace và metric | Dimension | Ngưỡng |
-|---|---|---|---|
-| flashrush-manual-dlqalarm | AWS/SQS ApproximateNumberOfMessagesVisible | QueueName=flashrush-manual-dlq | ≥ 1 |
-| flashrush-manual-workererroralarm | AWS/Lambda Errors | FunctionName=flashrush-manual-worker | ≥ 1 |
-| flashrush-manual-queueagealarm | AWS/SQS ApproximateAgeOfOldestMessage | QueueName=flashrush-manual-orders | ≥ 300 giây |
+**Bước 6.** Điều chỉnh khoảng thời gian tìm kiếm phù hợp với lần kiểm thử.
 
-Cấu hình chung theo template: Statistic Maximum, Period 1 minute, Evaluation periods 1, Datapoints to alarm 1/1, Treat missing data = notBreaching. Notification khi In alarm → topic flashrush-manual-alerts. Bật alarm actions.
+Các thông báo trên chỉ xuất hiện khi source code thực tế ghi log và hệ thống đã thực thi qua nhánh xử lý tương ứng.
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-23.png)
+![Các log stream của Worker](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-008.png)
 
-*Hình 5.3.9.23. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+*Hình 5.3.9.8. Các log stream của Worker.*
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-24.png)
+Ảnh mới cho thấy đúng log group /aws/lambda/flashrush-manual-worker và hai log stream có thời điểm sự kiện UTC. Mở stream khớp với lần kiểm thử để xem Log events và chụp bản ghi thực thi.
 
-*Hình 5.3.9.24. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+### 5.3.9.4 Kiểm tra API Gateway Access Logs
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-25.png)
+API Gateway Access Logs hỗ trợ giám sát các HTTP request đi vào hệ thống.
 
-*Hình 5.3.9.25. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+**Bước 1.** Trong CloudWatch, mở Logs → Log groups.
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-26.png)
+**Bước 2.** Tìm Log group được cấu hình cho API Gateway trong mục 5.3.5.
 
-*Hình 5.3.9.26. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+![Chọn API Gateway access log group](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-009.png)
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-27.png)
+*Hình 5.3.9.9. Chọn API Gateway access log group.*
 
-*Hình 5.3.9.27. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+**Bước 3.** Mở Log stream tương ứng với thời gian gửi request.
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-28.png)
+**Bước 4.** Kiểm tra các thông tin được cấu hình trong Access Log, chẳng hạn:
 
-*Hình 5.3.9.28. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+Request ID
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-29.png)
+HTTP method
 
-*Hình 5.3.9.29. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+Request path
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-30.png)
+HTTP status
 
-*Hình 5.3.9.30. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+Request time
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-31.png)
+**Bước 5.** Đối chiếu HTTP status với kết quả gọi API.
 
-*Hình 5.3.9.31. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+Nếu chưa có Access Logs, kiểm tra lại cấu hình Access Logging tại API Gateway Stage và quyền ghi log.
 
-![Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-32.png)
+![Mở access log stream](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-010.png)
 
-*Hình 5.3.9.32. Tạo alarm Lambda Worker Errors; đối chiếu cấu hình trước và sau lưu.*
+*Hình 5.3.9.10. Mở access log stream.*
 
-Metric có thể chưa xuất hiện khi tài nguyên chưa phát sinh hoạt động. Tạo một đơn hợp lệ, chờ metric xuất hiện rồi chọn lại; không đổi sang queue khác chỉ để hoàn thành wizard.
+![Request ID và HTTP status trong access logs](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-011.png)
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-33.png)
+*Hình 5.3.9.11. Request ID và HTTP status trong access logs.*
 
-*Hình 5.3.9.33. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+Lưu ý: Khi thu thập bằng chứng, cần ghi nhận thời gian UTC của bản ghi log. Giờ Việt Nam là UTC+7.
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-34.png)
+### 5.3.9.5 Tạo CloudWatch Alarm giám sát Dead-Letter Queue
 
-*Hình 5.3.9.34. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+Alarm đầu tiên được sử dụng để phát hiện các message xuất hiện trong Dead-Letter Queue.
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-35.png)
+Tên Alarm:
 
-*Hình 5.3.9.35. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+flashrush-manual-dlqalarm
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-36.png)
+**Bước 1.** Trong menu CloudWatch, chọn Alarms → All alarms.
 
-*Hình 5.3.9.36. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+![Mở danh sách alarms](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-012.png)
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-37.png)
+*Hình 5.3.9.12. Mở danh sách alarms.*
 
-*Hình 5.3.9.37. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+**Bước 2.** Nhấn Create alarm.
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-38.png)
+**Bước 3.** Chọn Select metric.
 
-*Hình 5.3.9.38. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+![Chọn Create alarm và Select metric](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-013.png)
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-39.png)
+*Hình 5.3.9.13. Chọn Create alarm và Select metric.*
 
-*Hình 5.3.9.39. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+**Bước 4.** Trong danh sách namespaces, chọn SQS (AWS/SQS).
 
-![Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-40.png)
+**Bước 5.** Chọn nhóm metric theo Queue Name.
 
-*Hình 5.3.9.40. Tạo alarm tuổi message và kiểm tra danh sách alarms; còn warning cần xác minh.*
+**Bước 6.** Tìm queue:
 
-notBreaching nghĩa là dữ liệu thiếu được xử lý như không vi phạm trong logic đánh giá; không có nghĩa hệ thống chắc chắn khỏe khi không có traffic. [Nguồn xử lý missing data](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarms-and-missing-data.html).
+flashrush-manual-dlq
 
-### Giới hạn cảnh báo
+**Bước 7.** Chọn metric:
 
-Partial batch failure có thể trả invocation thành công nên không tăng Lambda `Errors`. Luôn xem thêm `worker_retry`, queue age, DLQ và throttles. Alarm action thành công chỉ chứng minh SNS chấp nhận action; phải xác minh riêng email đến inbox. Ba log groups retention 7 ngày; dashboard React không thay CloudWatch.
+ApproximateNumberOfMessagesVisible
 
-![Kiểm tra retention của ba log groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-41.png)
+Metric này phản ánh số lượng message đang có thể nhận từ hàng đợi.
 
-*Hình 5.3.9.41. Kiểm tra retention của ba log groups.*
+![Chọn metric DLQ đúng QueueName](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-014.png)
 
+*Hình 5.3.9.14. Chọn metric DLQ đúng QueueName.*
 
+Chọn dòng đã khoanh xanh với QueueName = flashrush-manual-dlq và metric ApproximateNumberOfMessagesVisible, rồi bấm Select metric ở Bước 8.
 
+**Bước 8.** Nhấn Select metric.
 
+**Bước 9.** Cấu hình Metric và Conditions:
+
+| Thông số | Giá trị |
+|---|---|
+| Namespace | AWS/SQS |
+| Metric | ApproximateNumberOfMessagesVisible |
+| Dimension | QueueName=flashrush-manual-dlq |
+| Statistic | Maximum |
+| Period | 1 minute |
+| Threshold type | Static |
+| Condition | Greater/Equal |
+| Threshold value | 1 |
+| Evaluation periods | 1 |
+| Datapoints to alarm | 1 out of 1 |
+| Missing data | Treat missing data as good (not breaching threshold) |
+
+Như vậy, khi DLQ có ít nhất một message và metric đáp ứng điều kiện đánh giá, Alarm có thể chuyển sang trạng thái ALARM.
+
+![Điều kiện DLQ và missing data notBreaching](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-015.png)
+
+*Hình 5.3.9.15. Điều kiện DLQ và missing data notBreaching.*
+
+Ảnh cấu hình DLQ cho thấy đúng queue flashrush-manual-dlq, Maximum, 1 minute, ngưỡng ≥ 1, 1 out of 1 và Treat missing data as good (not breaching threshold).
+
+**Bước 10.** Nhấn Next để cấu hình thông báo.
+
+**Bước 11.** Tại phần Notification:
+
+Alarm state trigger: In alarm
+
+Notification: Select an existing SNS topic
+
+SNS Topic: flashrush-manual-alerts
+
+Bảo đảm Alarm actions được bật.
+
+![Chọn SNS action cho DLQ alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-016.png)
+
+*Hình 5.3.9.16. Chọn SNS action cho DLQ alarm.*
+
+**Bước 12.** Nhấn Next và nhập Alarm name:
+
+flashrush-manual-dlqalarm
+
+![Đặt tên DLQ alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-017.png)
+
+*Hình 5.3.9.17. Đặt tên DLQ alarm.*
+
+**Bước 13.** Kiểm tra cấu hình và nhấn Create alarm.
+
+![Rà soát và tạo DLQ alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-018.png)
+
+*Hình 5.3.9.18. Rà soát và tạo DLQ alarm.*
+
+![Thông báo tạo alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-21.png)
+
+*Hình 5.3.9.19. Thông báo tạo alarm.*
+
+![Chi tiết DLQ alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-020.png)
+
+*Hình 5.3.9.20. Chi tiết DLQ alarm.*
+
+### 5.3.9.6 Tạo CloudWatch Alarm giám sát Lambda Worker Errors
+
+Alarm thứ hai được sử dụng để theo dõi số lần Lambda Worker gặp lỗi thực thi.
+
+Tên Alarm:
+
+flashrush-manual-workererroralarm
+
+**Bước 1.** Truy cập CloudWatch → Alarms → All alarms → Create alarm.
+
+![Tạo Worker Errors alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-021.png)
+
+*Hình 5.3.9.21. Tạo Worker Errors alarm.*
+
+**Bước 2.** Chọn Select metric.
+
+![Mở bộ chọn metric](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-022.png)
+
+*Hình 5.3.9.22. Mở bộ chọn metric.*
+
+**Bước 3.** Chọn namespace Lambda (AWS/Lambda).
+
+![Chọn AWS/Lambda](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-25.png)
+
+*Hình 5.3.9.23. Chọn AWS/Lambda.*
+
+**Bước 4.** Chọn nhóm metric By Function Name.
+
+![Chọn By Function Name](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-26.png)
+
+*Hình 5.3.9.24. Chọn By Function Name.*
+
+**Bước 5.** Tìm Lambda Function:
+
+flashrush-manual-worker
+
+![Chọn đúng Worker](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-27.png)
+
+*Hình 5.3.9.25. Chọn đúng Worker.*
+
+**Bước 6.** Chọn metric Errors.
+
+![Chọn metric Errors](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-026.png)
+
+*Hình 5.3.9.26. Chọn metric Errors.*
+
+Ảnh ở Bước 6 minh họa cách chọn metric Errors của flashrush-manual-worker. Các giá trị điều kiện cần dùng được trình bày ở Bước 7.
+
+**Bước 7.** Cấu hình:
+
+| Thông số | Giá trị |
+|---|---|
+| Namespace | AWS/Lambda |
+| Metric | Errors |
+| Dimension | FunctionName=flashrush-manual-worker |
+| Statistic | Maximum |
+| Period | 1 minute |
+| Threshold | Greater/Equal 1 |
+| Evaluation periods | 1 |
+| Datapoints to alarm | 1/1 |
+| Missing data | Treat missing data as good (not breaching threshold) |
+| SNS Topic | flashrush-manual-alerts |
+|  |  |
+
+![Worker Errors với notBreaching](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-027.png)
+
+*Hình 5.3.9.27. Worker Errors với notBreaching.*
+
+Ảnh Edit alarm của Worker Errors cho thấy đúng function và metric, Maximum, 1 minute, ngưỡng ≥ 1, 1 out of 1 và Treat missing data as good (not breaching threshold).
+
+**Bước 8.** Chọn Notification khi trạng thái chuyển sang In alarm.
+
+![Chọn SNS action cho Worker](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-028.png)
+
+*Hình 5.3.9.28. Chọn SNS action cho Worker.*
+
+**Bước 9.** Đặt tên Alarm:
+
+flashrush-manual-workererroralarm
+
+**Bước 10.** Rà soát cấu hình. Chọn Update alarm khi sửa alarm hiện có hoặc Create alarm khi tạo lần đầu.
+
+![Rà soát hoặc cập nhật Worker alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-029.png)
+
+*Hình 5.3.9.29. Rà soát hoặc cập nhật Worker alarm.*
+
+Kết quả
+
+![Danh sách sau khi lưu Worker alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-030.png)
+
+*Hình 5.3.9.30. Danh sách sau khi lưu Worker alarm.*
+
+Lưu ý: Với SQS partial batch response, Worker có thể trả batchItemFailures mà Lambda invocation vẫn hoàn thành thành công. Vì vậy, metric Errors không phản ánh đầy đủ tất cả các trường hợp cần retry.
+
+Cần kết hợp theo dõi Worker Logs, DLQ và các metric liên quan để đánh giá hoạt động xử lý đơn hàng.
+
+### 5.3.9.7 Tạo CloudWatch Alarm giám sát thời gian chờ SQS
+
+Alarm thứ ba được sử dụng để phát hiện tình huống message nằm trong hàng đợi quá lâu.
+
+Tên Alarm:
+
+flashrush-manual-queueagealarm
+
+**Bước 1.** Truy cập CloudWatch → Alarms → All alarms → Create alarm.
+
+**Bước 2.** Chọn Select metric.
+
+![Tạo Queue Age alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-031.png)
+
+*Hình 5.3.9.31. Tạo Queue Age alarm.*
+
+**Bước 3.** Chọn namespace SQS (AWS/SQS).
+
+![Chọn AWS/SQS](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-34.png)
+
+*Hình 5.3.9.32. Chọn AWS/SQS.*
+
+**Bước 4.** Chọn nhóm metric theo Queue Name.
+
+**Bước 5.** Tìm queue:
+
+flashrush-manual-orders
+
+**Bước 6.** Chọn metric:
+
+ApproximateAgeOfOldestMessage
+
+![Chọn tuổi message của main queue](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-35.png)
+
+*Hình 5.3.9.33. Chọn tuổi message của main queue.*
+
+**Bước 7.** Cấu hình các giá trị:
+
+| Thông số | Giá trị |
+|---|---|
+| Namespace | AWS/SQS |
+| Metric | ApproximateAgeOfOldestMessage |
+| Dimension | QueueName=flashrush-manual-orders |
+| Statistic | Maximum |
+| Period | 1 minute |
+| Threshold | Greater/Equal 300 |
+| Evaluation periods | 1 |
+| Datapoints to alarm | 1/1 |
+| Missing data | notBreaching |
+| SNS Topic | flashrush-manual-alerts |
+
+Ngưỡng 300 được tính bằng giây, tương đương 5 phút.
+
+Khi metric tuổi message cũ nhất đạt hoặc vượt 300 giây và đáp ứng điều kiện đánh giá, Alarm sẽ chuyển sang trạng thái cảnh báo.
+
+![Điều kiện tuổi message 300 giây](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-034.png)
+
+*Hình 5.3.9.34. Điều kiện tuổi message 300 giây.*
+
+**Bước 8.** Cấu hình Notification khi trạng thái là In alarm.
+
+![Chọn SNS action cho Queue Age](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-035.png)
+
+*Hình 5.3.9.35. Chọn SNS action cho Queue Age.*
+
+**Bước 9.** Đặt Alarm name:
+
+flashrush-manual-queueagealarm
+
+![Đặt tên Queue Age alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-036.png)
+
+*Hình 5.3.9.36. Đặt tên Queue Age alarm.*
+
+**Bước 10.** Nhấn Create alarm.
+
+![Lưu Queue Age alarm](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-037.png)
+
+*Hình 5.3.9.37. Lưu Queue Age alarm.*
+
+### 5.3.9.8 Kiểm tra trạng thái ba CloudWatch Alarms
+
+Sau khi tạo các Alarms, cần kiểm tra toàn bộ cấu hình đã được lưu.
+
+**Bước 1.** Truy cập CloudWatch → Alarms → All alarms.
+
+**Bước 2.** Kiểm tra danh sách có đủ ba Alarm:
+
+| STT | Alarm name | Chức năng |
+|---|---|---|
+| 1 | flashrush-manual-dlqalarm | Theo dõi message trong DLQ |
+| 2 | flashrush-manual-workererroralarm | Theo dõi lỗi Lambda Worker |
+| 3 | flashrush-manual-queueagealarm | Theo dõi thời gian chờ SQS |
+
+**Bước 3.** Kiểm tra trạng thái của từng Alarm.
+
+Các trạng thái thường gặp:
+
+OK: Metric không vi phạm điều kiện cảnh báo theo đánh giá hiện tại.
+
+ALARM: Metric đã vi phạm điều kiện cảnh báo.
+
+INSUFFICIENT_DATA: Chưa có đủ dữ liệu để xác định trạng thái.
+
+**Bước 4.** Mở chi tiết từng alarm và đối chiếu metric, dimension, threshold, Missing data treatment và SNS action với các bảng cấu hình ở trên.
+
+**Bước 5.** Xác nhận Alarm actions đang bật.
+
+![Ba alarm OK với actions enabled trong ảnh cung cấp](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/update-038.png)
+
+*Hình 5.3.9.38. Ba alarm OK với actions enabled trong ảnh cung cấp.*
+
+Ảnh danh sách ghi nhận cả ba alarm ở trạng thái OK, Actions enabled và hiển thị ngưỡng tương ứng. Dùng trang chi tiết của từng alarm để đối chiếu thêm Missing data treatment và SNS action.
+
+Cập nhật alarm đã có: kiểm tra flashrush-manual-dlqalarm và flashrush-manual-workererroralarm. Nếu giá trị còn là missing, chọn Actions → Edit → Additional configuration → Missing data treatment → Treat missing data as good (not breaching threshold). Đi tiếp qua các màn hình, giữ action In alarm → flashrush-manual-alerts rồi chọn Update alarm.
+
+Mở lại chi tiết từng alarm đã cập nhật và chụp metric, dimension, threshold, missing data và SNS action. DLQ dùng AWS/SQS, ApproximateNumberOfMessagesVisible, QueueName=flashrush-manual-dlq, ≥ 1. Worker dùng AWS/Lambda, Errors, FunctionName=flashrush-manual-worker, ≥ 1. Giữ Maximum, 1 minute và 1/1 cho cả hai.
+
+Sau khi frontend hoạt động và nhóm thống nhất kịch bản, đối chiếu Alarm History với email của cùng lần thử. Email từ Publish trực tiếp ở mục SNS xác nhận riêng đường gửi từ topic đến hộp thư.
+
+### 5.3.9.9 Kiểm tra CloudWatch Logs Retention
+
+Để giới hạn thời gian lưu trữ logs trong môi trường thực hành, cần kiểm tra retention của ba Log groups.
+
+**Bước 1.** Truy cập CloudWatch → Logs → Log groups.
+
+**Bước 2.** Chọn Log group của Lambda API, Lambda Worker hoặc API Gateway.
+
+**Bước 3.** Tìm mục Retention setting.
+
+**Bước 4.** Nếu chưa được cấu hình theo baseline, chỉnh retention thành 7 days.
+
+**Bước 5.** Lưu thay đổi và kiểm tra lại.
+
+Lặp lại với ba Log groups.
+
+![Retention 7 ngày của ba log group](/images/5-Workshop/FLASHRUSH/evidence/5.3.9-CloudWatch/image-41.png)
+
+*Hình 5.3.9.39. Retention 7 ngày của ba log group.*
+
+Ảnh Log groups xác nhận cả ba nhóm có retention 1 week (7 ngày).
+
+### Kiểm tra kết quả
+
+Các tiêu chí nghiệm thu của phần thực hành:
+
+| STT | Tiêu chí | Kết quả mong đợi |
+|---|---|---|
+| 1 | Lambda API Logs | Truy cập được log group và xem được log thực tế |
+| 2 | Lambda Worker Logs | Truy cập được log group và xem được log thực tế |
+| 3 | API Gateway Logs | Xem được access logs nếu đã bật và phát sinh request |
+| 4 | DLQ Alarm | Tạo đúng metric, dimension và threshold ≥ 1 |
+| 5 | Worker Errors Alarm | Tạo đúng metric Errors của flashrush-manual-worker |
+| 6 | Queue Age Alarm | Tạo đúng metric, dimension và threshold ≥ 300 giây |
+| 7 | SNS Notification | Ba Alarm trỏ tới flashrush-manual-alerts |
+| 8 | Log Retention | Ba Log groups có retention 7 ngày |
+
+Kết quả rà soát: Ảnh cấu hình mới của DLQ và Worker Errors hiển thị notBreaching. Ảnh danh sách cho thấy cả ba alarm ở trạng thái OK và Actions enabled. Retention 7 ngày của ba log group đã được ghi nhận. Ca CloudWatch Alarm → SNS → email còn chờ kiểm thử theo kịch bản đã thống nhất.
+
+### Các lỗi thường gặp
+
+Lỗi 1 Không tìm thấy Log group
+
+Nguyên nhân có thể do Lambda chưa được gọi, sai Region hoặc thiếu quyền ghi CloudWatch Logs.
+
+Cách xử lý: Kiểm tra Region, gọi Lambda bằng Test Event và xác minh execution role có quyền ghi logs.
+
+Lỗi 2 Không thấy metric trong CloudWatch
+
+Nguyên nhân có thể là Lambda hoặc SQS chưa phát sinh hoạt động nên chưa có dữ liệu metric phù hợp.
+
+Cách xử lý: Tạo hoạt động hợp lệ trên đúng tài nguyên, kiểm tra lại khoảng thời gian và Refresh danh sách metric. Không chọn metric của tài nguyên khác.
+
+Lỗi 3 Alarm ở trạng thái INSUFFICIENT_DATA
+
+Nguyên nhân có thể do chưa có đủ dữ liệu để CloudWatch đánh giá.
+
+Cách xử lý: Kiểm tra metric, khoảng thời gian đánh giá và cấu hình Treat missing data.
+
+Lỗi 4 CloudWatch Alarm không gửi email
+
+Cần kiểm tra Alarm actions, SNS Topic, Access Policy và trạng thái Email Subscription.
+
+Chỉ khi subscription đã được xác nhận, SNS mới có thể gửi email đến endpoint đó.
+
+Lỗi 5 Lambda Errors không tăng dù Worker cần retry
+
+Nguyên nhân có thể do Worker sử dụng partial batch response, trả về danh sách record thất bại mà không làm Lambda invocation thất bại.
+
+Cách xử lý: Kiểm tra thêm Worker Logs, queue age, DLQ và throttles.
+
+### Kết luận
+
+Amazon CloudWatch đóng vai trò quan trọng trong quá trình giám sát và vận hành hệ thống FLASHRUSH.
+
+Thông qua CloudWatch Logs, người thực hành có thể theo dõi lịch sử thực thi của Lambda API, Lambda Worker và các HTTP request đi qua API Gateway.
+
+Bên cạnh đó, ba CloudWatch Alarms được cấu hình nhằm phát hiện các trường hợp bất thường liên quan đến Dead-Letter Queue, lỗi thực thi Lambda Worker và thời gian chờ xử lý trong Amazon SQS.
+
+Việc kết nối CloudWatch Alarms với Amazon SNS hỗ trợ gửi thông báo qua email khi Alarm chuyển sang trạng thái cảnh báo.
+
+Tuy nhiên, các Alarms chỉ phản ánh những điều kiện và metric đã được cấu hình. Chúng không thay thế việc kiểm tra logs, trạng thái đơn hàng và các bằng chứng kiểm thử nghiệp vụ.
+
+### Tài liệu tham khảo
+
+AWS Documentation Amazon CloudWatch: https://docs.aws.amazon.com/cloudwatch/
+
+AWS Documentation Missing data in CloudWatch alarms: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarms-and-missing-data.html
+
+AWS Documentation Amazon SQS metrics: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html
+
+AWS Documentation Amazon CloudWatch Logs: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html

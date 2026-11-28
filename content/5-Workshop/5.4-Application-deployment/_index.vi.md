@@ -7,9 +7,8 @@ draft: false
 
 
 
-> **Trạng thái:** Bản hướng dẫn thực hành thủ công dựa trên source FLASHRUSH; **có ảnh thực hành từng dịch vụ, chưa đủ bằng chứng nghiệm thu toàn bộ luồng**. Không sử dụng CloudFormation/CLI để tạo hạ tầng. Các bước tạo/sửa/xóa tài nguyên AWS có thể phát sinh phí. Chỉ thực hiện trong môi trường demo có quyền hợp lệ; chụp ảnh thực tế khi làm, không thay bằng ảnh giả.
 
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`, đối chiếu cấu hình stack `flashrush-lab` trước đây. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
 
 **Điều kiện đầu vào:** Đã hoàn tất các bước 5.3. Đặc biệt cần có HTTP API endpoint, S3 private bucket và CloudFront distribution đúng bộ manual.
 
@@ -129,4 +128,3 @@ Trong ZIP, đặt `<DUONG_DAN_TOI_THU_MUC_APP>` bằng đường dẫn tuyệt �
 Home/Listing đọc catalog từ API khi chọn HTTP mode. Nếu catalog thiếu/sai schema, sửa dữ liệu Products theo 5.3.1; không chuyển về mock để che lỗi kết nối. Lưu trữ đơn trên browser phân tách theo mode/API URL; đơn từ website/API cũ không tự xuất hiện ở bộ mới. Admin/Monitoring vẫn mock kể cả khi mua hàng đã dùng HTTP.
 
 Khi upload lại: lưu dist cũ để rollback, upload assets trước và index cuối, kiểm tra hash/tên file và MIME, invalidate `/*`, chờ Completed. Không xóa assets cũ khi trình duyệt còn có thể giữ index cũ. Rollback bằng bộ dist đã lưu, upload theo cùng thứ tự rồi invalidate.
-

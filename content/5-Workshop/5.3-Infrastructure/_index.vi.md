@@ -4,11 +4,6 @@ weight: 3
 draft: false
 ---
 
-
-
-
-> **Trạng thái:** Bản nháp thực hành; chưa chạy lại từ đầu trên AWS Console. Người học sẽ tạo resource AWS thật, có thể phát sinh chi phí. Chỉ thực hiện trên `flashrush-manual-*`, tách biệt khỏi `flashrush-lab` do CloudFormation quản lý.
-
 **Mục tiêu:** Đi từng dịch vụ, tạo tài nguyên bằng giao diện AWS Console, kiểm tra kết quả rồi mới chuyển bước. Các bài dùng source Python Lambda và frontend React hiện có của FLASHRUSH; **không dùng CloudFormation hoặc AWS CLI để tạo hạ tầng**.
 
 ## Thứ tự thao tác
@@ -35,9 +30,9 @@ draft: false
 
 **Các phần giao thoa:** CloudWatch Log Groups phải được tạo trong bài IAM để giới hạn quyền ghi log; bài CloudWatch cuối chương phụ trách alarms/observability. Upload frontend và tích hợp trình duyệt nằm ở **5.4**, không thực hiện trước khi có API URL, S3 và CloudFront.
 
-## Ảnh thực tế cần bổ sung
+## Minh chứng cấu hình
 
-| Bước | Ảnh cần chụp | Tên gợi ý |
+| Dịch vụ | Nội dung đối chiếu | Tên ảnh gợi ý |
 |---|---|---|
 | DynamoDB | Hai bảng ACTIVE và kiểu khóa | `5.3-01-dynamodb-tables.png` |
 | SQS | Main Queue, DLQ, redrive policy | `5.3-02-sqs-dlq.png` |

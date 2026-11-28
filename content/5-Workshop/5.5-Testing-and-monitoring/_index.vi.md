@@ -7,9 +7,8 @@ draft: false
 
 
 
-> **Trạng thái:** Bản hướng dẫn thực hành thủ công dựa trên source FLASHRUSH; **có ảnh thực hành từng dịch vụ, chưa đủ bằng chứng nghiệm thu toàn bộ luồng**. Không sử dụng CloudFormation/CLI để tạo hạ tầng. Các bước tạo/sửa/xóa tài nguyên AWS có thể phát sinh phí. Chỉ thực hiện trong môi trường demo có quyền hợp lệ; chụp ảnh thực tế khi làm, không thay bằng ảnh giả.
 
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`, đối chiếu cấu hình stack `flashrush-lab` trước đây. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
 
 **Điều kiện đầu vào:** Hạ tầng 5.3 và frontend 5.4 đã hoạt động. Bài Test trong Lambda hoặc gửi message SQS có thể tạo đơn và làm thay đổi DynamoDB. Chỉ chạy trong bộ `flashrush-manual-*` đã xác nhận.
 
@@ -261,7 +260,7 @@ Kiểm tra theo lớp: Lambda Test → GET HTTP → website. Không sửa nhiề
 
 ## 5.5.6 Ảnh và bằng chứng bắt buộc
 
-> [CẦN CHỤP ẢNH: Lambda Test POST `/orders` có kết quả `202`, DynamoDB Orders terminal, Products stock trước/sau, Worker logs, CloudWatch alarms và SNS confirmed.]
+Ảnh Lambda Test, Orders CONFIRMED, Products, SNS Confirmed và các cấu hình CloudWatch đã có trong [các bài dịch vụ 5.3]({{< relref "/5-Workshop/5.3-Infrastructure/" >}}). Khi nghiệm thu, vẫn cần đối chiếu cùng một lần kiểm thử: stock trước/sau, order ID, Worker logs và Alarm History với email tương ứng.
 
 Ghi lại mã sản phẩm và số lượng tồn trước/sau, `orderId`, trạng thái cuối và thời gian UTC; không công khai giá trị Idempotency-Key/X-Order-Token của đơn thật.
 
@@ -276,4 +275,3 @@ Ghi lại mã sản phẩm và số lượng tồn trước/sau, `orderId`, tr�
 5. Chỉ đánh dấu PASS khi thu được kết quả thật. Bộ lab trước đây có bằng chứng 100 đơn (10 CONFIRMED, 90 OUT_OF_STOCK), chạy tối đa 10 workers phía client; không phải 100 request đồng thời và không chứng minh bộ manual mới.
 
 Mẫu ghi nhận: thời gian UTC, namespace/account/region, ca kiểm thử, stock trước/sau, orderId, HTTP/status, log xác nhận, PASS/FAIL/chưa chạy. Lưu riêng token; không đưa vào báo cáo công khai.
-

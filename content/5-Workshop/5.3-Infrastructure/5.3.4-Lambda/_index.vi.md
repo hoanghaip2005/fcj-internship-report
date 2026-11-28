@@ -4,271 +4,268 @@ weight: 4
 draft: false
 ---
 
+Mục tiêu: Tạo Order API, Order Worker và SQS trigger; kiểm tra trực tiếp bằng Lambda Test.
 
+Điều kiện: Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}); có DynamoDB Products/Orders, SQS main queue, DLQ và IAM execution roles. Dùng region us-east-1 và backend/app.py của dự án FLASHRUSH.
 
+Cách đọc: Khung xanh chỉ ô nhập, nút hoặc giá trị cần kiểm tra. Vòng tròn xanh dùng số bước toàn cục 1–21; các hình cùng bước lặp lại cùng số. Mỗi hình dùng một trang ngang để đọc rõ Console.
 
-**Mục tiêu:** Order API, Order Worker và SQS trigger.
+Giá trị cấu hình cần dùng
 
-> **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
+API: flashrush-manual-api · Python 3.12 · ARM64 · app.api · 256 MB · 15 giây.
 
-**Điều kiện đầu vào:** Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước trang này. Region `us-east-1`; thay `YOUR_AWS_ACCOUNT_ID` bằng Account ID đúng của người thực hành.
+Worker: flashrush-manual-worker · Python 3.12 · ARM64 · app.worker · 256 MB · 15 giây.
 
-### 5.3.4.1 Chuẩn bị code để dán trên web
+PRODUCTS_TABLE = flashrush-manual-products; ORDERS_TABLE = flashrush-manual-orders; QUEUE_URL = URL main queue của tài khoản đang dùng.
 
+SQS trigger: flashrush-manual-orders; Batch size = 1; Batch window = 0; Maximum concurrency = 5; bật Report batch item failures.
 
-**Bước 1.** Mở source-snapshot/backend/app.py trong ZIP bằng VS Code hoặc trình soạn thảo văn bản.
+### 5.3.4.1 Chuẩn bị mã nguồn
 
-![Mở mã nguồn app.py](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-01.png)
+**Bước 1.** Mở VS Code → backend/app.py → sao chép toàn bộ mã nguồn. Hai Lambda dùng cùng app.py, khác handler.
 
-*Hình 5.3.4.1. Mở mã nguồn app.py.*
+![Mã nguồn dùng PRODUCTS_TABLE, ORDERS_TABLE và SQS client](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-01.png)
 
-
-**Bước 2.** Chọn toàn bộ nội dung → Copy.
-
-
-**Bước 3.** Trong Lambda ở các bước sau, tạo file app.py ở gốc cây source và dán nội dung.
-
-
-**Bước 4.** Bấm **Deploy** sau khi dán; lưu trong editor chưa đủ nếu chưa deploy.
-
-
-**Bước 5.** Hai functions dùng cùng app.py nhưng handler khác nhau.
-
-Runtime dùng boto3 đi kèm Lambda Python. Không upload .venv, tests, credentials hoặc frontend vào Lambda.
-
-Nếu thích upload ZIP: trong File Explorer chọn riêng app.py → Compress to ZIP file, mở ZIP kiểm tra app.py ở gốc, rồi Code → Upload from → .zip file. Cách chính trong bài là dán code bằng editor web.
+*Hình 5.3.4.1. Mã nguồn dùng PRODUCTS_TABLE, ORDERS_TABLE và SQS client.*
 
 ### 5.3.4.2 Tạo Lambda API
 
+**Bước 2.** Mở AWS Lambda tại us-east-1 → nhấn Create an Event Function.
 
-**Bước 1.** Lambda → Create function → Author from scratch.
+![Nút tạo Lambda Event Function](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-02.png)
 
-![Mở màn hình tạo Lambda](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-02.png)
+*Hình 5.3.4.2. Nút tạo Lambda Event Function.*
 
-*Hình 5.3.4.2. Mở màn hình tạo Lambda.*
+#### Tạo Lambda API
 
+**Bước 3.** Chọn Author from scratch → Function name: flashrush-manual-api → Runtime: Python 3.12. Chọn role flashrush-manual-api-role trong Custom execution role.
 
-**Bước 2.** Function name: `flashrush-manual-api`.
+![Tên function, runtime và dropdown IAM role](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-03.png)
 
+*Hình 5.3.4.3. Tên function, runtime và dropdown IAM role.*
 
-**Bước 3.** Runtime Python 3.12, architecture arm64.
+#### Tạo Lambda API
 
+**Bước 4.** Bật ARM64 architecture và Custom execution role → chọn flashrush-manual-api-role → Save. Giữ VPC tắt.
 
-**Bước 4.** Permissions → Use an existing role → `flashrush-manual-api-role`.
+![Hai công tắc cấu hình, dropdown role và nút Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-04.png)
 
-![Nhập tên, runtime, ARM64 và execution role API](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-03.png)
+*Hình 5.3.4.4. Hai công tắc cấu hình, dropdown role và nút Save.*
 
-*Hình 5.3.4.3. Nhập tên, runtime, ARM64 và execution role API.*
+#### Tạo Lambda API
 
-![Nhập tên, runtime, ARM64 và execution role API](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-04.png)
+Tiếp bước 4: Kiểm tra ARM64 đã bật và role đúng → nhấn Create Event Function.
 
-*Hình 5.3.4.4. Nhập tên, runtime, ARM64 và execution role API.*
+![Hoàn tất tạo function sau khi lưu role](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-05.png)
 
+*Hình 5.3.4.5. Hoàn tất tạo function sau khi lưu role.*
 
-**Bước 5.** Create function.
+### 5.3.4.2 Triển khai mã nguồn API
 
-![Hoàn tất tạo Lambda API](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-05.png)
+**Bước 5.** Code → tạo app.py ở gốc Explorer → dán toàn bộ backend/app.py → nhấn Deploy. Khung mã nguồn chỉ phần handler worker trong file dùng chung.
 
-*Hình 5.3.4.5. Hoàn tất tạo Lambda API.*
+![File app.py, handler trong mã nguồn và nút Deploy](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-06.png)
 
+*Hình 5.3.4.6. File app.py, handler trong mã nguồn và nút Deploy.*
 
-**Bước 6.** Code → cây source → New file → tên **app.py** → dán nội dung từ [mục 5.3.4.1 Lambda code]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.4-Lambda/" >}}) → bấm **Deploy**. Có thể giữ file mẫu lambda_function.py, nhưng handler phải trỏ app.py.
+### 5.3.4.2 Đặt handler API
 
-![Dán mã nguồn vào app.py và Deploy](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-06.png)
+**Bước 6.** Trong tab Code → Runtime settings → nhấn Edit để đổi handler mặc định.
 
-*Hình 5.3.4.6. Dán mã nguồn vào app.py và Deploy.*
+![Runtime settings, handler mặc định và nút Edit](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-07.png)
 
+*Hình 5.3.4.7. Runtime settings, handler mặc định và nút Edit.*
 
-**Bước 7.** Runtime settings → Edit → Handler **app.api** → Save.
+#### Đặt handler API
 
-![Đổi handler API thành app.api](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-07.png)
+Tiếp bước 6: Nhập Handler = app.api → nhấn Save settings.
 
-*Hình 5.3.4.7. Đổi handler API thành app.api.*
+![Ô handler app.api và nút Save settings](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-08.png)
 
-![Đổi handler API thành app.api](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-08.png)
+*Hình 5.3.4.8. Ô handler app.api và nút Save settings.*
 
-*Hình 5.3.4.8. Đổi handler API thành app.api.*
+### 5.3.4.2 Cấu hình bộ nhớ và thời gian chạy
 
+**Bước 7.** Configuration → General configuration → Edit. Ảnh hiện Memory 128 MB và Timeout 3 secs trước khi sửa.
 
-**Bước 8.** Configuration → General configuration → Memory 256 MB, Timeout 15 seconds.
+![Menu cấu hình, giá trị hiện tại và nút Edit](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-09.png)
 
-![Sửa memory 256 MB và timeout 15 giây; ảnh đầu là trước khi sửa](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-09.png)
+*Hình 5.3.4.9. Menu cấu hình, giá trị hiện tại và nút Edit.*
 
-*Hình 5.3.4.9. Sửa memory 256 MB và timeout 15 giây; ảnh đầu là trước khi sửa.*
+#### Cấu hình bộ nhớ và thời gian chạy
 
-![Sửa memory 256 MB và timeout 15 giây; ảnh đầu là trước khi sửa](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-10.png)
+Tiếp bước 7: Memory = 256 MB; Timeout = 0 mins 15 secs; Execution role = flashrush-manual-api-role → Save.
 
-*Hình 5.3.4.10. Sửa memory 256 MB và timeout 15 giây; ảnh đầu là trước khi sửa.*
+![Các ô giá trị Memory, Timeout, role và nút Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-10.png)
 
+*Hình 5.3.4.10. Các ô giá trị Memory, Timeout, role và nút Save.*
 
-**Bước 9.** Configuration → Environment variables → thêm ba biến ở bảng dưới.
+### 5.3.4.2 Thêm biến môi trường
 
-![Thêm và kiểm tra ba biến môi trường](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-11.png)
+**Bước 8.** Configuration → Environment variables → Edit. Thêm PRODUCTS_TABLE, ORDERS_TABLE và QUEUE_URL.
 
-*Hình 5.3.4.11. Thêm và kiểm tra ba biến môi trường.*
+![Menu Environment variables, số biến hiện tại và nút Edit](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-11.png)
 
-![Thêm và kiểm tra ba biến môi trường](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-12.png)
+*Hình 5.3.4.11. Menu Environment variables, số biến hiện tại và nút Edit.*
 
-*Hình 5.3.4.12. Thêm và kiểm tra ba biến môi trường.*
+#### Thêm biến môi trường
 
-![Thêm và kiểm tra ba biến môi trường](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-13.png)
+Tiếp bước 8: Nhập từng cặp Key/Value → Add environment variable để thêm dòng. Chỉ nhấn Save sau khi điền đủ ba biến.
 
-*Hình 5.3.4.13. Thêm và kiểm tra ba biến môi trường.*
+![Ô Key, ô Value, nút thêm dòng và nút Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-12.png)
 
-![Thêm và kiểm tra ba biến môi trường](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-14.png)
+*Hình 5.3.4.12. Ô Key, ô Value, nút thêm dòng và nút Save.*
 
-*Hình 5.3.4.14. Thêm và kiểm tra ba biến môi trường.*
+#### Thêm biến môi trường
 
+Tiếp bước 8: PRODUCTS_TABLE = flashrush-manual-products; ORDERS_TABLE = flashrush-manual-orders; QUEUE_URL = URL của main queue → Save.
 
-**Bước 10.** Không gắn VPC cho bài lab này. VPC không cần thiết cho DynamoDB/SQS public service endpoints và có thể làm mất kết nối nếu không cấu hình egress.
+![Ba biến môi trường trước khi lưu; QUEUE_URL dùng URL của main queue](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-13.png)
 
-| Biến | Giá trị cho bài thực hành |
-|---|---|
-| PRODUCTS_TABLE | flashrush-manual-products |
-| ORDERS_TABLE | flashrush-manual-orders |
-| QUEUE_URL | Queue URL của flashrush-manual-orders lấy từ Console |
+*Hình 5.3.4.13. Ba biến môi trường trước khi lưu; QUEUE_URL dùng URL của main queue.*
 
-QUEUE_URL là URL, không phải ARN. Không đặt AWS_ACCESS_KEY_ID hay AWS_SECRET_ACCESS_KEY trong Lambda environment; runtime dùng execution role.
+#### Thêm biến môi trường
 
-### 5.3.4.3 Test API trực tiếp trước khi nối HTTP
+Tiếp bước 8: Kiểm tra Environment variables (3) và đủ ba dòng giá trị đã lưu.
 
-**Minh họa thao tác**
+![Xác nhận ba biến môi trường của Lambda API](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-14.png)
 
+*Hình 5.3.4.14. Xác nhận ba biến môi trường của Lambda API.*
 
-![Tạo test GET products và đọc phản hồi 200](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-15.png)
+### 5.3.4.3 Kiểm tra GET /products
 
-*Hình 5.3.4.15. Tạo test GET products và đọc phản hồi 200.*
+**Bước 9.** Test → Create new event → Event name: GetProducts → Synchronous → Private. Nhập JSON ở hình tiếp theo rồi Save → Test.
 
-![Tạo test GET products và đọc phản hồi 200](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-16.png)
+![Tạo test event GetProducts với kiểu gọi Synchronous](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-15.png)
 
-*Hình 5.3.4.16. Tạo test GET products và đọc phản hồi 200.*
+*Hình 5.3.4.15. Tạo test event GetProducts với kiểu gọi Synchronous.*
 
-![Tạo test GET products và đọc phản hồi 200](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-17.png)
+#### Kiểm tra GET /products
 
-*Hình 5.3.4.17. Tạo test GET products và đọc phản hồi 200.*
+Tiếp bước 9: Trong Event JSON, nhập payload HTTP API 2.0 với rawPath = /products và requestContext.http.method = GET → Save → Test.
 
-![Tạo test GET products và đọc phản hồi 200](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-18.png)
+![Toàn bộ editor Event JSON cho GET /products](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-16.png)
 
-*Hình 5.3.4.18. Tạo test GET products và đọc phản hồi 200.*
+*Hình 5.3.4.16. Toàn bộ editor Event JSON cho GET /products.*
 
-Tab Test → Create new event → đặt tên `GetProducts` → dán:
+### 5.3.4.3 Đọc kết quả GET /products
 
-```json
-{
-  "version": "2.0",
-  "rawPath": "/products",
-  "headers": {},
-  "requestContext": {
-    "requestId": "manual-read-test",
-    "http": {"method": "GET", "path": "/products"}
-  }
-}
-```
+**Bước 10.** Kiểm tra Executing function: succeeded → mở Details để đọc Response. Tiếp tục đối chiếu HTTP status và body ở hình sau.
 
-Nhấn Test. Phải có statusCode 200 và body là JSON chứa items. Lambda hiển thị invocation thành công nhưng body statusCode 503 vẫn là lỗi ứng dụng: xem CloudWatch logs và IAM/environment.
+![Trạng thái thực thi thành công và nút Test](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-17.png)
+
+*Hình 5.3.4.17. Trạng thái thực thi thành công và nút Test.*
+
+#### Đọc kết quả GET /products
+
+Tiếp bước 10: Response phải có statusCode = 200; body chứa items và productId = manual-sku-001.
+
+![HTTP 200 và toàn bộ body chứa sản phẩm thử](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-18.png)
+
+*Hình 5.3.4.18. HTTP 200 và toàn bộ body chứa sản phẩm thử.*
 
 ### 5.3.4.4 Tạo Lambda Worker
 
-**Minh họa thao tác**
+**Bước 11.** Tạo flashrush-manual-worker: Python 3.12, ARM64, role flashrush-manual-worker-role; Deploy cùng app.py; handler app.worker; 256 MB, 15 giây; cùng ba biến môi trường.
 
+![Ảnh xác nhận tên Worker và ba biến; handler, memory và timeout cần kiểm tra trong Console](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-19.png)
 
-![Kiểm tra tên Lambda Worker và các biến môi trường](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-19.png)
-
-*Hình 5.3.4.19. Kiểm tra tên Lambda Worker và các biến môi trường.*
-
-Lặp lại quy trình tạo với tên `flashrush-manual-worker`, role `flashrush-manual-worker-role`, handler **app.worker**, cùng nội dung app.py đã dán và Deploy, Python 3.12, arm64, 256 MB, timeout 15 giây và cùng ba environment variables.
+*Hình 5.3.4.19. Ảnh xác nhận tên Worker và ba biến; handler, memory và timeout cần kiểm tra trong Console.*
 
 ### 5.3.4.5 Gắn SQS trigger
 
+**Bước 12.** Trên Lambda Worker → Add trigger → tại Trigger configuration mở Select a source. Lấy ARN main queue theo hai bước tiếp theo.
 
-**Bước 1.** Mở Worker → Add trigger → SQS.
+![Màn hình cấu hình trigger và dropdown chọn nguồn](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-20.png)
 
-![Mở Add trigger](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-20.png)
+*Hình 5.3.4.20. Màn hình cấu hình trigger và dropdown chọn nguồn.*
 
-*Hình 5.3.4.20. Mở Add trigger.*
+### 5.3.4.5 Xác định main queue
 
+**Bước 13.** Mở Amazon SQS → Queues → chọn flashrush-manual-orders (main queue). Dòng flashrush-manual-dlq là dead-letter queue.
 
-**Bước 2.** Chọn queue `flashrush-manual-orders`, không chọn DLQ.
+![Dòng trên: DLQ; dòng dưới: main queue đang được chọn](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-21.png)
 
-![Xác định main queue, ARN và URL](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-21.png)
+*Hình 5.3.4.21. Dòng trên: DLQ; dòng dưới: main queue đang được chọn.*
 
-*Hình 5.3.4.21. Xác định main queue, ARN và URL.*
+### 5.3.4.5 Sao chép ARN và URL queue
 
-![Xác định main queue, ARN và URL](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-22.png)
+**Bước 14.** Trong flashrush-manual-orders → sao chép ARN để gắn trigger; sao chép URL cho QUEUE_URL. Kiểm tra Dead-letter queue = Enabled.
 
-*Hình 5.3.4.22. Xác định main queue, ARN và URL.*
+![ARN và URL đều được khoanh đủ hai dòng; DLQ đang Enabled](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-22.png)
 
+*Hình 5.3.4.22. ARN và URL đều được khoanh đủ hai dòng; DLQ đang Enabled.*
 
-**Bước 3.** Batch size: **1**.
+### 5.3.4.5 Cấu hình SQS event source mapping
 
+**Bước 15.** Quay lại Add trigger → chọn SQS → nhập ARN flashrush-manual-orders. Đổi Batch size từ 10 thành 1; đặt Batch window = 0.
 
-**Bước 4.** Batch window: **0 seconds**.
+![Ảnh đang hiển thị Batch size = 10 trước khi sửa; chưa xác nhận giá trị 1](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-23.png)
 
-![Màn hình tạo mapping còn hiển thị batch size 10; cần đổi thành 1 theo hướng dẫn](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-23.png)
+*Hình 5.3.4.23. Ảnh đang hiển thị Batch size = 10 trước khi sửa; chưa xác nhận giá trị 1.*
 
-*Hình 5.3.4.23. Màn hình tạo mapping còn hiển thị batch size 10; cần đổi thành 1 theo hướng dẫn.*
+#### Cấu hình SQS event source mapping
 
+Tiếp bước 15: Maximum concurrency = 5 → bật Report batch item failures → Add. Giữ Provisioned mode và EventCount metrics tắt theo baseline.
 
-**Bước 5.** Bật **Report batch item failures**. Nếu form Add trigger không hiển thị, mở event source mapping sau khi tạo để cập nhật.
+![Ảnh chỉ thấy ô concurrency 5, checkbox đã bật và Add; Batch size/Batch window nằm ngoài ảnh](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-24.png)
 
+*Hình 5.3.4.24. Ảnh chỉ thấy ô concurrency 5, checkbox đã bật và Add; Batch size/Batch window nằm ngoài ảnh.*
 
-**Bước 6.** Maximum concurrency: **5**.
+### 5.3.4.5 Theo dõi trạng thái trigger
 
-![Đặt concurrency 5 và bật partial batch failures](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-24.png)
+**Bước 16.** Configuration → Triggers → kiểm tra đúng flashrush-manual-orders. State có thể tạm thời là Creating; không thêm trigger thứ hai.
 
-*Hình 5.3.4.24. Đặt concurrency 5 và bật partial batch failures.*
+![Main queue flashrush-manual-orders trong trạng thái Creating](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-25.png)
 
+*Hình 5.3.4.25. Main queue flashrush-manual-orders trong trạng thái Creating.*
 
-**Bước 7.** Enable trigger, chờ state Enabled.
+### 5.3.4.5 Xác nhận trigger hoạt động
 
-![Theo dõi mapping từ Creating đến Enabled](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-25.png)
+**Bước 17.** Mở Details khi cần xem cấu hình; nhấn Refresh và chờ State chuyển từ Creating sang Enabled.
 
-*Hình 5.3.4.25. Theo dõi mapping từ Creating đến Enabled.*
+![Tên main queue đầy đủ, trạng thái Creating và nút Details](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-26.png)
 
-![Theo dõi mapping từ Creating đến Enabled](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-26.png)
+*Hình 5.3.4.26. Tên main queue đầy đủ, trạng thái Creating và nút Details.*
 
-*Hình 5.3.4.26. Theo dõi mapping từ Creating đến Enabled.*
+#### Xác nhận trigger hoạt động
 
-![Theo dõi mapping từ Creating đến Enabled](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-27.png)
+Tiếp bước 17: Xác nhận State: Enabled. Trạng thái này xác nhận event source mapping đã được bật; cần thêm bằng chứng để kết luận Worker xử lý đơn thành công.
 
-*Hình 5.3.4.27. Theo dõi mapping từ Creating đến Enabled.*
+![Tên main queue đầy đủ và State: Enabled](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-27.png)
 
+*Hình 5.3.4.27. Tên main queue đầy đủ và State: Enabled.*
 
-**Bước 8.** Giữ reserved concurrency chưa cấu hình theo baseline; kiểm tra quota toàn tài khoản đủ cho Worker và API.
+### 5.3.4.5 Kiểm tra concurrency của Worker
 
-![Kiểm tra chế độ unreserved concurrency của Worker](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-28.png)
+**Bước 18.** Configuration → Concurrency and recursion detection → giữ Use unreserved account concurrency. Ảnh hiển thị quota 10 và Provisioned concurrency (0); kiểm tra quota trước test tải.
 
-*Hình 5.3.4.28. Kiểm tra chế độ unreserved concurrency của Worker.*
+![Chế độ unreserved, giá trị 10 và không có provisioned configuration](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-28.png)
 
-Worker trả batchItemFailures để retry các record lỗi. Lambda có thể ghi nhận invocation không lỗi dù một record cần retry, vì vậy metric Errors đơn lẻ không đủ theo dõi đường này. [Nguồn partial batch response](https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html).
+*Hình 5.3.4.28. Chế độ unreserved, giá trị 10 và không có provisioned configuration.*
 
 ### 5.3.4.6 Hiểu cơ chế chống overselling
 
-**Minh họa thao tác**
+Order API tạo Order PENDING bằng conditional Put. orderId dẫn xuất từ Idempotency-Key; enqueue lease phối hợp retry khi DynamoDB đã ghi Order nhưng chưa chắc SQS đã nhận message.
 
+Worker dùng DynamoDB transaction để giảm stock có điều kiện và chuyển PENDING sang CONFIRMED trong cùng thao tác nguyên tử. Order đã ở trạng thái cuối không được trừ stock lần hai.
 
-![Test POST orders: phản hồi 202 và PENDING chỉ xác nhận tiếp nhận](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-29.png)
+Khi hết hàng, transaction riêng kiểm tra thiếu hàng rồi ghi OUT_OF_STOCK. Lỗi kỹ thuật phải được retry; không thay transaction bằng đọc stock → trừ trong Python → ghi đè stock.
 
-*Hình 5.3.4.29. Test POST orders: phản hồi 202 và PENDING chỉ xác nhận tiếp nhận.*
+HTTP 202 chỉ chứng minh API tiếp nhận đơn. Trigger Enabled chỉ xác nhận mapping đã bật. Kết luận xử lý thành công cần bằng chứng CloudWatch và DynamoDB Orders/Products.
 
-![Test POST orders: phản hồi 202 và PENDING chỉ xác nhận tiếp nhận](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-30.png)
+### 5.3.4.7 Kiểm tra POST /orders
 
-*Hình 5.3.4.30. Test POST orders: phản hồi 202 và PENDING chỉ xác nhận tiếp nhận.*
+**Bước 19.** Lambda API → Test → lưu ManualPostOrderTest: payload 2.0, POST /orders, header idempotency-key là UUIDv4; body có productId và quantity. Seed sản phẩm trước khi thử.
 
-API tạo Orders=PENDING bằng conditional Put; orderId xác định từ idempotency key. Khi gửi SQS, enqueue lease phối hợp retry để xử lý tình huống đã ghi DynamoDB nhưng chưa chắc SQS nhận message.
+![Event JSON cho POST /orders trong ManualPostOrderTest](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-29.png)
 
-Worker đọc order hiện tại rồi thực hiện một transaction gồm: giảm stock với điều kiện stock đủ, đồng thời chuyển order từ PENDING sang CONFIRMED. Nếu giao lại message của order đã terminal, Worker không giảm stock nữa. Nếu hết hàng, Worker dùng transaction riêng kiểm tra stock rồi ghi OUT_OF_STOCK. Lỗi kỹ thuật được retry thay vì bị coi thành hết hàng.
+*Hình 5.3.4.29. Event JSON cho POST /orders trong ManualPostOrderTest.*
 
-Không sửa flow thành đọc stock → trừ trong Python → ghi đè stock, vì nhiều Worker có thể cùng nhìn thấy một lượng tồn kho cũ.
+### 5.3.4.7 Đọc kết quả POST /orders
 
-### Code bàn giao và trạng thái enqueue
+**Bước 20.** Nhấn Test với ManualPostOrderTest đã lưu → kiểm tra Executing function: succeeded.21. Mở Details → Response: statusCode = 202; body có status = PENDING và orderId. Kết quả chỉ chứng minh API đã tiếp nhận đơn.
 
-Lấy `source-snapshot/backend/app.py` trong ZIP, dùng chính xác cùng file cho cả hai functions. ZIP upload chỉ chứa `app.py` ở gốc. Runtime cung cấp boto3; không upload virtualenv/dependencies local thay cho code này.
+![Kết quả bước 20–21: thực thi thành công, HTTP 202 và Order PENDING](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-30.png)
 
-`202` chỉ có sau ACK SQS hoặc đã ghi SENT. Retry đơn terminal trả `200`; đổi payload cùng key trả `409`; quantity khác 1 trả `400`; enqueue chưa chắc chắn có thể trả `503`. Giữ key/payload cũ khi retry. Lease hết hạn sau 30 giây; tối đa 3 send attempts có điều kiện. Đừng bấm Test liên tục rồi tạo key mới để né lỗi.
-
-Khi update, lưu code cũ cả hai functions trước; deploy API và Worker cùng snapshot, kiểm tra environment vẫn trỏ đúng bộ manual. Không cần artifact bucket riêng cho cách upload trực tiếp Console.
-
-
-
-
+*Hình 5.3.4.30. Kết quả bước 20–21: thực thi thành công, HTTP 202 và Order PENDING.*

@@ -4,236 +4,281 @@ weight: 7
 draft: false
 ---
 
+Mục tiêu: OAC, HTTPS, bucket policy và SPA Function.
 
-
-
-**Mục tiêu:** OAC, HTTPS, bucket policy và SPA Function.
-
-> **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
-
-**Điều kiện đầu vào:** Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước trang này. Region `us-east-1`; thay `YOUR_AWS_ACCOUNT_ID` bằng Account ID đúng của người thực hành.
+Điều kiện đầu vào: Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước trang này. Region us-east-1; thay YOUR_AWS_ACCOUNT_ID bằng Account ID đúng của người thực hành.
 
 ### 5.3.7.1 Tạo distribution và OAC
 
+Vào AWS Management Console → tìm CloudFront → chọn Distributions → nhấn Create distribution:
 
-**Bước 1.** CloudFront → Create distribution. Chọn cấu hình distribution tiêu chuẩn với S3 origin; nếu giao diện có thêm lựa chọn gói, kiểm tra giá trước khi chọn.
+![Mở danh sách CloudFront distributions](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-001.png)
 
-![Tạo distribution, chọn gói và đặt tên](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-01.png)
+*Hình 5.3.7.1. Mở danh sách CloudFront distributions.*
 
-*Hình 5.3.7.1. Tạo distribution, chọn gói và đặt tên.*
+Step 1 Choose a plan:
 
-![Tạo distribution, chọn gói và đặt tên](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-02.png)
+Bấm chọn ô Pay as you go bên phải (không dùng Flat-rate plans).
 
-*Hình 5.3.7.2. Tạo distribution, chọn gói và đặt tên.*
+Nhấn Next.
 
-![Tạo distribution, chọn gói và đặt tên](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-03.png)
+Kiểm tra: Khung Pay as you go hiện viền xanh.
 
-*Hình 5.3.7.3. Tạo distribution, chọn gói và đặt tên.*
+![Chọn gói Pay as you go](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-02.png)
 
+*Hình 5.3.7.2. Chọn gói Pay as you go.*
 
-**Bước 2.** Origin domain: chọn bucket website manual; dùng regional REST endpoint, không dùng website endpoint.
+Step 2 Get started:
 
+Distribution name: Nhập flashrush-manual-web (hoặc tên gợi nhớ bất kỳ).
 
-**Bước 3.** Origin path: để trống vì index nằm ở gốc.
+Distribution type: Giữ mặc định Single website or app.
 
-![Chọn S3 REST origin và để trống origin path](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-04.png)
+Nhấn Next.
 
-*Hình 5.3.7.4. Chọn S3 REST origin và để trống origin path.*
+![Đặt tên distribution](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-03.png)
 
-![Chọn S3 REST origin và để trống origin path](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-05.png)
+*Hình 5.3.7.3. Đặt tên distribution.*
 
-*Hình 5.3.7.5. Chọn S3 REST origin và để trống origin path.*
+Step 3 Specify origin:
 
-![Chọn S3 REST origin và để trống origin path](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-06.png)
+Origin type: Chọn Amazon S3.
 
-*Hình 5.3.7.6. Chọn S3 REST origin và để trống origin path.*
+![Chọn origin Amazon S3](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-04.png)
 
+*Hình 5.3.7.4. Chọn origin Amazon S3.*
 
-**Bước 4.** Origin access: Origin access control → Create OAC, tên `flashrush-manual-oac`.
+Origin: Nhấn Browse S3 và chọn đúng bucket REST endpoint:
 
+flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1.s3.us-east-1.amazonaws.com
 
-**Bước 5.** Signing behavior: Always sign requests, protocol SigV4.
+Origin path: Để trống.
 
-![Tạo OAC, chọn ký request và sao chép bucket policy](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-12.png)
+![Chọn đúng bucket S3 REST origin](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-005.png)
 
-*Hình 5.3.7.12. Tạo OAC, chọn ký request và sao chép bucket policy.*
+*Hình 5.3.7.5. Chọn đúng bucket S3 REST origin.*
 
-![Tạo OAC, chọn ký request và sao chép bucket policy](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-13.png)
+Allow private S3 bucket access to CloudFront: Giữ nguyên tích xanh Allow private S3 bucket access to CloudFront - Recommended.
 
-*Hình 5.3.7.13. Tạo OAC, chọn ký request và sao chép bucket policy.*
+Origin settings: Chọn Use recommended origin settings.
 
-![Tạo OAC, chọn ký request và sao chép bucket policy](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-14.png)
+Cache settings: Chọn Use recommended cache settings tailored to serving S3 content. Sau khi lưu, mở Behaviors → Default (*) và kiểm tra Redirect HTTP to HTTPS, GET/HEAD, Managed-CachingOptimized và Compress objects automatically = Yes.
 
-*Hình 5.3.7.14. Tạo OAC, chọn ký request và sao chép bucket policy.*
+Nhấn Next.
 
-![Tạo OAC, chọn ký request và sao chép bucket policy](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-15.png)
+![Cho phép truy cập S3 private và chọn cache settings](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-06.png)
 
-*Hình 5.3.7.15. Tạo OAC, chọn ký request và sao chép bucket policy.*
+*Hình 5.3.7.6. Cho phép truy cập S3 private và chọn cache settings.*
 
+Step 4 Enable security:
 
-**Bước 6.** Viewer protocol policy: Redirect HTTP to HTTPS.
+Tại mục Web Application Firewall (WAF), chọn Do not enable security protections (tắt WAF để tránh phát sinh phí ngoài ý muốn).
 
+Nhấn Next.
 
-**Bước 7.** Allowed methods: GET, HEAD. Bật compression.
+![Lựa chọn WAF cho môi trường lab](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-07.png)
 
+*Hình 5.3.7.7. Lựa chọn WAF cho môi trường lab.*
 
-**Bước 8.** Cache policy: Managed-CachingOptimized để khớp template.
+Step 5 Review and create:
 
+Rà soát lại toàn bộ cấu hình và nhấn Create distribution.
 
-**Bước 9.** Default root object: index.html.
+Kiểm tra: Trình duyệt mở trang quản lý chi tiết của Distribution vừa tạo (có các tab General, Origins, Behaviors...).
 
-![Đặt default root object index.html](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-10.png)
+![Rà soát distribution trước khi tạo](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-008.png)
 
-*Hình 5.3.7.10. Đặt default root object index.html.*
+*Hình 5.3.7.8. Rà soát distribution trước khi tạo.*
 
-![Đặt default root object index.html](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-11.png)
+![Trang chi tiết distribution](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-009.png)
 
-*Hình 5.3.7.11. Đặt default root object index.html.*
+*Hình 5.3.7.9. Trang chi tiết distribution.*
 
+Cấu hình thông số Baseline & OAC:
 
-**Bước 10.** Dùng default CloudFront certificate và domain cloudfront.net. Không cần Route 53/ACM cho bài lab này.
+Ngay tại trang quản lý chi tiết của Distribution vừa tạo, bạn hoàn thiện 2 thiết lập sau để khớp tuyệt đối với yêu cầu đề bài:
 
+**Bước 1.** Thiết lập Default root object và Price class (Tab General):
 
-**Bước 11.** Price class theo baseline: PriceClass_100. Đây là lựa chọn lab; đánh giá độ trễ cho người dùng Việt Nam khi chọn vùng edge.
+Tại tab General, nhấn Edit ở góc trên bên phải khung Settings.
 
+![Mở General Settings để chỉnh cấu hình](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-010.png)
 
-**Bước 12.** Tạo distribution. Ghi Distribution ID và Domain name, chờ trạng thái deployed sau mỗi lần cập nhật.
+*Hình 5.3.7.10. Mở General Settings để chỉnh cấu hình.*
 
-![Rà soát và tạo distribution; ảnh cuối đang Deploying](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-07.png)
+Price class: Chọn Use only North America and Europe (PriceClass_100).
 
-*Hình 5.3.7.7. Rà soát và tạo distribution; ảnh cuối đang Deploying.*
+Default root object: Nhập chính xác index.html.
 
-![Rà soát và tạo distribution; ảnh cuối đang Deploying](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-08.png)
+![Đặt PriceClass_100 và default root object index.html](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-011.png)
 
-*Hình 5.3.7.8. Rà soát và tạo distribution; ảnh cuối đang Deploying.*
+*Hình 5.3.7.11. Đặt PriceClass_100 và default root object index.html.*
 
-![Rà soát và tạo distribution; ảnh cuối đang Deploying](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-09.png)
+Nhấn Save changes.
 
-*Hình 5.3.7.9. Rà soát và tạo distribution; ảnh cuối đang Deploying.*
+**Bước 2.** Tạo và gán OAC chuẩn (Tab Origins):
 
-### 5.3.7.2 Gắn bucket policy cho OAC
+Chuyển sang tab Origins → tích chọn dòng S3 origin → nhấn Edit.
 
-**Minh họa thao tác**
+![Mở cấu hình S3 origin](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-012.png)
 
+*Hình 5.3.7.12. Mở cấu hình S3 origin.*
 
-![Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-16.png)
+Tại Origin access control, chọn flashrush-manual-oac nếu OAC này đã có. Chỉ nhấn Create new OAC khi cần tạo OAC lần đầu.
 
-*Hình 5.3.7.16. Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access.*
+![Chọn hoặc tạo OAC](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-013.png)
 
-![Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-17.png)
+*Hình 5.3.7.13. Chọn hoặc tạo OAC.*
 
-*Hình 5.3.7.17. Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access.*
+Name: flashrush-manual-oac
 
-![Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-18.png)
+Signing behavior: Giữ Sign requests (recommended) (SigV4)
 
-*Hình 5.3.7.18. Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access.*
+Origin type: S3 → nhấn Create.
 
-![Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-19.png)
+![Tên OAC và chế độ ký request](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-14.png)
 
-*Hình 5.3.7.19. Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access.*
+*Hình 5.3.7.14. Tên OAC và chế độ ký request.*
 
-![Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-20.png)
+Chọn flashrush-manual-oac trong danh sách thả xuống → nhấn Save changes.
 
-*Hình 5.3.7.20. Mở S3 Permissions, lưu bucket policy và kiểm tra Block Public Access.*
+Sau khi lưu, mở lại tab Origins và xác nhận S3 REST origin đang gắn OAC flashrush-manual-oac với Sign requests (recommended). Ảnh Edit origin bên dưới minh họa lựa chọn trước khi lưu.
 
-CloudFront có thể cung cấp nút Copy policy. Vào S3 bucket → Permissions → Bucket policy, cho phép CloudFront đọc object khi SourceArn đúng distribution. Ví dụ dưới đây cần thay `YOUR_DISTRIBUTION_ID`:
+![Gắn OAC vào S3 origin](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-015.png)
+
+*Hình 5.3.7.15. Gắn OAC vào S3 origin.*
+
+### 5.3.7.2 Cập nhật Bucket Policy cho OAC và HTTPS trên S3
+
+Mở dịch vụ Amazon S3 → vào bucket flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1 → chuyển sang tab Permissions.
+
+![Mở S3 Permissions](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-016.png)
+
+*Hình 5.3.7.16. Mở S3 Permissions.*
+
+Kéo xuống Bucket policy → Edit. Trong mảng Statement, bổ sung hoặc cập nhật quyền đọc của CloudFront và điều kiện từ chối truy cập qua HTTP theo mẫu. Giữ các statement cần thiết đang dùng, thay YOUR_AWS_ACCOUNT_ID và YOUR_DISTRIBUTION_ID rồi Save changes.
 
 ```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {"Service": "cloudfront.amazonaws.com"},
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1/*",
-      "Condition": {"StringEquals": {
-        "AWS:SourceArn": "arn:aws:cloudfront::YOUR_AWS_ACCOUNT_ID:distribution/YOUR_DISTRIBUTION_ID"
-      }}
-    },
-    {
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        "arn:aws:s3:::flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1",
-        "arn:aws:s3:::flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1/*"
-      ],
-      "Condition": {"Bool": {"aws:SecureTransport": "false"}}
-    }
-  ]
+"Version": "2012-10-17",
+"Statement": [
+{
+"Effect": "Allow",
+"Principal": {"Service": "cloudfront.amazonaws.com"},
+"Action": "s3:GetObject",
+"Resource": "arn:aws:s3:::flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1/*",
+"Condition": {"StringEquals": {
+"AWS:SourceArn": "arn:aws:cloudfront::YOUR_AWS_ACCOUNT_ID:distribution/YOUR_DISTRIBUTION_ID"
+}}
+},
+{
+"Effect": "Deny",
+"Principal": "*",
+"Action": "s3:*",
+"Resource": [
+"arn:aws:s3:::flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1",
+"arn:aws:s3:::flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1/*"
+],
+"Condition": {"Bool": {"aws:SecureTransport": "false"}}
+}
+]
 }
 ```
 
-Giữ Block Public Access bật. OAC cần S3 REST origin, không tương thích theo cùng cách với website endpoint. [Nguồn OAC và bucket policy](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html).
+![Chỉnh bucket policy cho CloudFront OAC](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-017.png)
 
-### 5.3.7.3 Làm cho refresh đường dẫn React hoạt động
+*Hình 5.3.7.17. Chỉnh bucket policy cho CloudFront OAC.*
 
-BrowserRouter cần trả index.html cho đường dẫn ứng dụng. Tạo CloudFront Function thay vì đổi mọi lỗi 403/404 thành 200, vì cách đổi tất cả có thể che lỗi file assets.
+![Quyền đọc giới hạn theo distribution ARN](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-018.png)
 
+*Hình 5.3.7.18. Quyền đọc giới hạn theo distribution ARN.*
 
-**Bước 1.** CloudFront → Functions → Create function → tên `flashrush-manual-spa-rewrite`, runtime cloudfront-js-2.0.
+![Lưu bucket policy và yêu cầu HTTPS](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-019.png)
 
-![Tạo CloudFront Function cho SPA](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-21.png)
+*Hình 5.3.7.19. Lưu bucket policy và yêu cầu HTTPS.*
 
-*Hình 5.3.7.21. Tạo CloudFront Function cho SPA.*
+Giữ Block Public Access bật. OAC cần S3 REST origin, không tương thích theo cùng cách với website endpoint. Nguồn OAC và bucket policy.
 
-![Tạo CloudFront Function cho SPA](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-22.png)
+![Kiểm tra S3 Block Public Access](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-20.png)
 
-*Hình 5.3.7.22. Tạo CloudFront Function cho SPA.*
+*Hình 5.3.7.20. Kiểm tra S3 Block Public Access.*
 
+### 5.3.7.3 Tạo CloudFront Function cho React SPA Routing
 
-**Bước 2.** Dán code sau, Save.
+Quay lại CloudFront → chọn Functions ở menu trái → nhấn Create function:
 
-![Nhập code Function và Save changes](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-23.png)
+![Mở CloudFront Functions](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-21.png)
 
-*Hình 5.3.7.23. Nhập code Function và Save changes.*
+*Hình 5.3.7.21. Mở CloudFront Functions.*
 
+Name: flashrush-manual-spa-rewrite
 
-**Bước 3.** Test URI `/products/manual-sku-001`: request URI đầu ra phải là `/index.html`.
+Runtime: cloudfront-js-2.0
 
-![Test đường dẫn sản phẩm ở DEVELOPMENT](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-24.png)
+Nhấn Create function.
 
-*Hình 5.3.7.24. Test đường dẫn sản phẩm ở DEVELOPMENT.*
+![Đặt tên và runtime Function](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-22.png)
 
-![Test đường dẫn sản phẩm ở DEVELOPMENT](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-25.png)
+*Hình 5.3.7.22. Đặt tên và runtime Function.*
 
-*Hình 5.3.7.25. Test đường dẫn sản phẩm ở DEVELOPMENT.*
+Tại tab Build, xóa code mẫu và dán đoạn mã sau → nhấn Save changes:
 
-
-**Bước 4.** Test URI `/assets/missing.js`: URI giữ nguyên.
-
-![Test đường dẫn asset ở DEVELOPMENT](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-26.png)
-
-*Hình 5.3.7.26. Test đường dẫn asset ở DEVELOPMENT.*
-
-
-**Bước 5.** Publish function lên LIVE.
-
-![Màn hình Publish Function; cần xác nhận LIVE sau publish](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-27.png)
-
-*Hình 5.3.7.27. Màn hình Publish Function; cần xác nhận LIVE sau publish.*
-
-
-**Bước 6.** Distribution → Behaviors → Default behavior → Function associations → Viewer request → chọn function LIVE.
-
-![Chỉnh default behavior và gắn Function vào viewer request](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-28.png)
-
-*Hình 5.3.7.28. Chỉnh default behavior và gắn Function vào viewer request.*
-
-![Chỉnh default behavior và gắn Function vào viewer request](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-29.png)
-
-*Hình 5.3.7.29. Chỉnh default behavior và gắn Function vào viewer request.*
+JavaScript
 
 ```javascript
 function handler(event) {
-  var request = event.request;
-  var appRoute = /^\/(products|checkout|orders|admin|monitoring)(\/.*)?$/.test(request.uri);
-  var filePath = /\.[^/]+$/.test(request.uri);
-  if (appRoute && !filePath) request.uri = '/index.html';
-  return request;
+var request = event.request;
+var appRoute = /^\/(products|checkout|orders|admin|monitoring)(\/.*)?$/.test(request.uri);
+var filePath = /\.[^/]+$/.test(request.uri);
+if (appRoute && !filePath) request.uri = '/index.html';
+return request;
 }
 ```
 
-Đường `/` dùng DefaultRootObject. Khi thêm route React cấp cao mới, phải cập nhật rule tương ứng.
+![Lưu mã rewrite cho SPA](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-23.png)
 
+*Hình 5.3.7.23. Lưu mã rewrite cho SPA.*
+
+Chuyển sang tab Test:
+
+![Mở Function Test](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-24.png)
+
+*Hình 5.3.7.24. Mở Function Test.*
+
+Nhập URL path là /products/manual-sku-001 → nhấn Run test
+
+![Test route sản phẩm trong DEVELOPMENT](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-025.png)
+
+*Hình 5.3.7.25. Test route sản phẩm trong DEVELOPMENT.*
+
+Đổi URL path thành /assets/missing.js → nhấn Run test
+
+![Test đường dẫn asset giữ nguyên URI](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-026.png)
+
+*Hình 5.3.7.26. Test đường dẫn asset giữ nguyên URI.*
+
+Đối chiếu trường uri trong phần kết quả. /products/manual-sku-001 phải trả về /index.html. /assets/missing.js phải giữ nguyên. Hai ảnh hiện có ghi nhận Success ở DEVELOPMENT. Cần ảnh Output để xác nhận hai URI.
+
+Chỉ khi triển khai phiên bản mới, mở tab Publish và nhấn Publish function để đưa mã lên LIVE. Với Function hiện có, kiểm tra stage LIVE trước khi thay đổi.
+
+![Publish Function lên LIVE](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/image-27.png)
+
+*Hình 5.3.7.27. Publish Function lên LIVE.*
+
+Quay lại Distributions → mở YOUR_DISTRIBUTION_ID → chuyển sang tab Behaviors → tích chọn Default (*) → nhấn Edit.
+
+![Mở default behavior](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-028.png)
+
+*Hình 5.3.7.28. Mở default behavior.*
+
+Ở Function associations → Viewer request, kiểm tra CloudFront Functions và flashrush-manual-spa-rewrite (LIVE). Nếu cấu hình đã lưu đúng thì giữ nguyên. Nếu chưa gắn, chọn Function, nhấn Save changes và chờ distribution triển khai xong.
+
+![Gắn Function ở Viewer request](/images/5-Workshop/FLASHRUSH/evidence/5.3.7-CloudFront/update-029.png)
+
+*Hình 5.3.7.29. Gắn Function ở Viewer request.*
+
+Kiểm tra sau khi lưu và triển khai
+
+Nếu bucket S3 chưa có bản build hoặc website trả HTTP 403, kiểm tra nội dung triển khai trước khi kết luận cấu hình phân phối sai. Phối hợp bước triển khai frontend: đặt nội dung bản build ở gốc bucket private, tải assets trước index.html, giữ Block Public Access bật, sau đó invalidate /* và chờ Completed.
+
+Sau khi frontend được triển khai và origin của website đã được cho phép trong API Gateway CORS, kiểm tra trang chủ HTTPS, trang sản phẩm, refresh /orders và phản hồi API trong Network → Fetch/XHR.

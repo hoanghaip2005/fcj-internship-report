@@ -1,153 +1,130 @@
 ---
-title: "Bản đề xuất"
+title: "Proposal (Đề xuất giải pháp Workshop)"
 weight: 2
 chapter: false
 pre: "<b>2. </b> "
 ---
 
-## Đề xuất xây dựng hệ thống Flash Sale Serverless FLASHRUSH trên AWS
+## Đề xuất Workshop FLASHRUSH trên AWS
 
-## 1. Tóm tắt đề xuất
+### 1. Tổng quan bài toán và giải pháp
 
-FLASHRUSH là hệ thống minh họa xử lý đơn hàng trong một đợt bán giới hạn số lượng. Đề xuất tập trung vào ba vấn đề: tiếp nhận yêu cầu tăng đột biến, xử lý đơn bất đồng bộ và bảo đảm số đơn được xác nhận không vượt tồn kho. Hệ thống sử dụng React cho giao diện, Python cho nghiệp vụ và các dịch vụ AWS Serverless để giảm công việc quản lý máy chủ.
+FLASHRUSH là Workshop thực hành xây dựng ứng dụng Flash Sale bằng các dịch vụ AWS Serverless. Bài toán đặt ra là nhiều người cùng gửi yêu cầu mua trong khi số lượng sản phẩm có hạn; hệ thống cần tiếp nhận yêu cầu, xử lý đơn và bảo vệ tồn kho khi có thao tác thử lại hoặc thông điệp trùng.
 
-Sản phẩm hướng tới môi trường học tập và thực hành trong chương trình **First Cloud AI Journey** của sinh viên **Phạm Hoàng Hải, MSSV 2302700162, lớp IT2307V, vị trí Cloud AI Intern**. Phần triển khai chi tiết được trình bày tại [Workshop FLASHRUSH]({{< relref "/5-Workshop/" >}}).
+Giải pháp đề xuất dùng React làm giao diện, API Gateway và Lambda tiếp nhận yêu cầu, SQS điều phối xử lý, DynamoDB lưu sản phẩm và đơn hàng. S3/CloudFront phân phối website; IAM, CloudWatch và SNS hỗ trợ phân quyền, theo dõi lỗi và cảnh báo. Người học cấu hình các thành phần qua AWS Management Console để hiểu vai trò và cách kết nối dịch vụ.
 
-**Trạng thái đề xuất:** Dự án đã có mã nguồn, hướng dẫn và ảnh thực hành của chín dịch vụ AWS. Các ảnh ghi nhận quá trình cấu hình cùng một số kết quả kiểm thử. Cần tiếp tục đối chiếu cấu hình trên AWS và kiểm chứng toàn bộ luồng đặt hàng trước khi nghiệm thu.
+Giá trị của Workshop là một luồng ứng dụng nhỏ, có thể giải thích và kiểm tra từng bước: từ truy cập website đến tiếp nhận yêu cầu, xác nhận đơn và quan sát dữ liệu sau xử lý.
 
-## 2. Bài toán và mục tiêu
+### 2. Mục tiêu và phạm vi
 
-Trong Flash Sale, nhiều người có thể cùng mua sản phẩm còn ít hàng. Nếu đọc tồn kho rồi cập nhật bằng những thao tác rời rạc, nhiều yêu cầu có thể cùng nhìn thấy một số lượng hàng và dẫn đến bán vượt tồn kho. Người dùng bấm lại hoặc trình duyệt gửi lại yêu cầu cũng có thể tạo đơn trùng. Ngoài ra, xử lý mọi tác vụ ngay trong một request khiến thời gian phản hồi phụ thuộc vào toàn bộ luồng nghiệp vụ.
+#### Mục tiêu
 
-Đề xuất đặt ra các mục tiêu:
+- Hiểu kiến trúc xử lý bất đồng bộ và phân biệt HTTP `202 Accepted` với đơn `CONFIRMED`.
+- Cấu hình và kết nối chín dịch vụ AWS theo quan hệ phụ thuộc.
+- Áp dụng quyền tối thiểu, S3 private và CloudFront OAC.
+- Kiểm tra yêu cầu lặp, cập nhật tồn kho có điều kiện và xử lý message lỗi.
+- Ghi lại cấu hình, kết quả kiểm thử và cách dọn tài nguyên để người khác thực hành lại.
 
-- Tiếp nhận yêu cầu qua HTTP API, đưa tác vụ vào hàng đợi để xử lý bất đồng bộ.
-- Dùng cập nhật có điều kiện và transaction DynamoDB để bảo vệ tồn kho.
-- Sử dụng idempotency key để nhận biết yêu cầu gửi lại cùng một ý định mua.
-- Cho phép người dùng theo dõi trạng thái đơn, phân biệt đã tiếp nhận với đã mua thành công.
-- Thu thập log, theo dõi hàng đợi và cảnh báo lỗi để phục vụ vận hành lab.
-- Ghi lại cấu hình, kết quả kiểm thử và quy trình dọn dẹp để có thể thực hành lại.
+#### Phạm vi Workshop
 
-## 3. Phạm vi thực hiện
-
-Đề xuất này mô tả phạm vi Workshop AWS Console với prefix `flashrush-manual-*`; không đồng nhất với môi trường CloudFormation `flashrush-lab` hoặc các bản mở rộng của dự án.
-
-| Trong phạm vi | Kết quả dự kiến |
+| Trong phạm vi | Sản phẩm dự kiến |
 |---|---|
-| Danh mục và chi tiết sản phẩm | Đọc dữ liệu từ DynamoDB qua API |
-| Tạo đơn một sản phẩm | `quantity` là số nguyên 1, kiểm tra dữ liệu đầu vào |
-| Tiếp nhận và xử lý đơn | Lambda API, SQS và Lambda Worker |
-| Bảo vệ tồn kho | Transaction cập nhật tồn kho và xác nhận đơn |
-| Tra cứu đơn | Kiểm tra `X-Order-Token` gắn với đơn |
-| Phân phối giao diện | React build trên S3 private, truy cập qua CloudFront |
-| Giám sát | CloudWatch logs, metrics, alarms và email qua SNS |
-| Tài liệu thực hành | Chín dịch vụ AWS, kiểm thử, ảnh minh chứng và cleanup |
+| Danh mục và chi tiết sản phẩm | API đọc dữ liệu sản phẩm từ DynamoDB |
+| Đặt một sản phẩm mỗi yêu cầu | Kiểm tra dữ liệu đầu vào, `quantity = 1` |
+| Xử lý đơn bất đồng bộ | Lambda API, SQS và Lambda Worker |
+| Bảo vệ dữ liệu | Idempotency key, token tra cứu đơn và transaction tồn kho |
+| Phân phối giao diện | React build trên S3 private, truy cập HTTPS qua CloudFront |
+| Theo dõi và cảnh báo | Logs, metrics, alarms CloudWatch và thông báo SNS |
+| Tài liệu thực hành | Hướng dẫn Console, ảnh theo bước, kịch bản kiểm tra và cleanup |
 
-Chưa đưa vào phạm vi: thanh toán thật, vận chuyển, tài khoản khách hàng production, backend quản trị và hệ thống phân tích kinh doanh. Trong mã nguồn tham chiếu của Workshop manual, cần kiểm tra các trang Admin/Monitoring để nhận diện dữ liệu mô phỏng. Các tính năng bổ sung của môi trường lab khác được đánh giá riêng. Đồng hồ đếm ngược trên giao diện chưa phải cơ chế cưỡng chế thời gian bán tại backend.
+Không đưa vào Workshop này: thanh toán thật, giao hàng, vận hành thương mại, backend quản trị đầy đủ và tài khoản khách hàng production. Chức năng mô phỏng trong mã nguồn tham chiếu cần được ghi rõ khi sử dụng.
 
-## 4. Kiến trúc đề xuất
+**Đối tượng:** sinh viên hoặc người mới có kiến thức cơ bản về AWS, HTTP, Python và JavaScript. **Điều kiện:** tài khoản AWS được phép sử dụng, quyền tạo tài nguyên phù hợp, Node.js để build giao diện và mã nguồn FLASHRUSH đã chọn phiên bản.
 
-![Sơ đồ kiến trúc tham chiếu FLASHRUSH v1.1](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
+Workshop sử dụng một môi trường riêng tại `us-east-1`, prefix `flashrush-manual-*`. Các môi trường `flashrush-lab` hoặc bản mở rộng của dự án không được coi là cùng phạm vi thực hành.
 
-*Sơ đồ tham chiếu do nhóm cung cấp, thể hiện thiết kế v1.1; không phải ảnh chứng minh tài nguyên AWS đang hoạt động. Khi triển khai, cần đối chiếu từng thành phần với mã nguồn và cấu hình Workshop.*
+### 3. Vấn đề cần giải quyết
 
-| Dịch vụ | Vai trò trong giải pháp |
-|---|---|
-| Amazon S3 | Lưu bản build frontend trong bucket private |
-| Amazon CloudFront | Phân phối website qua HTTPS, truy cập S3 bằng OAC |
-| Amazon API Gateway | Cung cấp HTTP API, cấu hình routes và CORS |
-| AWS Lambda | Tách hàm API tiếp nhận yêu cầu và Worker xử lý đơn |
-| Amazon DynamoDB | Lưu Products, Orders; bảo vệ cập nhật tồn kho |
-| Amazon SQS | Đệm yêu cầu xử lý, retry và đưa message lỗi vào DLQ |
-| AWS IAM | Phân quyền riêng theo trách nhiệm API và Worker |
-| Amazon CloudWatch | Lưu log, theo dõi metrics và tạo alarms |
-| Amazon SNS | Gửi thông báo cảnh báo đến email đã xác nhận |
-
-### 4.1. Luồng truy cập và đặt hàng
-
-1. Người dùng mở website qua CloudFront; CloudFront lấy nội dung từ S3 private.
-2. Frontend gọi API Gateway để lấy danh sách hoặc chi tiết sản phẩm.
-3. Khi mua, frontend gửi yêu cầu kèm idempotency key. Lambda API kiểm tra dữ liệu, ghi nhận đơn và gửi message vào SQS.
-4. HTTP `202 Accepted` xác nhận yêu cầu được tiếp nhận; chưa xác nhận mua thành công.
-5. Lambda Worker nhận message, xử lý transaction DynamoDB. Khi đáp ứng điều kiện tồn kho, đơn chuyển thành `CONFIRMED`; khi hết hàng, kết quả là `OUT_OF_STOCK`.
-6. Frontend tra cứu trạng thái đơn bằng order ID và token để hiển thị kết quả.
-
-### 4.2. Tính nhất quán và khả năng phục hồi
-
-SQS có thể giao lại message, vì vậy Worker phải xử lý lặp an toàn. Việc kiểm tra trạng thái đơn và cập nhật tồn kho cần tuân theo logic transaction trong mã nguồn, tránh giảm tồn kho nhiều lần cho một đơn. Với API, gửi lại cùng key và cùng nội dung phải trỏ về cùng ý định mua; dùng lại key với nội dung khác cần bị từ chối.
-
-Ghi Orders và gửi SQS là hai thao tác khác nhau, không tạo thành một transaction chung. Nếu việc gửi queue có kết quả không rõ ràng, đơn có thể cần đối soát. Mã nguồn bàn giao có trạng thái `enqueueState=UNKNOWN`, lease 30 giây và giới hạn số lần gửi có điều kiện; chưa có scheduler tự khôi phục. Đây là giới hạn cần kiểm thử và ghi nhận, chưa thể khẳng định mọi đơn đều tự phục hồi.
-
-Lỗi kỹ thuật ở Worker sử dụng partial batch failure để retry message lỗi. Message vào DLQ không tự chuyển trạng thái đơn thành `FAILED`; người vận hành cần đối chiếu log và dữ liệu trước khi xử lý lại.
-
-## 5. Đánh giá tính khả thi
-
-**Khả thi ở quy mô lab:** Đã có mã nguồn Python/React, schema dữ liệu và tài liệu cấu hình tham chiếu. Chín dịch vụ phù hợp để thực hành kiến trúc Serverless; không cần mua thiết bị chuyên dụng hoặc vận hành máy chủ riêng. Có thể triển khai từng thành phần và kiểm tra theo thứ tự phụ thuộc.
-
-Điều kiện thực hiện gồm tài khoản AWS được phép sử dụng, quyền IAM phù hợp, môi trường Node.js để build frontend và kiến thức cơ bản về HTTP, Python, React, DynamoDB, SQS. Chọn Region `us-east-1` cho lab và namespace `flashrush-manual-*` theo Workshop, kiểm tra tài nguyên có sẵn trước khi tạo.
-
-**Chưa đủ cơ sở để cam kết vận hành thương mại:** Cần bổ sung xác thực, giới hạn truy cập, kiểm soát thời gian sale ở backend, quản lý bí mật, đối soát đơn, kiểm thử tải và quy trình vận hành. Mục tiêu lab là kiểm chứng hành vi trong phạm vi xác định, không cam kết khả năng chịu tải hay tính sẵn sàng chưa được đo.
-
-## 6. Kế hoạch triển khai
-
-| Giai đoạn dự kiến | Công việc | Sản phẩm bàn giao |
+| Vấn đề | Tác động | Hướng giải quyết đề xuất |
 |---|---|---|
-| Buổi 1 | Chốt phạm vi, đọc source snapshot, chuẩn bị tài khoản và inventory | Danh sách tài nguyên, sơ đồ và tiêu chí kiểm thử |
-| Buổi 2–3 | Tạo DynamoDB, SQS/DLQ, IAM, log groups và Lambda | API/Worker có cấu hình đúng, kiểm thử trực tiếp Lambda |
-| Buổi 4 | Cấu hình HTTP API, S3 private và CloudFront/OAC | API HTTPS, website truy cập qua CloudFront |
-| Buổi 5 | Build frontend, cấu hình API URL và kiểm tra CORS | Luồng trình duyệt tạo và tra cứu đơn |
-| Buổi 6 | Cấu hình SNS/CloudWatch, kiểm thử retry và tồn kho | Bảng kết quả, log và ảnh minh chứng |
-| Buổi 7 | Rà soát giới hạn, hoàn thiện hướng dẫn, dọn tài nguyên | Báo cáo nghiệm thu lab và inventory sau cleanup |
+| Yêu cầu tăng nhanh hơn khả năng xử lý | Request chậm, dễ quá tải thành phần phía sau | SQS đệm công việc; giới hạn concurrency của Worker theo năng lực xử lý |
+| Nhiều đơn cùng tranh sản phẩm ít hàng | Có thể xác nhận vượt tồn kho nếu đọc/ghi rời rạc | DynamoDB transaction và điều kiện stock khi ghi |
+| Người dùng thử lại sau timeout | Tạo đơn hoặc giảm tồn kho nhiều lần | Giữ cùng idempotency key/payload; Worker xử lý thông điệp lặp an toàn |
+| Lỗi kỹ thuật trong quá trình xử lý | Đơn chờ kéo dài, khó tìm nguyên nhân | Logs theo order ID, retry có kiểm soát, DLQ và quy trình đối soát |
+| Giao diện báo thành công quá sớm | Người dùng hiểu nhầm kết quả mua hàng | Hiển thị trạng thái chờ sau HTTP 202; tra cứu trạng thái cuối bằng token |
+| Tài liệu không khớp mã nguồn/cấu hình | Người học khó tái hiện bài lab | Chốt phiên bản nguồn, checklist cấu hình và ảnh kết quả tương ứng |
 
-Đây là lịch dự kiến, điều chỉnh theo thời gian cấp quyền, lỗi cấu hình và kết quả kiểm thử. Mỗi bước chỉ ghi hoàn thành khi có kết quả thực tế. Thao tác thực hành chi tiết nằm tại [mục 5.3]({{< relref "/5-Workshop/5.3-Infrastructure/" >}}).
+### 4. Kiến trúc giải pháp sơ bộ
 
-## 7. Ngân sách và kiểm soát chi phí
+![Kiến trúc sơ bộ Workshop FLASHRUSH](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
 
-Chi phí phụ thuộc thời gian tồn tại tài nguyên, Region, lượng request, dung lượng lưu trữ, lưu lượng truyền dữ liệu và mức ghi log. Đề xuất chưa có bảng AWS Pricing Calculator được kiểm chứng cho cấu hình manual, vì vậy chưa đưa ra tổng tiền cố định hoặc cam kết miễn phí.
+*Sơ đồ kiến trúc tham chiếu cho thiết kế Workshop; không phải bằng chứng nghiệm thu hệ thống.*
 
-| Nhóm chi phí | Yếu tố cần đưa vào ước tính |
-|---|---|
-| CloudFront và S3 | Dung lượng frontend, request, lưu lượng tải website |
-| API Gateway và Lambda | Số API call, thời gian chạy, bộ nhớ và invocation Worker |
-| DynamoDB | Read/write, transaction và dung lượng hai bảng |
-| SQS và SNS | Gửi/nhận/xóa message, retry và thông báo |
-| CloudWatch | Log ingestion, retention, metrics và alarms |
+| Nhóm thành phần | Dịch vụ | Trách nhiệm |
+|---|---|---|
+| Giao diện | S3, CloudFront | Lưu bản build, phân phối HTTPS; giữ S3 private bằng OAC |
+| Tiếp nhận | API Gateway, Lambda API | Kiểm tra request, ghi nhận đơn và gửi message |
+| Xử lý | SQS, Lambda Worker | Đệm tác vụ, xử lý đơn, retry và cô lập lỗi bằng DLQ |
+| Dữ liệu | DynamoDB | Lưu Products/Orders; kiểm soát thay đổi trạng thái và tồn kho |
+| Phân quyền | IAM | Tách quyền API và Worker theo actions/resources cần thiết |
+| Quan sát | CloudWatch, SNS | Logs, metrics, alarms và email cảnh báo đã xác nhận |
 
-Trước khi thực hành, lập ước tính trên [AWS Pricing Calculator](https://calculator.aws/) theo workload dự kiến, kiểm tra quyền lợi Free Tier của chính tài khoản và thống nhất ngân sách với người quản lý lab. Dùng AWS Budgets để cảnh báo; cảnh báo không tự giới hạn mức chi tiêu. Đặt log retention, giới hạn khối lượng kiểm thử và dọn tài nguyên sau nghiệm thu.
+**Luồng chính:** người dùng mở website qua CloudFront, đọc sản phẩm qua API rồi gửi yêu cầu mua kèm idempotency key. API tiếp nhận, ghi đơn `PENDING` và gửi SQS. Worker xử lý transaction, ghi `CONFIRMED` hoặc `OUT_OF_STOCK`. Frontend tra cứu đơn bằng order ID và token để hiển thị kết quả.
 
-## 8. Rủi ro và phương án xử lý
+**Điểm cần thiết kế rõ:** ghi DynamoDB và gửi SQS không nằm trong cùng một transaction; phải có cách phát hiện/đối soát đơn chưa được đưa vào hàng đợi. DLQ cũng không tự đổi trạng thái đơn. Các giới hạn này được đưa vào bài kiểm tra và hướng dẫn xử lý lỗi.
 
-| Rủi ro | Hướng xử lý dự kiến |
-|---|---|
-| Bán vượt tồn kho hoặc giảm tồn kho lặp | Kiểm tra transaction, điều kiện stock và xử lý message lặp |
-| Đơn PENDING kéo dài | Đối chiếu enqueue state, queue, Worker logs; ghi rõ giới hạn phục hồi hiện tại |
-| Message lỗi vào DLQ | Điều tra nguyên nhân, sửa lỗi, kiểm tra tính an toàn trước redrive |
-| IAM quá rộng hoặc lộ dữ liệu | Giới hạn actions/resources, bucket private, OAC, che token và Account ID trong ảnh |
-| Website lỗi CORS hoặc refresh route | Kiểm tra origin, routes, API URL và CloudFront Function |
-| Phát sinh chi phí ngoài dự kiến | Theo dõi billing, ngân sách, retention và inventory tài nguyên |
-| Nhầm dữ liệu mô phỏng với kết quả thật | Gắn nhãn mock, tách ảnh kiến trúc khỏi ảnh Console và kết quả kiểm thử |
+### 5. Kế hoạch và timeline thực hiện
 
-## 9. Tiêu chí nghiệm thu và minh chứng
+Kế hoạch Workshop tập trung trong **tuần 8–10** của lộ trình thực tập. Đây là phân bổ công việc dự kiến; kết quả thực hiện được theo dõi riêng trong nhật ký.
 
-- Website phục vụ qua HTTPS; truy cập trực tiếp nội dung S3 private không được mở công khai.
-- Đọc được danh sách và chi tiết sản phẩm qua HTTP API.
-- Tạo đơn hợp lệ nhận kết quả tiếp nhận, sau đó tra cứu được trạng thái cuối bằng token đúng.
-- Gửi lại cùng ý định không tạo đơn mới hoặc giảm tồn kho lần hai; nội dung khác cùng key bị từ chối theo hợp đồng API.
-- Token sai không đọc được đơn; dữ liệu đầu vào sai bị từ chối.
-- Trong kịch bản tồn kho được kiểm soát, tổng số lượng xác nhận không vượt tồn kho ban đầu và stock không âm.
-- Theo dõi được log, queue/DLQ và cấu hình alarms; ghi riêng kết quả test thông báo nếu đã thực hiện.
-- Có inventory và xác minh dọn tài nguyên sau khi kết thúc lab.
+| Giai đoạn | Thời lượng dự kiến | Công việc | Đầu ra cần có |
+|---|---|---|---|
+| Tuần 8: xác định yêu cầu | 1 buổi, 3 giờ | Chốt bài toán, phạm vi, phiên bản mã nguồn, sơ đồ và giả định chi phí | Đề xuất, kiến trúc sơ bộ và checklist chuẩn bị |
+| Tuần 9: hạ tầng và backend | 2 buổi, 8 giờ | Tạo DynamoDB, SQS/DLQ, IAM, Lambda và API Gateway | API/Worker kết nối đúng, kiểm tra từng thành phần |
+| Tuần 9: giao diện | 1 buổi, 4 giờ | Build React, cấu hình API URL, S3 private, OAC và CloudFront | Website gọi được API; kiểm tra CORS và route |
+| Tuần 10: kiểm thử và giám sát | 2 buổi, 4 giờ | SNS/CloudWatch, đặt hàng, thử lại, hết hàng và lỗi message | Bảng expected/actual, logs và ảnh minh chứng |
+| Tuần 10: hoàn thiện và bàn giao | 1 buổi, 3 giờ | Rà soát hướng dẫn Việt/Anh, tổng hợp giới hạn và cleanup | Tài liệu thực hành, kết quả kiểm tra và inventory sau cleanup |
+| **Tổng** | **7 buổi, 22 giờ** | Điều chỉnh theo kinh nghiệm và lỗi phát sinh | Một bộ Workshop có thể thực hiện lại |
 
-Mỗi kịch bản cần ghi điều kiện đầu vào, thao tác, kết quả kỳ vọng, kết quả thực tế và bằng chứng. Ảnh dự kiến gồm cấu hình DynamoDB, SQS/DLQ, IAM, Lambda, HTTP API, S3/OAC, CloudFront, SNS và CloudWatch; bổ sung ảnh website và trạng thái đơn. Chỉ ghi PASS khi đã kiểm tra. Workshop đã bổ sung ảnh của chín dịch vụ từ tài liệu thực hành. Các ảnh chưa chứng minh đầy đủ toàn bộ luồng đặt hàng; cấu hình và kết quả còn thiếu cần được kiểm tra riêng trên AWS.
+**Điều kiện hoàn thành:** đọc được sản phẩm, tạo và tra cứu đơn, không giảm kho lặp trong các ca đã kiểm tra, giữ S3 private, có log/cảnh báo được kiểm chứng và danh sách tài nguyên sau cleanup. Ca chưa chạy không đánh dấu đạt.
 
-## 10. Kết quả kỳ vọng
+### 6. Dự toán ngân sách và chi phí
 
-Hoàn thành một môi trường lab Flash Sale Serverless có luồng mua hàng bất đồng bộ, bảo vệ tồn kho và tài liệu thực hành có thể kiểm tra lại. Qua dự án, sinh viên củng cố kiến thức phân quyền IAM, tích hợp các dịch vụ AWS, xử lý nhất quán dữ liệu và giám sát hệ thống; đồng thời nhận biết các phần còn thiếu trước khi phát triển thành sản phẩm thực tế.
+#### Giả định tính ngân sách
 
-## Tài liệu đối chiếu
+Một môi trường lab, tối đa **1 tháng**, khoảng **10.000 API request**, **1.000 yêu cầu đặt hàng**, frontend khoảng **100 MB**, truyền dữ liệu website khoảng **1 GB**, logs tối đa **0,5 GB**, **3 alarm tiêu chuẩn** và tối đa **100 email cảnh báo**. Lambda dự kiến **256 MB**, trung bình **200 ms/lần gọi**; lượng thử lại được theo dõi và giới hạn. Không dùng EC2, NAT Gateway, tên miền riêng hoặc dịch vụ trả phí ngoài danh sách.
 
-- [Repository FLASHRUSH](https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale).
-- [Workshop triển khai AWS Console]({{< relref "/5-Workshop/" >}}).
-- [DynamoDB transactions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transactions.html).
-- [Lambda với Amazon SQS](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html).
-- [CloudFront truy cập S3 bằng OAC](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html).
+Các khoản dưới đây là **phân bổ ngân sách sơ bộ có làm tròn**, chưa phải báo giá AWS Pricing Calculator hoặc chi phí thực tế. Dự toán không trừ Free Tier; đơn giá, Region người truy cập và khối lượng thực tế cần đối chiếu trước khi chạy lab.
+
+| Dịch vụ | Cơ sở dự toán | Phân bổ USD/tháng |
+|---|---|---:|
+| S3 | Frontend 100 MB, lưu object và request build/upload/đọc | 0,10 |
+| CloudFront | Khoảng 1 GB truyền website và request HTTPS | 0,20 |
+| API Gateway HTTP API | Khoảng 10.000 request | 0,05 |
+| Lambda | API/Worker, 256 MB, trung bình 200 ms, có dư địa retry | 0,10 |
+| DynamoDB | Hai bảng nhỏ, đọc/ghi theo yêu cầu và transaction | 0,15 |
+| SQS | Gửi/nhận/xóa message và polling trong giới hạn lab | 0,05 |
+| SNS | Tối đa 100 email cảnh báo và request liên quan | 0,05 |
+| CloudWatch | Tối đa 0,5 GB logs, lưu log ngắn hạn, 3 alarm tiêu chuẩn | 0,60 |
+| **Tổng phân bổ** | | **1,30** |
+| **Dự phòng 50%** | Thử lại, sửa cấu hình và chênh lệch khối lượng | **0,65** |
+| **Dự toán có dự phòng** | | **1,95** |
+| **Ngân sách đề xuất** | Làm tròn để quản lý một môi trường lab | **5,00** |
+
+Ngân sách **5 USD** là mức dự kiến để theo dõi, không phải trần chi tiêu tự động. Trước thực hành cần nhập các giả định vào [AWS Pricing Calculator](https://calculator.aws/), kiểm tra bảng giá từng dịch vụ, đặt AWS Budgets và thống nhất ngưỡng dừng với người quản lý tài khoản. Giới hạn khối lượng test, đặt log retention và dọn tài nguyên sau khi lưu minh chứng. IAM không có khoản phí riêng trong bảng này.
+
+Chi phí nhân công và thiết bị cá nhân không tính vào ngân sách hạ tầng. Không suy ra lợi nhuận hoặc thời gian hoàn vốn từ một Workshop học tập.
+
+### 7. Rủi ro và phương án giảm thiểu
+
+| Rủi ro | Mức ảnh hưởng | Phương án giảm thiểu | Cách kiểm tra |
+|---|---|---|---|
+| Sai tồn kho hoặc đơn trùng | Cao | Điều kiện ghi/transaction và idempotency ở API/Worker | Gửi cùng key, message trùng và nhiều đơn tranh tồn kho nhỏ |
+| Đơn PENDING kéo dài | Cao | Theo dõi enqueue state, queue, logs và quy trình đối soát | Thử lỗi giữa ghi đơn và gửi queue; kiểm tra khả năng phục hồi |
+| Message lỗi lặp liên tục | Trung bình | Retry giới hạn, DLQ và điều tra trước redrive | Theo dõi số lần nhận, DLQ và kết quả sau xử lý lỗi |
+| Quyền quá rộng hoặc lộ dữ liệu | Cao | IAM tối thiểu, S3 private/OAC, bảo vệ token và che thông tin nhạy cảm | Kiểm tra quyền bị từ chối và truy cập S3 trực tiếp |
+| Website lỗi CORS/route | Trung bình | Kiểm tra origin, endpoint, cấu hình CloudFront và build | Gọi API trên trình duyệt, refresh trang chi tiết |
+| Phát sinh phí ngoài dự kiến | Trung bình | Budget, giới hạn tải, retention và inventory | Đối chiếu chi phí/tài nguyên trong và sau lab |
+| Nguồn, ảnh và hướng dẫn lệch phiên bản | Trung bình | Chốt source snapshot và rà cấu hình đã lưu | Người khác thực hiện lại theo tài liệu và báo điểm sai lệch |
+
+Khi gặp lỗi ảnh hưởng tính đúng của đơn hoặc bảo mật, dừng kịch bản thử, giữ logs và dữ liệu cần điều tra, sửa nguyên nhân rồi kiểm tra lại trước khi tiếp tục. Việc xóa tài nguyên và redrive message thực hiện theo phạm vi lab đã thống nhất.

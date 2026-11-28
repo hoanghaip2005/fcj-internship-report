@@ -7,9 +7,8 @@ draft: false
 
 
 
-> **Trạng thái:** Bản hướng dẫn thực hành thủ công dựa trên source FLASHRUSH; **có ảnh thực hành từng dịch vụ, chưa đủ bằng chứng nghiệm thu toàn bộ luồng**. Không sử dụng CloudFormation/CLI để tạo hạ tầng. Các bước tạo/sửa/xóa tài nguyên AWS có thể phát sinh phí. Chỉ thực hiện trong môi trường demo có quyền hợp lệ; chụp ảnh thực tế khi làm, không thay bằng ảnh giả.
 
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`, đối chiếu cấu hình stack `flashrush-lab` trước đây. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
 
 **Cảnh báo dữ liệu:** Cleanup xóa dữ liệu demo thật. Không chạy nếu chưa chụp và lưu evidence; không xóa stack CloudFormation `flashrush-lab` hoặc resource không thuộc bộ manual.
 
@@ -86,4 +85,3 @@ Nếu báo resource in use, xử lý association cụ thể; không mở rộng 
 ## Lưu ý khi bàn giao
 
 Bộ manual không có CloudFormation stack và không cần bucket artifacts. Không dùng Delete stack để dọn tài nguyên manual. Khi xóa IAM execution roles, xóa inline policies/detach managed policies theo yêu cầu Console trước; giữ IAM users đăng nhập của thành viên. Sau cleanup ghi riêng tài nguyên còn sót, lý do, người xử lý; Billing có độ trễ, không kết luận chi phí bằng 0.
-

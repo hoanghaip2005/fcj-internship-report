@@ -5,11 +5,11 @@ chapter: false
 pre: "<b>6. </b> "
 ---
 
-# Tự đánh giá quá trình thực tập
+## Tự đánh giá quá trình thực tập
 
 ## 1. Cơ sở tự đánh giá
 
-Em là **Phạm Hoàng Hải MSSV 2302700162**, sinh viên ngành Công nghệ thông tin tại Trường Đại học Quản lý và Công nghệ TP.HCM (UMT), tham gia chương trình **Workforce Bootcamp First Cloud AI Journey**. Phần tự đánh giá bao quát lộ trình **12 tuần từ 21/09 đến 12/12/2026**, gồm kiến thức AWS, blog, sự kiện, phân tích dự án và Workshop FLASHRUSH. Nhận định về kết quả dựa trên công việc đã có ghi nhận; các tuần và nhiệm vụ dự kiến được dùng để xác định mục tiêu rèn luyện tiếp theo.
+Em là **Phạm Hoàng Hải, MSSV 2302700162, lớp IT2307V**, vị trí thực tập **Cloud AI Intern**, sinh viên ngành Công nghệ thông tin tại Trường Đại học Quản lý và Công nghệ TP.HCM (UMT), tham gia chương trình **Workforce Bootcamp First Cloud AI Journey**. Phần tự đánh giá bao quát lộ trình **12 tuần từ 21/09 đến 12/12/2026**, gồm kiến thức AWS, blog, sự kiện, phân tích dự án và Workshop FLASHRUSH. Nhận định về kết quả dựa trên công việc đã có ghi nhận; các tuần và nhiệm vụ dự kiến được dùng để xác định mục tiêu rèn luyện tiếp theo.
 
 Đây là đánh giá của cá nhân tại thời điểm cập nhật báo cáo, không thay thế nhận xét của người hướng dẫn hoặc xác nhận hoàn thành toàn bộ kỳ thực tập. Những nội dung đang ở mức khảo sát, đề xuất hay chưa có bằng chứng kiểm thử được trình bày theo đúng trạng thái đó.
 
@@ -23,7 +23,7 @@ Việc phân tích DropIt và đề xuất kiến trúc AWS cho FitJoy giúp em 
 
 ### 2.2. Tổng hợp và trình bày kiến thức kỹ thuật
 
-Ba bài blog về **Karpenter và Amazon EKS**, **Amazon S3 Express One Zone**, **Amazon Cognito** giúp em rèn luyện cách tìm hiểu dịch vụ, phân tích luồng hoạt động, trình bày trường hợp sử dụng và nhận diện giới hạn. Em cũng nhận thấy một bài viết kỹ thuật cần giải thích điều kiện áp dụng, không chỉ liệt kê ưu điểm.
+Năm bài blog về **Karpenter và Amazon EKS**, **Amazon S3 Express One Zone**, **Amazon Cognito**, **SQS/Lambda** và **idempotency với DynamoDB** giúp em rèn luyện cách tìm hiểu dịch vụ, phân tích luồng hoạt động, trình bày trường hợp sử dụng và nhận diện giới hạn. Em cũng nhận thấy một bài viết kỹ thuật cần giải thích điều kiện áp dụng, không chỉ liệt kê ưu điểm.
 
 Bốn bài thu hoạch sự kiện giúp em tổng hợp các chủ đề Cloud, Generative AI, Agentic AI, dữ liệu và phát triển phần mềm. Giá trị học tập nằm ở việc liên hệ nội dung được chia sẻ với câu hỏi kỹ thuật của bản thân; các hướng ứng dụng sau sự kiện vẫn cần được kiểm chứng bằng thực hành.
 
@@ -31,7 +31,9 @@ Bốn bài thu hoạch sự kiện giúp em tổng hợp các chủ đề Cloud,
 
 Khi xây dựng phần đề xuất và tài liệu Workshop FLASHRUSH, em làm rõ vai trò của API Gateway, Lambda, SQS, DynamoDB, S3, CloudFront, IAM, CloudWatch và SNS trong một hệ thống xử lý đơn bất đồng bộ. Các nội dung giúp em hiểu sự khác nhau giữa tiếp nhận yêu cầu và xác nhận đơn, ý nghĩa của idempotency, transaction tồn kho, retry và DLQ.
 
-Em cần tiếp tục thực hành để kiểm chứng đầy đủ cấu hình manual. Bộ `flashrush-lab` trước đây đã được gỡ; tài liệu và sơ đồ không thay thế bằng chứng hệ thống đang hoạt động. Những phần như Admin/Monitoring dùng dữ liệu mock, đăng nhập production và thanh toán thật không được tính là chức năng đã hoàn thành.
+Em cần tiếp tục đối chiếu hướng dẫn manual với kết quả kiểm thử của đúng môi trường. Môi trường `flashrush-manual` của Workshop Console và stack `flashrush-lab` dùng CloudFormation được ghi nhận riêng; tài liệu hoặc trạng thái stack không thay thế bằng chứng nghiệp vụ. Các chức năng mô phỏng, đăng nhập production và thanh toán thật chỉ được ghi nhận hoàn thành khi có kiểm thử phù hợp.
+
+Các bài thực hành bổ sung đã kiểm chứng versioning S3, cập nhật tồn kho có điều kiện trên DynamoDB và gửi/nhận/xóa message SQS bằng tài nguyên riêng. Các kết quả này củng cố kiến thức dịch vụ, chưa thay thế kiểm thử toàn luồng FLASHRUSH.
 
 ## 3. Tự đánh giá theo tiêu chí
 
@@ -55,7 +57,7 @@ Em cần tiếp tục thực hành để kiểm chứng đầy đủ cấu hình
 | Tiêu chí | Tự đánh giá | Nhận xét |
 |---|---|---|
 | Kiến thức chuyên môn | Tốt | Em hệ thống hóa kiến thức IAM, mạng, lưu trữ, cơ sở dữ liệu và Serverless; vận dụng để phân tích kiến trúc FLASHRUSH và viết hướng dẫn cấu hình từng dịch vụ. Em cần tiếp tục kiểm thử các tình huống lỗi để củng cố chiều sâu thực hành. |
-| Khả năng tự học & nghiên cứu | Tốt | Em chủ động tìm hiểu tài liệu AWS, tổng hợp ba bài blog về Karpenter/EKS, S3 Express One Zone và Cognito; liên hệ kiến thức với bài toán sử dụng, điều kiện áp dụng và giới hạn của dịch vụ. |
+| Khả năng tự học & nghiên cứu | Tốt | Em chủ động tìm hiểu tài liệu AWS, tổng hợp năm bài blog về Karpenter/EKS, S3 Express One Zone, Cognito, SQS/Lambda và idempotency với DynamoDB; liên hệ kiến thức với bài toán sử dụng, điều kiện áp dụng và giới hạn của dịch vụ. |
 | Tính chủ động trong công việc | Tốt | Em chủ động rà soát nội dung mẫu, bổ sung nhật ký, sắp xếp ảnh minh chứng theo thao tác và ghi nhận những cấu hình cần xác thực để hoàn thiện Workshop. |
 | Kỷ luật & tuân thủ quy định | Khá | Em có ý thức tuân thủ quy trình và phạm vi công việc. Việc cập nhật nhật ký, lưu bằng chứng và đồng bộ tài liệu còn cần thực hiện đều đặn hơn; em sẽ kiểm tra tiến độ và hồ sơ sau mỗi tuần. |
 | Kỹ năng giao tiếp | Tốt | Em rèn luyện cách trình bày kiến trúc, viết bài thu hoạch và mô tả vấn đề kỹ thuật qua mục tiêu, thao tác, kết quả quan sát. Em tiếp tục cải thiện cách diễn đạt ngắn gọn để người đọc dễ thực hiện theo. |
@@ -76,7 +78,7 @@ Em cần tiếp tục thực hành để kiểm chứng đầy đủ cấu hình
 | Ưu tiên | Hành động tiếp theo | Cách kiểm tra kết quả |
 |---|---|---|
 | Hoàn thiện hồ sơ | Cập nhật nhật ký từ hoạt động thực tế, rà soát thông tin giữa các mục | Mốc thời gian và trạng thái công việc thống nhất |
-| Thực hành FLASHRUSH | Khi có tài khoản và phạm vi được phép, thực hiện lần lượt hướng dẫn Console | Có inventory, ảnh cấu hình và kết quả kiểm thử từng bước |
+| Thực hành FLASHRUSH | Trong môi trường được phép, tiếp tục đối chiếu cấu hình đã lưu và thực hiện các ca kiểm thử còn thiếu | Có inventory, ảnh cấu hình và kết quả kiểm thử từng bước |
 | Kiểm chứng nghiệp vụ | Kiểm tra retry, token, tồn kho và xử lý message lỗi trong lab | Có bảng expected/actual; không giảm stock lặp hoặc vượt tồn kho trong kịch bản đã kiểm tra |
 | Nâng chất lượng tài liệu | Bổ sung ảnh thật, chú thích và tài liệu đối chiếu | Người đọc có thể xác định thao tác, kết quả và giới hạn |
 | Củng cố chuyên môn | Học sâu IAM, DynamoDB transaction, SQS/Lambda và CloudWatch | Giải thích được lựa chọn cấu hình và cách điều tra lỗi |

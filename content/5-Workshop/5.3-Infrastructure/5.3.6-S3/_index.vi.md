@@ -4,66 +4,76 @@ weight: 6
 draft: false
 ---
 
+Mục tiêu: Tạo bucket S3 để lưu frontend theo cấu hình private; kiểm tra loại bucket, tên, Object Ownership, Block Public Access và lựa chọn mã hóa SSE-S3.
 
+Điều kiện: Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước. Biết Account ID của tài khoản đang thực hành để đặt tên bucket.
 
+Cách đọc: Khung xanh chỉ nút, lựa chọn hoặc giá trị cần kiểm tra. Vòng tròn xanh, số trắng dùng bước toàn cục 1–7. Mỗi hình walkthrough nằm trên một trang ngang.
 
-**Mục tiêu:** Private bucket lưu trữ frontend.
+Giá trị cấu hình cần dùng
 
-> **Hình thức:** Tạo thủ công bằng **AWS Management Console**. Các thao tác dưới đây tạo hoặc cập nhật tài nguyên AWS thật và có thể phát sinh phí. Chỉ làm trên bộ `flashrush-manual-*`, không đụng tới `flashrush-lab` của CloudFormation. Ảnh thực hành được trình bày bên dưới; các điểm chưa đủ bằng chứng cần kiểm tra lại trên AWS.
+Region: us-east-1. Bucket type: General purpose. Namespace đang chọn trong ảnh: Global namespace.
 
-**Điều kiện đầu vào:** Hoàn thành [5.2 Chuẩn bị]({{< relref "/5-Workshop/5.2-Prerequisite/" >}}) và các mục 5.3 đứng trước trang này. Region `us-east-1`; thay `YOUR_AWS_ACCOUNT_ID` bằng Account ID đúng của người thực hành.
+Tên bucket: flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1. Thay YOUR_AWS_ACCOUNT_ID bằng Account ID của bạn. Nếu tên đã tồn tại, xác minh owner trước khi dùng.
 
+Object Ownership: Bucket owner enforced; ACLs disabled. Block all public access: bật, cả bốn tùy chọn con có dấu tích.
 
-**Bước 1.** S3 → Create bucket → General purpose.
+Default encryption: Server-side encryption with Amazon S3 managed keys (SSE-S3).
 
-![Mở Create bucket, chọn Region và General purpose](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-01.png)
+Cấu hình cần giữ cho luồng CloudFront: Static website hosting = Disabled; dùng S3 REST origin với OAC ở mục 5.3.7.
 
-*Hình 5.3.6.1. Mở Create bucket, chọn Region và General purpose.*
+### 5.3.6.1 Mở màn hình tạo bucket
 
-![Mở Create bucket, chọn Region và General purpose](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-02.png)
+**Bước 1.** Mở Amazon S3 tại us-east-1 → nhấn Create bucket.
 
-*Hình 5.3.6.2. Mở Create bucket, chọn Region và General purpose.*
+![Nút Create bucket trên trang Amazon S3](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-01.png)
 
+*Hình 5.3.6.1. Nút Create bucket trên trang Amazon S3.*
 
-**Bước 2.** Tên: `flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1`.
+### 5.3.6.1 Chọn region và loại bucket
 
+**Bước 2.** Kiểm tra AWS Region = US East (N. Virginia) us-east-1 → chọn Bucket type = General purpose.
 
-**Bước 3.** Region us-east-1. Tên bucket phải duy nhất; nếu đã tồn tại, xác minh owner trước khi dùng. Không chọn bucket không rõ nguồn gốc.
+![Region us-east-1 và lựa chọn General purpose](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-02.png)
 
-![Nhập tên bucket theo tài khoản và Region](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-03.png)
+*Hình 5.3.6.2. Region us-east-1 và lựa chọn General purpose.*
 
-*Hình 5.3.6.3. Nhập tên bucket theo tài khoản và Region.*
+### 5.3.6.1 Đặt tên bucket
 
+**Bước 3.** Giữ Global namespace → nhập flashrush-manual-web-YOUR_AWS_ACCOUNT_ID-us-east-1. Thay YOUR_AWS_ACCOUNT_ID bằng Account ID của bạn; ảnh dùng ID của tài khoản chụp.
 
-**Bước 4.** Object Ownership: Bucket owner enforced, ACLs disabled.
+![Global namespace và ô tên bucket đầy đủ](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-03.png)
 
-![Giữ ACLs disabled và Bucket owner enforced](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-04.png)
+*Hình 5.3.6.3. Global namespace và ô tên bucket đầy đủ.*
 
-*Hình 5.3.6.4. Giữ ACLs disabled và Bucket owner enforced.*
+### 5.3.6.1 Giữ ACLs disabled
 
+**Bước 4.** Tại Object Ownership → giữ ACLs disabled (recommended) → kiểm tra giá trị Bucket owner enforced.
 
-**Bước 5.** Giữ cả bốn **Block Public Access** bật.
+![ACLs disabled và Object Ownership = Bucket owner enforced](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-04.png)
 
-![Bật Block all public access](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-05.png)
+*Hình 5.3.6.4. ACLs disabled và Object Ownership = Bucket owner enforced.*
 
-*Hình 5.3.6.5. Bật Block all public access.*
+### 5.3.6.1 Chặn truy cập công khai
 
+**Bước 5.** Giữ Block all public access được chọn → kiểm tra cả bốn tùy chọn con đều có dấu tích.
 
-**Bước 6.** Default encryption: SSE-S3.
+![Block all public access và bốn tùy chọn con trước khi tạo bucket](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-05.png)
 
-![Chọn SSE-S3; nút Create bucket nằm cuối form](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-06.png)
+*Hình 5.3.6.5. Block all public access và bốn tùy chọn con trước khi tạo bucket.*
 
-*Hình 5.3.6.6. Chọn SSE-S3; nút Create bucket nằm cuối form.*
+### 5.3.6.1 Chọn mã hóa và tạo bucket
 
+**Bước 6.** Tại Default encryption → giữ Server-side encryption with Amazon S3 managed keys (SSE-S3). Rà soát cấu hình ở các bước trước → nhấn Create bucket.
 
-**Bước 7.** Không bật Static website hosting; CloudFront sẽ đọc REST origin private.
+![Lựa chọn SSE-S3 và nút Create bucket](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-06.png)
 
+*Hình 5.3.6.6. Lựa chọn SSE-S3 và nút Create bucket.*
 
-**Bước 8.** Create bucket.
+### 5.3.6.2 Kiểm tra bucket sau khi tạo
 
-![Bucket đã tạo và Block all public access ở trạng thái On](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-07.png)
+**Bước 7.** Mở bucket vừa tạo → Permissions → kiểm tra đúng tên bucket và Block all public access = On. Ảnh đang thu gọn Individual Block Public Access settings.
 
-*Hình 5.3.6.7. Bucket đã tạo và Block all public access ở trạng thái On.*
+![Bucket đã tồn tại; tab Permissions hiển thị Block all public access = On](/images/5-Workshop/FLASHRUSH/evidence/5.3.6-S3/image-07.png)
 
-AWS cho phép kết hợp S3 private và CloudFront OAC để phân phối website mà không mở bucket public. [Nguồn S3 và Block Public Access](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingBucket.html).
-
+*Hình 5.3.6.7. Bucket đã tồn tại; tab Permissions hiển thị Block all public access = On.*

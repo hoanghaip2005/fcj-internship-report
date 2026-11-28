@@ -1,153 +1,130 @@
 ---
-title: "Proposal"
+title: "Proposal (Workshop Solution Proposal)"
 weight: 2
 chapter: false
 pre: "<b>2. </b> "
 ---
 
-## FLASHRUSH Serverless Flash Sale System on AWS
+## FLASHRUSH AWS Workshop Proposal
 
-## 1. Executive summary
+### 1. Problem and solution overview
 
-FLASHRUSH demonstrates order processing during a sale with limited inventory. The proposal addresses traffic spikes, asynchronous processing, duplicate requests and inventory consistency. React provides the frontend, Python implements the backend, and AWS Serverless services reduce server administration.
+FLASHRUSH is a hands-on Workshop for building a flash-sale application with AWS Serverless services. Many customers may submit purchase requests while inventory is limited; the system must accept requests, process orders and protect stock when clients retry or messages are duplicated.
 
-The project supports the First Cloud AI Journey learning activities of **Phạm Hoàng Hải, student ID 2302700162, class IT2307V, Cloud AI Intern**. Implementation instructions are available in the [FLASHRUSH Workshop]({{< relref "/5-Workshop/" >}}).
+The proposed solution uses React for the interface, API Gateway and Lambda to accept requests, SQS to coordinate processing, and DynamoDB for products and orders. S3/CloudFront deliver the website; IAM, CloudWatch and SNS support permissions, monitoring and alerts. Learners configure the components through the AWS Management Console to understand each service and its integration points.
 
-The Console workshop has source code, configuration instructions and screenshots covering nine AWS services. Acceptance requires configuration checks and evidence of the complete ordering flow. This proposal describes the manual workshop; additional features in other deployments require separate validation. The nine-service images document configuration and selected checks, not acceptance of the complete ordering flow.
+The Workshop delivers a small, explainable and testable flow: access the website, read products, submit a request, confirm an order and inspect the resulting data.
 
-## 2. Problem and objectives
+### 2. Objectives and scope
 
-Concurrent customers may read the same stock before separate updates complete, causing overselling. Browser retries can create duplicate orders. Processing every task within one HTTP request couples response time to the entire business operation.
+#### Objectives
 
-The objectives are to:
+- Understand asynchronous ordering and distinguish HTTP `202 Accepted` from `CONFIRMED`.
+- Configure and connect nine AWS services in dependency order.
+- Apply least privilege, private S3 and CloudFront OAC.
+- Test repeated requests, conditional inventory updates and failed messages.
+- Record configuration, test results and cleanup steps so another learner can repeat the lab.
 
-- Accept requests through an HTTP API and queue processing work.
-- Protect inventory with DynamoDB conditions and transactions.
-- Recognize repeated purchase intentions using idempotency keys.
-- Let customers distinguish request acceptance from order confirmation.
-- Collect logs, monitor queues and notify operators of errors.
-- Document configuration, test results and resource cleanup.
+#### Workshop scope
 
-## 3. Implementation scope
-
-This proposal describes the AWS Console workshop using `flashrush-manual-*`; it is separate from the `flashrush-lab` CloudFormation environment and other project extensions.
-
-| Capability | Expected behavior |
+| In scope | Expected output |
 |---|---|
-| Product catalogue and details | Read DynamoDB data through the API |
-| Single-product order | Validate integer `quantity` equal to 1 |
-| Asynchronous processing | API Lambda, SQS and Worker Lambda |
-| Inventory protection | Transactionally update stock and confirm the order |
-| Order lookup | Validate the order-specific `X-Order-Token` |
-| Frontend delivery | React build in private S3, delivered through CloudFront |
-| Monitoring | CloudWatch logs, metrics and alarms; SNS email notifications |
-| Documentation | Nine AWS services, tests, screenshots and cleanup |
+| Product catalogue and details | API reads product data from DynamoDB |
+| One product per order request | Validate input and `quantity = 1` |
+| Asynchronous order processing | API Lambda, SQS and Worker Lambda |
+| Data protection | Idempotency key, order lookup token and inventory transaction |
+| Frontend delivery | React build in private S3, accessed through CloudFront HTTPS |
+| Monitoring and alerts | CloudWatch logs/metrics/alarms and SNS notifications |
+| Practice documentation | Console guide, step screenshots, test cases and cleanup |
 
-Real payments, shipping, production customer accounts, administrative backend features and business analytics are outside this manual workshop's scope. Administrative or monitoring screens in the reference frontend must be checked for simulated data. A frontend countdown alone does not enforce sale timing at the backend.
+This Workshop excludes real payments, shipping, commercial operation, a complete production admin backend and production customer accounts. Simulated reference functions must be labelled when used.
 
-## 4. Proposed architecture
+**Audience:** students or beginners with basic AWS, HTTP, Python and JavaScript knowledge. **Prerequisites:** an authorized AWS account, suitable creation permissions, Node.js for the frontend build and a pinned FLASHRUSH source version.
 
-![FLASHRUSH reference architecture](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
+The Workshop uses an isolated `us-east-1` environment with the `flashrush-manual-*` prefix. The `flashrush-lab` CloudFormation environment and other project extensions are outside this practice scope.
 
-*Reference architecture supplied by the team. Verify each component against the workshop source and deployed configuration.*
+### 3. Problem statement
 
-| Service | Responsibility |
-|---|---|
-| Amazon S3 | Store the frontend build in a private bucket |
-| Amazon CloudFront | Deliver HTTPS content; access S3 through OAC |
-| Amazon API Gateway | Provide HTTP routes and CORS configuration |
-| AWS Lambda | Separate request acceptance from order processing |
-| Amazon DynamoDB | Store products and orders; protect inventory updates |
-| Amazon SQS | Buffer work, retry failures and isolate messages in a DLQ |
-| AWS IAM | Grant API and Worker permissions according to their roles |
-| Amazon CloudWatch | Store logs, expose metrics and evaluate alarms |
-| Amazon SNS | Deliver alerts to confirmed email subscribers |
-
-### 4.1. Request and ordering flow
-
-1. A customer opens the website through CloudFront, which retrieves content from private S3.
-2. The frontend calls API Gateway to read products.
-3. An order request carries an idempotency key. The API validates input, records the order and sends a message to SQS.
-4. HTTP `202 Accepted` confirms receipt; the purchase is still pending.
-5. The Worker processes the message and executes a DynamoDB transaction. Eligible orders become `CONFIRMED`; insufficient stock produces `OUT_OF_STOCK`.
-6. The frontend retrieves the final status using the order ID and token.
-
-### 4.2. Consistency and recovery
-
-SQS can deliver a message more than once. The Worker must check order state and update stock safely within the source code's transaction logic. Repeating the same request must not decrement stock again. Reusing a key with a different payload must follow the API's conflict behavior.
-
-Writing an order and sending an SQS message are separate operations. The reference source includes `enqueueState=UNKNOWN`, a 30-second lease and conditional limits on enqueue attempts. A scheduled recovery mechanism is not assumed. These paths require explicit testing.
-
-Partial batch failures allow failed messages to retry. Moving a message into the DLQ does not automatically change its order to `FAILED`; operators must inspect logs and data before redriving it.
-
-## 5. Feasibility
-
-The proposal is feasible as a learning lab: Python/React source, a data schema and configuration guidance are available. Services can be configured and checked in dependency order without dedicated hardware.
-
-Prerequisites include an authorized AWS account, suitable IAM permissions, Node.js for frontend builds and basic HTTP, Python, React, DynamoDB and SQS knowledge. The Console workshop uses `us-east-1` and the `flashrush-manual-*` namespace. Check existing resources before creating new ones.
-
-Commercial operation requires further work on authentication, access controls, sale timing, secret management, reconciliation, load testing and operational procedures. Throughput and availability commitments require measurements.
-
-## 6. Implementation plan
-
-| Planned session | Work | Deliverable |
+| Problem | Impact | Proposed response |
 |---|---|---|
-| 1 | Agree scope, inspect source and prepare the account | Inventory, architecture and test criteria |
-| 2–3 | Configure DynamoDB, SQS/DLQ, IAM, log groups and Lambda | Configured API/Worker and direct function checks |
-| 4 | Configure HTTP API, private S3 and CloudFront/OAC | HTTPS API and frontend distribution |
-| 5 | Build frontend, configure API URL and verify CORS | Browser ordering and lookup flow |
-| 6 | Configure SNS/CloudWatch; test retries and inventory | Results, logs and screenshots |
-| 7 | Review limitations, complete documentation and clean up | Acceptance report and final inventory |
+| Requests arrive faster than processing capacity | Slow requests and pressure on downstream components | Buffer work in SQS and limit Worker concurrency to service capacity |
+| Multiple orders compete for scarce inventory | Separate reads/writes can confirm too much stock | DynamoDB transactions and write-time stock conditions |
+| A client retries after a timeout | Duplicate orders or stock effects | Retain the same idempotency key/payload and process redelivery safely |
+| Technical failures interrupt processing | Orders remain pending and causes are hard to trace | Order-ID logs, bounded retries, DLQ and reconciliation |
+| The UI reports success too early | Customers misunderstand the purchase result | Show processing after HTTP 202 and retrieve the final state with a token |
+| Instructions diverge from code/configuration | Learners cannot reproduce the lab | Pin a source version, use a configuration checklist and matching screenshots |
 
-Adjust this plan for permissions, configuration issues and test results. Record completion after verification. See [infrastructure instructions]({{< relref "/5-Workshop/5.3-Infrastructure/" >}}) for the individual steps.
+### 4. Preliminary solution architecture
 
-## 7. Budget and cost control
+![Preliminary FLASHRUSH Workshop architecture](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
 
-Costs depend on Region, resource lifetime, request volume, storage, data transfer and logging. A validated AWS Pricing Calculator estimate for this manual configuration is not yet available; a fixed total or free-operation guarantee would require that estimate.
+*Reference architecture for the Workshop design; not acceptance evidence for a live system.*
 
-| Cost group | Inputs to estimate |
-|---|---|
-| CloudFront and S3 | Build size, requests and website data transfer |
-| API Gateway and Lambda | API calls, execution duration, memory and Worker invocations |
-| DynamoDB | Reads, writes, transactions and table storage |
-| SQS and SNS | Send, receive and delete requests; retries and notifications |
-| CloudWatch | Log ingestion, retention, metrics and alarms |
+| Component group | Services | Responsibility |
+|---|---|---|
+| Frontend | S3, CloudFront | Store the build and deliver HTTPS; keep S3 private through OAC |
+| Intake | API Gateway, API Lambda | Validate requests, record orders and send messages |
+| Processing | SQS, Worker Lambda | Buffer work, process orders, retry and isolate failures in a DLQ |
+| Data | DynamoDB | Store Products/Orders and protect state/inventory transitions |
+| Permissions | IAM | Separate API and Worker actions/resources |
+| Observability | CloudWatch, SNS | Logs, metrics, alarms and confirmed-email notifications |
 
-Prepare an estimate in [AWS Pricing Calculator](https://calculator.aws/), check the account's Free Tier eligibility and agree a lab budget. AWS Budgets provides alerts rather than a hard spending cap. Limit test volume, set log retention and remove resources after acceptance.
+**Main flow:** the customer opens CloudFront, reads products through the API and submits an order with an idempotency key. The API records `PENDING` and sends SQS. The Worker runs the transaction and records `CONFIRMED` or `OUT_OF_STOCK`. The frontend retrieves the order with its ID and token.
 
-## 8. Risks and mitigations
+**Design boundary:** writing DynamoDB and sending SQS are separate operations; the Workshop must include a way to detect or reconcile an order that was not queued. A DLQ does not automatically change order state. These limits belong in the test and failure-handling instructions.
 
-| Risk | Mitigation |
-|---|---|
-| Overselling or repeated stock reduction | Verify transactions, stock conditions and duplicate-message handling |
-| Orders remain pending | Inspect enqueue state, queues and Worker logs; document recovery limits |
-| Messages enter the DLQ | Investigate and fix the cause before a safe redrive |
-| Excessive permissions or exposed data | Restrict actions/resources, keep S3 private and protect tokens |
-| CORS errors or broken route refresh | Verify origins, routes, API URL and CloudFront rewrite behavior |
-| Unexpected costs | Track billing, budgets, retention and resource inventory |
-| Simulated data mistaken for real results | Label mock data and distinguish diagrams from runtime evidence |
+### 5. Implementation plan and timeline
 
-## 9. Acceptance criteria and evidence
+Workshop work is planned across **weeks 8–10**. This is an expected allocation; execution results are tracked separately in the worklog.
 
-- The website works over HTTPS; private S3 content is not publicly accessible.
-- The API returns product lists and details.
-- Valid orders are accepted and their final state can be retrieved with the correct token.
-- Repeated requests do not create extra orders or decrement stock twice.
-- Conflicting idempotency payloads, invalid tokens and malformed requests are rejected according to the API contract.
-- Confirmed quantities do not exceed initial inventory in controlled tests; stock remains nonnegative.
-- Logs, queues, DLQ and alarms can be inspected. Notification delivery has its own test result.
-- Cleanup is verified against a resource inventory.
+| Stage | Expected time | Work | Required output |
+|---|---:|---|---|
+| Week 8: requirements | 1 session, 3 hours | Confirm problem, scope, source version, diagram and cost assumptions | Proposal, preliminary architecture and prerequisites checklist |
+| Week 9: infrastructure/backend | 2 sessions, 8 hours | Create DynamoDB, SQS/DLQ, IAM, Lambda and API Gateway | Connected API/Worker and component checks |
+| Week 9: frontend | 1 session, 4 hours | Build React, configure API URL, private S3, OAC and CloudFront | Website calls the API; CORS and routes checked |
+| Week 10: tests/monitoring | 2 sessions, 4 hours | SNS/CloudWatch, orders, retries, insufficient stock and failed messages | Expected/actual table, logs and evidence |
+| Week 10: handover | 1 session, 3 hours | Review bilingual guidance, limitations and cleanup | Repeatable guide, test results and post-cleanup inventory |
+| **Total** | **7 sessions, 22 hours** | Adjust for errors and learning pace | A repeatable Workshop |
 
-Each scenario needs input conditions, steps, expected and actual results, and evidence. Screenshots cover the nine services; website and final order-state evidence must also support the complete flow. Mark a test as passed only after execution.
+**Completion conditions:** product reads work, an order can be created and retrieved, tested retries do not decrement stock twice, S3 remains private, logs/alerts have a recorded check and the resource inventory is reviewed after cleanup. Untested cases are not marked passed.
 
-## 10. Expected outcome
+### 6. Budget and cost estimation
 
-A repeatable Serverless flash-sale lab with asynchronous ordering, inventory protection and verifiable guidance. The work develops IAM, service integration, data consistency and monitoring skills, while identifying requirements for further development.
+#### Estimation assumptions
 
-## References
+One lab environment for **one month**, up to **10,000 API requests**, **1,000 order requests**, a **100 MB** frontend, about **1 GB** website transfer, up to **0.5 GB** logs, **3 standard alarms** and up to **100 alert emails**. Lambda uses **256 MB** and averages **200 ms/invocation**; retries are bounded and monitored. No EC2, NAT Gateway, custom domain or other paid service outside this table is assumed.
 
-- [FLASHRUSH repository](https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale).
-- [AWS Console workshop]({{< relref "/5-Workshop/" >}}).
-- [DynamoDB transactions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transactions.html).
-- [Using Lambda with Amazon SQS](https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html).
-- [Restricting S3 access with CloudFront OAC](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html).
+The figures below are **rounded planning allocations**, not a verified AWS Pricing Calculator quote or actual bill. They exclude Free Tier and must be checked against current prices, Region and actual usage.
+
+| Service | Planning basis | USD/month allocation |
+|---|---|---:|
+| S3 | 100 MB frontend, objects and build/upload/read requests | 0.10 |
+| CloudFront | About 1 GB website transfer and HTTPS requests | 0.20 |
+| HTTP API Gateway | About 10,000 requests | 0.05 |
+| Lambda | API/Worker, 256 MB, 200 ms average, retry headroom | 0.10 |
+| DynamoDB | Two small tables, reads/writes and transactions | 0.15 |
+| SQS | Send/receive/delete and polling within lab limits | 0.05 |
+| SNS | Up to 100 alert emails and related requests | 0.05 |
+| CloudWatch | Up to 0.5 GB logs, short retention and 3 alarms | 0.60 |
+| **Allocated total** | | **1.30** |
+| **50% contingency** | Retries, corrections and volume variation | **0.65** |
+| **Estimated with contingency** | | **1.95** |
+| **Proposed working budget** | Rounded lab-management amount | **5.00** |
+
+The **USD 5** value is a planning budget, not an automatic spending cap. Before the lab, enter assumptions into [AWS Pricing Calculator](https://calculator.aws/), check service prices, set AWS Budgets and agree a stop threshold with the account owner. Limit test volume, set log retention and clean up after evidence capture. IAM has no separate charge in this table.
+
+Personnel and personal equipment are excluded. A learning Workshop does not imply profit or payback.
+
+### 7. Risks and mitigation plan
+
+| Risk | Impact | Mitigation | Check |
+|---|---|---|---|
+| Incorrect stock or duplicate order | High | Write conditions/transactions and idempotency in API/Worker | Same key, duplicate messages and competing orders for scarce stock |
+| Order remains PENDING | High | Track enqueue state, queue, logs and reconciliation | Inject a failure between order write and queue send; inspect recovery |
+| Message retries indefinitely | Medium | Bounded retry, DLQ and investigation before redrive | Inspect receive count, DLQ and post-fix processing |
+| Excessive permissions or data exposure | High | Least-privilege IAM, private S3/OAC, protected tokens and redaction | Check denied access and direct S3 access |
+| CORS or route errors | Medium | Verify origin, endpoint, CloudFront behavior and build | Call API in a browser and refresh detail routes |
+| Unexpected cost | Medium | Budget, load limits, retention and inventory | Compare cost/resources during and after the lab |
+| Source, image and instruction drift | Medium | Pin source snapshot and review saved configuration | Have another learner repeat the documented steps |
+
+When an error threatens order correctness or security, stop the test, retain relevant logs/data, fix the cause and rerun the check. Deletion and redrive follow the agreed lab scope.
