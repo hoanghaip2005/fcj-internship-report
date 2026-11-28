@@ -80,3 +80,20 @@ Scope aws.cognito.signin.user.admin cho phép hoạt động access-token của 
 - [App client](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html)
 - [User groups](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-user-groups.html)
 - [JWT authorizer](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+
+## Ảnh kiểm chứng cấu hình hiện có — 28/11/2026
+
+Ảnh chụp chỉ đọc từ môi trường lab hiện có, không chứng minh nhóm đã thực hiện lại các bước tạo thủ công. Danh sách app client chưa chứng minh auth flows/no-secret; các ảnh tích hợp API/Lambda/DynamoDB vẫn cần bổ sung.
+
+![01-pool-overview](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/01-pool-overview.png)
+
+![02-sign-in](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/02-sign-in.png)
+
+![03-sign-up](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/03-sign-up.png)
+
+![04-app-client](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/04-app-client.png)
+
+![05-groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/05-groups.png)
+
+![Chi tiết app client Cognito: public client, flow, token](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/06-app-client-detail.png)
+

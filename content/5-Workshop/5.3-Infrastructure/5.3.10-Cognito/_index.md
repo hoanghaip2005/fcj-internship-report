@@ -75,3 +75,20 @@ Add Cognito clients/pool/groups and Customers/Business to the cleanup inventory.
 - [App client configuration](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html)
 - [User pool groups](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-user-groups.html)
 - [HTTP API JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+
+## Console evidence captured — 2026-11-28
+
+Read-only captures from the existing lab. Remaining API/Lambda/DynamoDB integration evidence is pending.
+
+![Cognito User Pool overview](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/01-pool-overview.png)
+
+![Cognito sign-in](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/02-sign-in.png)
+
+![Cognito sign-up](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/03-sign-up.png)
+
+![Cognito app client](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/04-app-client.png)
+
+![Cognito groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/05-groups.png)
+
+![Cognito app client detail: public client, flows, token settings](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/06-app-client-detail.png)
+
