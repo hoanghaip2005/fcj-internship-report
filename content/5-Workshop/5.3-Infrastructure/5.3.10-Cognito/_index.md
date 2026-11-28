@@ -91,4 +91,3 @@ Read-only captures from the existing lab. Remaining API/Lambda/DynamoDB integrat
 ![Cognito groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/05-groups.png)
 
 ![Cognito app client detail: public client, flows, token settings](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/06-app-client-detail.png)
-

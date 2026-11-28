@@ -83,7 +83,7 @@ Scope aws.cognito.signin.user.admin cho phép hoạt động access-token của 
 
 ## Ảnh kiểm chứng cấu hình hiện có — 28/11/2026
 
-Ảnh chụp chỉ đọc từ môi trường lab hiện có, không chứng minh nhóm đã thực hiện lại các bước tạo thủ công. Danh sách app client chưa chứng minh auth flows/no-secret; các ảnh tích hợp API/Lambda/DynamoDB vẫn cần bổ sung.
+Ảnh chụp chỉ đọc từ môi trường lab hiện có, không chứng minh nhóm đã thực hiện lại các bước tạo thủ công. Ảnh chi tiết app client xác nhận không secret, auth flows và token settings; các ảnh tích hợp API/Lambda/DynamoDB vẫn cần bổ sung.
 
 ![01-pool-overview](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/01-pool-overview.png)
 
@@ -96,4 +96,3 @@ Scope aws.cognito.signin.user.admin cho phép hoạt động access-token của 
 ![05-groups](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/05-groups.png)
 
 ![Chi tiết app client Cognito: public client, flow, token](/images/5-Workshop/FLASHRUSH/evidence/5.3.10-Cognito/06-app-client-detail.png)
-
