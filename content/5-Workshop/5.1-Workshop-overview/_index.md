@@ -1,65 +1,46 @@
 ---
-title: "FLASHRUSH overview"
+title: "5.1 FLASHRUSH overview"
 weight: 1
-chapter: false
-flashrush: true
-pre: "<b>5.1. </b> "
+draft: false
 ---
 
-## Objective
+## Problem, audience and acceptance
 
-Understand asynchronous intake and stock invariants.
+Students build an asynchronous purchase system for limited inventory. Goals: distinguish HTTP 202 from CONFIRMED, prevent duplicate stock decrements, observe retry/DLQ, keep S3 private and clean up only owned resources. A successful demonstration includes a confirmed purchase, replay of the same intent without another decrement, and rejected/terminal out-of-stock intent. A sequential test is not a concurrency benchmark.
 
-## Knowledge and inputs
+## Architecture and service choice
 
-Basic AWS Console, PowerShell and Git knowledge. Use the same approved lab account, region and session variables from 5.2. Provision only through the repository scripts; Console steps inspect resources, not create duplicates. All commands below run from the inner application root unless stated otherwise.
+Browser → CloudFront → private S3 serves the frontend. Browser → API Gateway → API Lambda stores PENDING and sends SQS. Worker reads the authoritative order and atomically updates stock and terminal status in DynamoDB. CloudWatch → SNS → confirmed email provides alerts. IAM separates API and Worker permissions.
 
-## Problem and request flow
+SQS buffers bursts; Lambda scales without provisioned servers; DynamoDB conditional transactions protect stock; S3/OAC/CloudFront separate public HTTPS delivery from private storage. Logs, alarms and SNS make failures visible. No VPC/NAT is required for this public managed-service lab; avoid adding networking resources without a requirement.
 
-A product has 10 units and receives 100 independent purchase intents. A separate read-then-update can oversell. FLASHRUSH uses conditional DynamoDB transactions and asynchronous SQS processing.
+| Order | Service | Required resources |
+|---|---|---|
+| 1 | DynamoDB | Products, Orders, Campaigns |
+| 2 | SQS | Standard main queue, DLQ |
+| 3 | IAM | API and Worker execution roles |
+| 4 | Lambda | API, Worker, event source mapping |
+| 5 | API Gateway | Six public HTTP API routes |
+| 6 | S3 | Private frontend bucket |
+| 7 | CloudFront | Distribution, OAC, SPA rewrite |
+| 8 | SNS | Topic, confirmed subscription |
+| 9 | CloudWatch | Logs, metrics, alarms |
 
-1. Browser fetches CloudFront content backed by private S3 through OAC.
-2. Catalog reads use API Gateway → API Lambda → Products.
-3. POST /orders conditionally creates PENDING, stores key/payload hashes, claims a 30-second send lease and sends SQS. HTTP 202 follows an ACK; **it is not CONFIRMED**.
-4. Worker reads the authoritative order and atomically decrements stock with CONFIRMED. A separate conditional transaction verifies shortage before OUT_OF_STOCK.
-5. Browser polls GET /orders/{orderId} with X-Order-Token. Terminal replay does not decrement again. Technical failures use partial batch retry; DLQ does not automatically set FAILED.
-6. CloudWatch logs/alarms observe the system and notify SNS. Pending reconciliation is manual; no scheduler exists.
+The supplied architecture is a reference, not proof of deployment. The student must confirm authorship, editable design source, AWS official icons and mapping to this three-table baseline. An AI-generated figure must not be represented as the student's independently designed final architecture.
 
-## Nine services
+![Team-supplied reference architecture; validation pending](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
 
-| Service | Purpose / logical IDs |
-|---|---|
-| S3 | Private Website; artifact bucket outside stack |
-| CloudFront | Distribution, OAC, SpaRewrite (a CloudFront Function) |
-| API Gateway | HttpApi, Integration, Route0–3, Stage |
-| Lambda | Api, Worker, Mapping |
-| SQS | Queue, DLQ |
-| DynamoDB | Products, Orders |
-| CloudWatch | ApiLog, WorkerLog, AccessLog, three alarms |
-| SNS | Alerts, AlertsPolicy; subscription is not in the template |
-| IAM | ApiRole, WorkerRole |
+## Runtime boundaries
 
-CloudFormation is deployment tooling, not a tenth application service. No EC2, RDS, Cognito, EventBridge or VPC is added.
+Backend quantity validation allows integers 1–100, then checks campaign maxQtyPerOrder; use a limit of 1 for this lab. Server-side sale checks apply. The full source includes real admin/CloudWatch/Cognito features, but they are outside this guest deployment. Do not call those features mock globally. No payment or shipping is performed.
 
-## Architecture baseline
+An intake ACK is not fulfillment. Queue delivery may repeat. Technical failures retry with partial batch failures; DLQ does not set order FAILED. Intake write and SQS send are separate operations, so inspect PENDING and enqueue state rather than editing orders manually.
 
-The team's Architecture v1.1 image was not found in the inspected repository. `docs/architecture/baseline.md` is a supporting Mermaid draft, not approved artwork. Requirements approvals remain Pending. Compare any supplied image with lease/recovery, routes/token, private S3/OAC and monitoring before adopting it.
-[SCREENSHOT REQUIRED: Team-approved AWS Icons Architecture v1.1; images/5-Workshop/01-architecture-v1-1.png]
 
-## Expected result and MVP limits
+## Historical Console screenshots
 
-For 100 unique valid orders completed without technical failures: 10 CONFIRMED, 90 OUT_OF_STOCK, 0 PENDING/FAILED and stock 0. `verify.py` uses **max_workers=10**, not concurrency 100. Retries/429 can produce more than 100 intake HTTP attempts. Elapsed time is not p95 latency.
+These shared images document the original manual exercise. Settings before Save and older three-variable/two-table/four-route layouts are not the current target; compare the service configuration tables. Screenshots do not prove the new baseline has been executed.
 
-MVP supports quantity=1, no payment/shipping/account authentication. The order token is a bearer capability. Admin/Monitoring screens are simulated. Catalog merchandise prices/images are illustrative; HTTP stock/order state is on AWS. Never use mock KPIs as live acceptance evidence.
+![Historical Console evidence 1](/images/5-Workshop/FLASHRUSH/flashrush-architecture-v1.1.png)
 
-**Read-only verification:** `Get-Content backend/app.py`; `Select-String -Path scripts/deploy/verify.py -Pattern max_workers`. Expect API/worker implementation and max_workers=10; compare with `tests/evidence/aws-3bf9033f.json`.
-
-## Troubleshooting
-
-Record diagram/source differences; do not relabel Pending as Approved.
-
-## Checkpoint and rollback
-
-Record the expected output, UTC, commit and target. Stop on mismatch; do not label an unexecuted step PASS. Read-only inspection needs no rollback. If a mutation fails, preserve manifests and events; use the rollback/cleanup procedure in 5.6 after ownership checks. No cleanup is executed by reading this page.
-
-[Next step]({{< relref "/5-Workshop/5.2-Prerequisite/" >}})
+*Figure 1. Historical Console evidence; verify the saved configuration against the steps above.*

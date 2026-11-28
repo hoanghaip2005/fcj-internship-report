@@ -66,4 +66,3 @@ Tiếp tục với [Rà soát Workshop và đối chiếu kết quả thực t�
 ### Tài liệu liên quan
 
 - [Hướng dẫn hạ tầng Workshop]({{< relref "/5-Workshop/5.3-Infrastructure/" >}})
-- [Blog SQS và Lambda]({{< relref "/3-BlogsPosted/3.4-Blog4/" >}})

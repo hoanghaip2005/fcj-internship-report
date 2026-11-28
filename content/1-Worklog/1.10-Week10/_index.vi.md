@@ -65,5 +65,4 @@ Tiếp tục với [Lưu trữ và phân tích dữ liệu trên AWS](../1.11-we
 
 ### Tài liệu liên quan
 
-- [Blog idempotency và DynamoDB]({{< relref "/3-BlogsPosted/3.5-Blog5/" >}})
 - [Kiểm thử và giám sát Workshop]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}})

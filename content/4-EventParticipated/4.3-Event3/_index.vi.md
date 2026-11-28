@@ -108,4 +108,3 @@ Sự kiện giúp em nhìn việc xây dựng ứng dụng Cloud và AI như m�
 ![Nội dung chia sẻ về nền tảng dữ liệu, chất lượng truy xuất RAG và bộ nhớ của AI Agent.](/images/4-EventParticipated/aws-financial-services-day-data-session.jpg)
 
 *Nội dung chia sẻ về nền tảng dữ liệu, chất lượng truy xuất RAG và bộ nhớ của AI Agent.*
-

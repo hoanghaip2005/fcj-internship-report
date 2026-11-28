@@ -66,4 +66,3 @@ Continue with [Workshop review and verification](../1.10-week10/).
 ### Related material
 
 - [Workshop infrastructure instructions]({{< relref "/5-Workshop/5.3-Infrastructure/" >}})
-- [SQS and Lambda blog]({{< relref "/3-BlogsPosted/3.4-Blog4/" >}})

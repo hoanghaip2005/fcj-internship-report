@@ -4,15 +4,9 @@ weight: 4
 draft: false
 ---
 
-
-
-
-
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
-
 **Điều kiện đầu vào:** Đã hoàn tất các bước 5.3. Đặc biệt cần có HTTP API endpoint, S3 private bucket và CloudFront distribution đúng bộ manual.
 
-**Backend:** Trong 5.3 đã tạo hai Lambda và dán `backend/app.py` từ source. Nếu chưa hoàn thành, hãy quay lại phần **5.3.4**. Không sử dụng Lambda code của dự án khác.
+**Backend:** Trong 5.3 đã tạo hai Lambda và tạo đủ năm module Lambda từ baseline. Nếu chưa hoàn thành, hãy quay lại phần **5.3.4**. Không sử dụng Lambda code của dự án khác.
 
 ## 5.4.1 Phụ lục build React trên máy
 
@@ -105,8 +99,7 @@ Thực hiện hoàn toàn bằng giao diện upload:
 
 Managed-CachingOptimized có minimum TTL; no-cache ở index không đồng nghĩa CDN luôn bỏ cache ngay. Sau mỗi lần upload website bằng Console, tạo invalidation theo mục 5.4.4. Khi cần chính sách cache khác cho production, thiết kế và kiểm thử riêng.
 
-**Điểm kiểm tra:** CloudFront 200 cho homepage, route sản phẩm refresh được, object S3 vẫn private, đặt đơn đi qua API thật. Không đánh giá tích hợp bằng Admin dashboard mock.
-
+**Điểm kiểm tra:** CloudFront 200 cho homepage, route sản phẩm refresh được, object S3 vẫn private, đặt đơn đi qua API thật. Không dùng admin/Cognito ngoài phạm vi guest để đánh giá bài này.
 
 ## 5.4.5 Checkpoint triển khai
 
@@ -117,14 +110,12 @@ Managed-CachingOptimized có minimum TTL; no-cache ở index không đồng ngh�
 - [ ] Homepage và trang chi tiết sản phẩm mở được qua CloudFront; refresh route không trả lỗi.
 - [ ] DevTools Network cho thấy yêu cầu `/products` chạy đến API Gateway của bộ manual, không chỉ đọc mock data.
 
-> [CẦN CHỤP ẢNH: file build frontend/dist, Objects tại gốc S3, CloudFront distribution, Network tab kiểm tra API.]
-
 Tiếp theo: [5.5 Kiểm thử và giám sát]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}}).
 
-## Đồng bộ build với source snapshot
+## Đồng bộ build với source baseline
 
-Trong ZIP, đặt `<DUONG_DAN_TOI_THU_MUC_APP>` bằng đường dẫn tuyệt đối tới `source-snapshot`. `frontend/public/images` đã đi kèm; không dùng dist từ lần deploy cũ. Sau `npm ci`, có thể chạy `npm.cmd test` trước `npm.cmd run build` để kiểm tra frontend local; lệnh này không tạo tài nguyên AWS.
+Dùng application root ở commit đã khóa trong 5.2. Không dùng ZIP/snapshot chưa có nguồn gốc. Home/Listing/Detail đọc products và campaigns qua HTTP. Nếu thiếu schema/campaign, sửa dữ liệu cấu hình; không đổi về mock để che lỗi. Mua khi chưa đăng nhập dùng /checkout; /orders là lịch sử guest theo browser/API. Không dùng giỏ đăng nhập, voucher, admin hoặc monitoring web trong track chín dịch vụ; các tính năng đó cần phần mở rộng Cognito và bảng phụ.
 
-Home/Listing đọc catalog từ API khi chọn HTTP mode. Nếu catalog thiếu/sai schema, sửa dữ liệu Products theo 5.3.1; không chuyển về mock để che lỗi kết nối. Lưu trữ đơn trên browser phân tách theo mode/API URL; đơn từ website/API cũ không tự xuất hiện ở bộ mới. Admin/Monitoring vẫn mock kể cả khi mua hàng đã dùng HTTP.
+Trong .env.local không cấu hình VITE_COGNITO_CLIENT_ID hoặc VITE_COGNITO_REGION của môi trường khác. Bỏ hai biến đó khỏi môi trường terminal trước build nếu đã có. Build mới khi đổi endpoint; không upload .env hoặc secrets lên S3.
 
 Khi upload lại: lưu dist cũ để rollback, upload assets trước và index cuối, kiểm tra hash/tên file và MIME, invalidate `/*`, chờ Completed. Không xóa assets cũ khi trình duyệt còn có thể giữ index cũ. Rollback bằng bộ dist đã lưu, upload theo cùng thứ tự rồi invalidate.

@@ -16,7 +16,7 @@ Giá trị cấu hình cần dùng
 
 HTTP API: flashrush-manual-api · us-east-1 · Lambda flashrush-manual-api · payload format version 2.0.
 
-Routes: GET /products; GET /products/{productId}; POST /orders; GET /orders/{orderId}. Stage $default, Auto-deploy Enabled; dùng Invoke URL không có /prod.
+Routes: GET /products; GET /products/{productId}; GET /campaigns; GET /campaigns/{campaignId}; POST /orders; GET /orders/{orderId}. Stage $default, Auto-deploy Enabled; dùng Invoke URL không có /prod.
 
 Throttling: Burst limit = 10; Rate limit = 5 requests/second.
 
@@ -62,7 +62,7 @@ Giới hạn bằng chứng
 
 **Bước 5.** 5.1 Tạo bốn routes
 
-**Bước 5.** Tạo GET /products; GET /products/{productId}; POST /orders; GET /orders/{orderId}. Đặt cả bốn Integration target = flashrush-manual-api → Next.
+**Bước 5.** Tạo GET /products; GET /products/{productId}; GET /campaigns; GET /campaigns/{campaignId}; POST /orders; GET /orders/{orderId}. Đặt cả bốn Integration target = flashrush-manual-api → Next.
 
 ![Bốn cặp method/path cùng trỏ tới Lambda API](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-05.png)
 
@@ -195,3 +195,5 @@ Tiếp bước 11: http://127.0.0.1:5173 đang nằm trong ô nhập; phải nh�
 ![UI có đơn mã demo-* “Đã xác nhận”; Network hiện document orders status 200](/images/5-Workshop/FLASHRUSH/evidence/5.3.5-API-Gateway/image-21.png)
 
 *Hình 5.3.5.21. UI có đơn mã demo-* “Đã xác nhận”; Network hiện document orders status 200.*
+
+> **Baseline hiện tại:** tạo đủ 6 public routes gồm GET /products, GET /products/{productId}, GET /campaigns, GET /campaigns/{campaignId}, POST /orders và GET /orders/{orderId}. Ảnh cũ có bốn route không chứng minh đã cấu hình Campaigns. Track guest không tạo route admin hoặc /me; không bật JWT cho guest routes.

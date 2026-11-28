@@ -16,8 +16,6 @@ Understanding S3's high-performance storage class: Single-digit millisecond late
 ### 3.3. [Blog 3 Application Authentication and Authorization on AWS with Amazon Cognito](3.3-Blog3/)
 Exploring the serverless identity architecture on AWS: Cognito User Pools for user directory management, Identity Pools for temporary STS credential delegation, API Gateway native token verification, and direct-to-S3 secure uploads.
 
-### 3.4. [Blog 4 Asynchronous order processing with Amazon SQS and AWS Lambda](3.4-Blog4/)
 Analyze buffering, visibility timeout, batches, retries, DLQ and concurrency in the FLASHRUSH ordering flow.
 
-### 3.5. [Blog 5 Preventing duplicate orders and protecting inventory with DynamoDB](3.5-Blog5/)
 Study idempotency keys, conditional writes, transactions, TTL and the DynamoDB/SQS failure gap, including client retries.

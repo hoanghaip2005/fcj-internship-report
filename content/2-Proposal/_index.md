@@ -94,7 +94,7 @@ Workshop work is planned across **weeks 8–10**. This is an expected allocation
 
 One lab environment for **one month**, up to **10,000 API requests**, **1,000 order requests**, a **100 MB** frontend, about **1 GB** website transfer, up to **0.5 GB** logs, **3 standard alarms** and up to **100 alert emails**. Lambda uses **256 MB** and averages **200 ms/invocation**; retries are bounded and monitored. No EC2, NAT Gateway, custom domain or other paid service outside this table is assumed.
 
-The figures below are **rounded planning allocations**, not a verified AWS Pricing Calculator quote or actual bill. They exclude Free Tier and must be checked against current prices, Region and actual usage.
+The table below uses the same workload inputs intended for AWS Pricing Calculator; it is not an invoice. The reference estimate is approximately **USD 0.73/month before Free Tier** and **USD 0.00–0.48/month after Free Tier**, depending on account eligibility. Enter the inputs again, save the share URL and verify current prices before accepting COST.
 
 | Service | Planning basis | USD/month allocation |
 |---|---|---:|
@@ -111,7 +111,7 @@ The figures below are **rounded planning allocations**, not a verified AWS Prici
 | **Estimated with contingency** | | **1.95** |
 | **Proposed working budget** | Rounded lab-management amount | **5.00** |
 
-The **USD 5** value is a planning budget, not an automatic spending cap. Before the lab, enter assumptions into [AWS Pricing Calculator](https://calculator.aws/), check service prices, set AWS Budgets and agree a stop threshold with the account owner. Limit test volume, set log retention and clean up after evidence capture. IAM has no separate charge in this table.
+The **USD 5** value is a monitoring budget, not an automatic cap. Open [AWS Pricing Calculator](https://calculator.aws/), enter the same assumptions, save the share URL and set AWS Budgets before the lab. Limit test volume, set log retention and clean up after evidence capture. IAM has no separate charge in this table.
 
 Personnel and personal equipment are excluded. A learning Workshop does not imply profit or payback.
 

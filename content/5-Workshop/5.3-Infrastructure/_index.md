@@ -1,40 +1,21 @@
 ---
-title: "Deploy and inspect AWS infrastructure"
+title: "5.3 Configure nine AWS services"
 weight: 3
-chapter: false
-flashrush: true
-pre: "<b>5.3. </b> "
+draft: false
 ---
 
-## Objective
+## Manual dependency order
 
-Use a single IaC stack and inspect each service after completion.
+Create resources through AWS Console only. Complete prerequisites and verify account/region before each service. Create log groups early when preparing scoped IAM logging permissions.
 
-## Knowledge and inputs
+1. [DynamoDB]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.1-DynamoDB/" >}})
+2. [SQS]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.2-SQS/" >}})
+3. [IAM]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.3-IAM/" >}})
+4. [Lambda]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.4-Lambda/" >}})
+5. [API Gateway]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.5-API-Gateway/" >}})
+6. [S3]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.6-S3/" >}})
+7. [CloudFront]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.7-CloudFront/" >}})
+8. [SNS]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.8-SNS/" >}})
+9. [CloudWatch]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.9-CloudWatch/" >}})
 
-Basic AWS Console, PowerShell and Git knowledge. Use the same approved lab account, region and session variables from 5.2. Provision only through the repository scripts; Console steps inspect resources, not create duplicates. All commands below run from the inner application root unless stated otherwise.
-
-## Sequence
-
-5.3.1 deploys infrastructure and backend (mutation). 5.3.2–5.3.8 inspect Console/CLI configuration; catalog is seeded in 5.4. Do not recreate tables, queues or functions manually.
-
-1. [CloudFormation and artifacts]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.1-CloudFormation/" >}})
-2. [DynamoDB Products/Orders]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.2-DynamoDB/" >}})
-3. [SQS queue and DLQ]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.3-SQS/" >}})
-4. [IAM execution roles]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.4-IAM/" >}})
-5. [Lambda API and Worker]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.5-Lambda/" >}})
-6. [API Gateway HTTP API]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.6-API-Gateway/" >}})
-7. [Private S3 and CloudFront]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.7-S3-CloudFront/" >}})
-8. [CloudWatch and SNS]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.8-CloudWatch-SNS/" >}})
-
-Source of truth: `scripts/deploy/deploy.py:template()`. Committed JSON is a snapshot; scripts generate `.build/flashrush.generated.json` for the chosen target. Artifact bucket is outside the stack and needs separate cleanup.
-
-## Troubleshooting
-
-Do not directly deploy a snapshot pointing to another account artifact. Inspect stack Events before retrying failures.
-
-## Checkpoint and rollback
-
-Record the expected output, UTC, commit and target. Stop on mismatch; do not label an unexecuted step PASS. Read-only inspection needs no rollback. If a mutation fails, preserve manifests and events; use the rollback/cleanup procedure in 5.6 after ownership checks. No cleanup is executed by reading this page.
-
-[Next step]({{< relref "/5-Workshop/5.3-Infrastructure/5.3.1-CloudFormation/" >}})
+Checkpoint: owned resources exist, both handlers use the correct source/modules, public GET /products returns JSON, and Campaigns contains a currently active fixture campaign. Website publication follows in 5.4. A screenshot of a form before Save is not proof of persisted configuration. Use the service pages for current settings and capture missing saved-state evidence.

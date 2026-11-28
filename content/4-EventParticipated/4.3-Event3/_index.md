@@ -92,4 +92,3 @@ The program connects Cloud and AI development to a complete engineering process:
 ![Session takeaways on data foundations, RAG retrieval quality and agent memory.](/images/4-EventParticipated/aws-financial-services-day-data-session.jpg)
 
 *Session takeaways on data foundations, RAG retrieval quality and agent memory.*
-

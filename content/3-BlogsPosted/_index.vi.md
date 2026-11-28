@@ -17,8 +17,6 @@ Tìm hiểu lớp lưu trữ hiệu năng cao của S3: Độ trễ single-digit
 Tìm hiểu mô hình kết hợp các dịch vụ Serverless trên AWS để xây dựng hệ thống định danh toàn diện: Cognito User Pool quản lý người dùng, Identity Pool cấp quyền tạm thời qua STS, API Gateway tự động xác thực token và Amazon S3 cho phép upload file trực tiếp an toàn.
 
 
-### 3.4. [Blog 4 Xử lý đơn hàng bất đồng bộ với Amazon SQS và AWS Lambda](3.4-Blog4/)
 Phân tích hàng đợi, visibility timeout, batch, thử lại, DLQ và giới hạn concurrency trong luồng đặt hàng FLASHRUSH.
 
-### 3.5. [Blog 5 Chống tạo đơn trùng và kiểm soát tồn kho với Amazon DynamoDB](3.5-Blog5/)
 Tìm hiểu idempotency key, conditional write, transaction, TTL và khoảng lỗi giữa DynamoDB với SQS; liên hệ cơ chế thử lại của giao diện.

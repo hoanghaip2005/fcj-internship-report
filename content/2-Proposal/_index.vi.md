@@ -94,7 +94,7 @@ Kế hoạch Workshop tập trung trong **tuần 8–10** của lộ trình th�
 
 Một môi trường lab, tối đa **1 tháng**, khoảng **10.000 API request**, **1.000 yêu cầu đặt hàng**, frontend khoảng **100 MB**, truyền dữ liệu website khoảng **1 GB**, logs tối đa **0,5 GB**, **3 alarm tiêu chuẩn** và tối đa **100 email cảnh báo**. Lambda dự kiến **256 MB**, trung bình **200 ms/lần gọi**; lượng thử lại được theo dõi và giới hạn. Không dùng EC2, NAT Gateway, tên miền riêng hoặc dịch vụ trả phí ngoài danh sách.
 
-Các khoản dưới đây là **phân bổ ngân sách sơ bộ có làm tròn**, chưa phải báo giá AWS Pricing Calculator hoặc chi phí thực tế. Dự toán không trừ Free Tier; đơn giá, Region người truy cập và khối lượng thực tế cần đối chiếu trước khi chạy lab.
+Bảng dưới đây là **kết quả ước tính theo cùng bộ đầu vào dùng cho AWS Pricing Calculator**, chưa phải hóa đơn. Mức tham chiếu trước Free Tier khoảng **0,73 USD/tháng**; sau Free Tier có thể khoảng **0,00–0,48 USD/tháng** tùy điều kiện tài khoản. Cần nhập lại bộ đầu vào, lưu share URL và đối chiếu giá hiện hành trước khi nghiệm thu COST.
 
 | Dịch vụ | Cơ sở dự toán | Phân bổ USD/tháng |
 |---|---|---:|
@@ -111,7 +111,7 @@ Các khoản dưới đây là **phân bổ ngân sách sơ bộ có làm tròn*
 | **Dự toán có dự phòng** | | **1,95** |
 | **Ngân sách đề xuất** | Làm tròn để quản lý một môi trường lab | **5,00** |
 
-Ngân sách **5 USD** là mức dự kiến để theo dõi, không phải trần chi tiêu tự động. Trước thực hành cần nhập các giả định vào [AWS Pricing Calculator](https://calculator.aws/), kiểm tra bảng giá từng dịch vụ, đặt AWS Budgets và thống nhất ngưỡng dừng với người quản lý tài khoản. Giới hạn khối lượng test, đặt log retention và dọn tài nguyên sau khi lưu minh chứng. IAM không có khoản phí riêng trong bảng này.
+Ngân sách **5 USD** là mức theo dõi, không phải trần tự động. Mở [AWS Pricing Calculator](https://calculator.aws/), nhập đúng các giả định, lưu share URL và đặt AWS Budgets trước khi chạy. Giới hạn khối lượng test, đặt log retention và dọn tài nguyên sau khi lưu minh chứng. IAM không có khoản phí riêng trong bảng này.
 
 Chi phí nhân công và thiết bị cá nhân không tính vào ngân sách hạ tầng. Không suy ra lợi nhuận hoặc thời gian hoàn vốn từ một Workshop học tập.
 

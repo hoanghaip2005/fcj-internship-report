@@ -65,5 +65,4 @@ Continue with [Data storage and analytics on AWS](../1.11-week11/).
 
 ### Related material
 
-- [Idempotency and DynamoDB blog]({{< relref "/3-BlogsPosted/3.5-Blog5/" >}})
 - [Workshop testing and monitoring]({{< relref "/5-Workshop/5.5-Testing-and-monitoring/" >}})

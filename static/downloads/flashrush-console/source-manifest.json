@@ -1,0 +1,12 @@
+{
+  "commit": "d6b3b2568bb2d9bea05d03391c9c7cb624f75f19",
+  "hashAlgorithm": "SHA256",
+  "files": {
+    "app.py": "8264865a6aa11eec806ce0025a0395e2df55f6bc506c0f152af29f5fbbebbb37",
+    "business.py": "2336d653b09265cbfda5016d9ed833d4890db0fb6c95680a92673f4cbd562631",
+    "customer.py": "699912695bdfe202c056d3c310be5305fea4aaae2661a4ac8d59fd087a1af3e7",
+    "monitoring.py": "01a7d4a2296ede911be07adb4555c53120e75a1df508452d4fed861b97713d15",
+    "vouchers.py": "46e9a43f57ce02abed4d22c5457a9347142bc5299a3a0a084a47eaa589b18c16"
+  },
+  "note": "Hash exact Git blob bytes, not editor-reformatted or CRLF-converted bytes."
+}

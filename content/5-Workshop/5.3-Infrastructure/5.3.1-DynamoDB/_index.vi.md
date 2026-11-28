@@ -131,7 +131,7 @@ Không tạo order giả trong Orders lúc này. Lambda API sẽ tạo order v�
 
 Item `manual-sku-001` là fixture kiểm thử, không phải toàn bộ catalog website. Để giao diện có đúng danh mục/sản phẩm của dự án:
 
-**Bước 1.** Mở thư mục `examples` ở gốc ZIP. Mỗi file `*.dynamodb.json` là một item DynamoDB JSON xuất từ catalog frontend snapshot.
+**Bước 1.** Dùng item manual-sku-001 theo mẫu JSON phía trên; không phụ thuộc thư mục examples trong ZIP không được đính kèm.
 
 **Bước 2.** Thay `THAY_BANG_THOI_DIEM_UTC_TUONG_LAI` bằng thời điểm ISO UTC hợp lệ, ví dụ thời điểm thực hành cộng 7 ngày. Không dùng nguyên placeholder.
 
@@ -152,3 +152,13 @@ Bảng Orders không cần GSI, TTL hoặc sort key. `enqueueState`, `enqueueAtt
 *Bản ghi đơn hàng hiển thị trạng thái CONFIRMED.*
 
 **Bước 2.** Đối chiếu thay đổi stock trong Products với số lượng đơn được xác nhận. Một ảnh CONFIRMED chưa đủ kết luận đã kiểm thử hết hàng, retry hoặc chống overselling.
+
+## Bổ sung bắt buộc cho baseline hiện tại: Campaigns
+
+DynamoDB → Tables → Create table → tên flashrush-manual-campaigns, partition key campaignId (String), On-demand; chờ ACTIVE. Tạo item mẫu, thay thời gian bằng khoảng UTC bao trùm buổi demo (không dùng ngày đã hết hạn):
+
+```json
+{"campaignId":"manual-demo","name":"FLASHRUSH Console demo","startTime":"REPLACE_START_UTC_ISO8601","endTime":"REPLACE_END_UTC_ISO8601","productIds":["manual-sku-001"],"maxQtyPerOrder":1}
+```
+
+REPLACE_* là placeholder phải thay trước khi lưu; ví dụ format 2026-12-01T01:00:00Z, không phải lịch cố định. Đặt saleStartsAt/saleEndsAt của product cùng khoảng. Giá và stock dùng DynamoDB Number. Tạo fixture test thì thêm ID vào campaign. API/Worker cần CAMPAIGNS_TABLE và quyền theo mục IAM. Ảnh chỉ hai bảng là ảnh lịch sử.

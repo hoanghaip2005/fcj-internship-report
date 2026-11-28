@@ -59,5 +59,4 @@ Continue with [Security and application authentication](../1.7-week7/).
 
 ### Related material
 
-- [SQS and Lambda blog]({{< relref "/3-BlogsPosted/3.4-Blog4/" >}})
 - [CloudFormation documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)

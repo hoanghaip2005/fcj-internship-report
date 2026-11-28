@@ -22,7 +22,7 @@ SQS trigger: flashrush-manual-orders; Batch size = 1; Batch window = 0; Maximum 
 
 ### 5.3.4.1 Chuẩn bị mã nguồn
 
-**Bước 1.** Mở VS Code → backend/app.py → sao chép toàn bộ mã nguồn. Hai Lambda dùng cùng app.py, khác handler.
+**Bước 1.** Mở VS Code → backend/app.py → lấy đủ app.py, business.py, customer.py, monitoring.py, vouchers.py cùng baseline. Hai Lambda dùng cùng bộ file, khác handler.
 
 ![Mã nguồn dùng PRODUCTS_TABLE, ORDERS_TABLE và SQS client](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-01.png)
 
@@ -62,7 +62,7 @@ Tiếp bước 4: Kiểm tra ARM64 đã bật và role đúng → nhấn Create 
 
 ### 5.3.4.2 Triển khai mã nguồn API
 
-**Bước 5.** Code → tạo app.py ở gốc Explorer → dán toàn bộ backend/app.py → nhấn Deploy. Khung mã nguồn chỉ phần handler worker trong file dùng chung.
+**Bước 5.** Code → tạo đủ năm file app.py, business.py, customer.py, monitoring.py, vouchers.py ở gốc Explorer → dán nội dung từ baseline → nhấn Deploy. Khung mã nguồn chỉ phần handler worker trong file dùng chung.
 
 ![File app.py, handler trong mã nguồn và nút Deploy](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-06.png)
 
@@ -102,7 +102,7 @@ Tiếp bước 7: Memory = 256 MB; Timeout = 0 mins 15 secs; Execution role = fl
 
 ### 5.3.4.2 Thêm biến môi trường
 
-**Bước 8.** Configuration → Environment variables → Edit. Thêm PRODUCTS_TABLE, ORDERS_TABLE và QUEUE_URL.
+**Bước 8.** Configuration → Environment variables → Edit. Thêm PRODUCTS_TABLE, ORDERS_TABLE, CAMPAIGNS_TABLE và QUEUE_URL.
 
 ![Menu Environment variables, số biến hiện tại và nút Edit](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-11.png)
 
@@ -110,7 +110,7 @@ Tiếp bước 7: Memory = 256 MB; Timeout = 0 mins 15 secs; Execution role = fl
 
 #### Thêm biến môi trường
 
-Tiếp bước 8: Nhập từng cặp Key/Value → Add environment variable để thêm dòng. Chỉ nhấn Save sau khi điền đủ ba biến.
+Tiếp bước 8: Nhập từng cặp Key/Value → Add environment variable để thêm dòng. Chỉ nhấn Save sau khi điền đủ bốn biến.
 
 ![Ô Key, ô Value, nút thêm dòng và nút Save](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-12.png)
 
@@ -166,7 +166,7 @@ Tiếp bước 10: Response phải có statusCode = 200; body chứa items và p
 
 ### 5.3.4.4 Tạo Lambda Worker
 
-**Bước 11.** Tạo flashrush-manual-worker: Python 3.12, ARM64, role flashrush-manual-worker-role; Deploy cùng app.py; handler app.worker; 256 MB, 15 giây; cùng ba biến môi trường.
+**Bước 11.** Tạo flashrush-manual-worker: Python 3.12, ARM64, role flashrush-manual-worker-role; Deploy cùng bộ năm file; handler app.worker; 256 MB, 15 giây; cùng bốn biến môi trường.
 
 ![Ảnh xác nhận tên Worker và ba biến; handler, memory và timeout cần kiểm tra trong Console](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-19.png)
 
@@ -269,3 +269,5 @@ HTTP 202 chỉ chứng minh API tiếp nhận đơn. Trigger Enabled chỉ xác 
 ![Kết quả bước 20–21: thực thi thành công, HTTP 202 và Order PENDING](/images/5-Workshop/FLASHRUSH/evidence/5.3.4-Lambda/image-30.png)
 
 *Hình 5.3.4.30. Kết quả bước 20–21: thực thi thành công, HTTP 202 và Order PENDING.*
+
+> **Ảnh lịch sử:** ảnh Environment variables có ba biến là baseline cũ. Cấu hình hiện tại phải thêm CAMPAIGNS_TABLE=flashrush-manual-campaigns ở cả hai Lambda. Các module app.py import phải tồn tại; không chỉ dán một file. Đối chiếu hướng dẫn IAM và Lambda trước khi test.

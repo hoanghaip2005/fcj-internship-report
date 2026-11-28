@@ -6,12 +6,9 @@ pre: '<b>5. </b> '
 draft: false
 ---
 
-
-
-
 Mục tiêu: dựng kiến trúc FLASHRUSH trên **AWS Management Console (us-east-1)** bằng các thao tác web, không chạy CloudFormation. Mã nguồn Python Lambda và React lấy từ repository FLASHRUSH.
 
-**Ảnh thực hành của chín dịch vụ AWS** đã được bổ sung từ tài liệu của các thành viên. Mỗi ảnh thể hiện một bước hoặc cấu hình cụ thể; không mặc định mọi màn hình nhập liệu đều đã được lưu thành công. Hệ thống manual có namespace riêng, không quản lý tài nguyên của stack CloudFormation nếu có nhóm dựng lại.
+**Ảnh thực hành của 9 dịch vụ AWS** đã được bổ sung từ tài liệu của các thành viên. Mỗi ảnh thể hiện một bước hoặc cấu hình cụ thể; không mặc định mọi màn hình nhập liệu đều đã được lưu thành công. Hệ thống manual có namespace riêng, không quản lý tài nguyên của stack CloudFormation nếu có nhóm dựng lại.
 
 1. [5.1 Tổng quan và kiến trúc]({{< relref "/5-Workshop/5.1-Workshop-overview/" >}})
 2. [5.2 Chuẩn bị Console và môi trường]({{< relref "/5-Workshop/5.2-Prerequisite/" >}})

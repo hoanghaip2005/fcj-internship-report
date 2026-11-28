@@ -1,0 +1,17 @@
+{
+  "Sid": "CloudWatchScopedPublish",
+  "Effect": "Allow",
+  "Principal": {
+    "Service": "cloudwatch.amazonaws.com"
+  },
+  "Action": "sns:Publish",
+  "Resource": "arn:aws:sns:us-east-1:YOUR_AWS_ACCOUNT_ID:flashrush-manual-alerts",
+  "Condition": {
+    "StringEquals": {
+      "aws:SourceAccount": "YOUR_AWS_ACCOUNT_ID"
+    },
+    "ArnLike": {
+      "aws:SourceArn": "arn:aws:cloudwatch:us-east-1:YOUR_AWS_ACCOUNT_ID:alarm:flashrush-manual-*"
+    }
+  }
+}

@@ -4,13 +4,9 @@ weight: 2
 draft: false
 ---
 
-
-
-
-
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
-
 ## 5.2.1 Chuẩn bị trên AWS Console
+
+Các tài nguyên theo vùng được tạo tại **US East (N. Virginia)**, mã vùng **us-east-1**. Tên tài nguyên bắt đầu bằng **flashrush-manual-** để nhận biết bộ thực hành. Trong các mẫu policy, thay **YOUR_AWS_ACCOUNT_ID** bằng mã tài khoản AWS gồm 12 chữ số của bạn.
 
 ### 5.2.1.1 Đăng nhập đúng tài khoản và vùng
 
@@ -32,7 +28,7 @@ IAM và CloudFront là dịch vụ toàn cục; các tài nguyên theo vùng tro
 
 | Nhóm | Tên trong bài |
 |---|---|
-| DynamoDB | flashrush-manual-products; flashrush-manual-orders |
+| DynamoDB | flashrush-manual-products; flashrush-manual-orders; flashrush-manual-campaigns |
 | SQS | flashrush-manual-orders; flashrush-manual-dlq |
 | IAM | flashrush-manual-api-role; flashrush-manual-worker-role |
 | Lambda | flashrush-manual-api; flashrush-manual-worker |
@@ -43,20 +39,19 @@ IAM và CloudFront là dịch vụ toàn cục; các tài nguyên theo vùng tro
 
 Vào danh sách từng dịch vụ, tìm tên trước khi Create. Gắn tag Project=FLASHRUSH, Environment=manual trên tài nguyên hỗ trợ tag. SQS và DynamoDB trùng tên vẫn được vì thuộc hai dịch vụ khác nhau.
 
-Tạo ghi chú local, điền dần: ARN hai bảng; Queue URL và ARN queue chính; ARN DLQ; ARN hai roles; API endpoint; CloudFront Distribution ID và domain; SNS Topic ARN. Không ghi token đơn vào ghi chú chia sẻ.
+Tạo ghi chú local, điền dần: ARN ba bảng; Queue URL và ARN queue chính; ARN DLQ; ARN hai roles; API endpoint; CloudFront Distribution ID và domain; SNS Topic ARN. Không ghi token đơn vào ghi chú chia sẻ.
 
 ### 5.2.1.3 Chuẩn bị mã nguồn
 
 Thư mục ứng dụng là `<DUONG_DAN_TOI_THU_MUC_APP>`, bên trong có backend và frontend.
 
-- Dùng `backend/app.py` để dán vào hai Lambda qua editor web.
+- Tạo đủ năm file app.py, business.py, customer.py, monitoring.py và vouchers.py trong gốc editor Lambda; dán nội dung cùng commit. Hai handler là app.api và app.worker.
 
 - Sau khi có API URL, làm mục 5.4.1 để build frontend/dist rồi upload qua S3 Console.
 
 - Không dùng dist cũ mà chưa kiểm tra API URL đã được build vào bundle.
 
 Tìm Service Quotas → AWS Lambda → Concurrent executions để kiểm tra quota. Worker trong bài giới hạn 5 concurrent batches; API và ứng dụng khác cũng cần concurrency. Không tăng tải khi chưa biết quota tài khoản.
-
 
 ## 5.2.2 Kiểm tra trước khi bắt đầu
 
@@ -71,17 +66,21 @@ Tìm Service Quotas → AWS Lambda → Concurrent executions để kiểm tra qu
 
 ## Chọn đúng source, giữ nguyên cấu trúc Git
 
-Giải nén ZIP một lần. Thư mục `source-snapshot` chứa `backend/` và `frontend/`, dùng làm `<DUONG_DAN_TOI_THU_MUC_APP>` cho bài này. Không cần clone rồi di chuyển toàn bộ file; không flatten thư mục Git hiện có.
+Baseline Console guest dùng commit `d6b3b2568bb2d9bea05d03391c9c7cb624f75f19`; đây là phiên bản cố định của workshop, không phải cam kết luôn bằng main mới nhất. Không dùng snapshot local không có manifest. Lấy đúng commit bằng Git trên máy (không tạo tài nguyên AWS):
 
-Snapshot lấy từ working tree trên nền commit `eef9a6fbc9930f3865a93681048b9b3cd35e215b`, gồm thay đổi local chưa push. Link GitHub `main` chỉ để tham khảo; không bảo đảm trùng snapshot. Kiểm tra SHA256 trong `SOURCE_MANIFEST.json` khi bàn giao giữa các nhóm.
+```powershell
+git clone https://github.com/kinnynee/FLASHRUSH-Serverless-Flash-Sale.git
+Set-Location FLASHRUSH-Serverless-Flash-Sale
+git checkout --detach d6b3b2568bb2d9bea05d03391c9c7cb624f75f19
+if ($LASTEXITCODE -ne 0) { throw 'Khong lay duoc baseline' }
+git rev-parse HEAD
+Set-Location FLASHRUSH-Serverless-Flash-Sale
+Test-Path backend/app.py
+Test-Path frontend/package-lock.json
+```
 
-| Bộ từng triển khai | Bộ thực hành Console |
-|---|---|
-| `flashrush-lab-products`, `flashrush-lab-orders` | `flashrush-manual-products`, `flashrush-manual-orders` |
-| `flashrush-lab-api`, `flashrush-lab-worker` | `flashrush-manual-api`, `flashrush-manual-worker` |
-| Queue/DLQ/SNS/logs prefix `flashrush-lab` | Giữ cùng hậu tố, đổi prefix thành `flashrush-manual` |
-| CloudFormation quản lý vòng đời | Người học lưu inventory, tạo/xóa từng tài nguyên |
+Hai Test-Path phải True. Thư mục bên trong là application root; không flatten repository. Nếu đã có clone, giữ thay đổi của bạn trước khi checkout; không chạy reset --hard.
 
-Namespace manual chỉ thay tên, không thay nghiệp vụ. Nếu nhiều nhóm dùng chung account/region, phân công dùng chung một bộ hoặc thống nhất prefix riêng; đổi đồng bộ tên, ARN, policies, environment, alarms. Không để các nhóm cùng ghi đè một bộ tài nguyên.
+Chạy Node.js 22.12+ và npm ci theo package-lock. Python 3.12 là runtime Lambda. Git/Node chỉ dùng lấy source/build; hạ tầng vẫn tạo trên AWS Console. Source cần ba bảng Products/Orders/Campaigns, sáu public routes và đủ module Lambda. Không tạo Cognito/Customers/Business cho bài guest; muốn trình diễn đăng nhập/voucher/admin phải dùng một hướng dẫn mở rộng riêng.
 
-Không chạy `deploy.py`, `publish.py`, `verify.py`, `cleanup_inventory.py` của track CloudFormation cho bộ manual: các script đó phụ thuộc stack outputs/guards.
+Tên tài nguyên cùng prefix flashrush-manual. Nếu dùng account chung, thống nhất namespace với owner trước khi tạo. Không chạy scripts/deploy/deploy.py hoặc xóa stack để thay cho các bước Console.

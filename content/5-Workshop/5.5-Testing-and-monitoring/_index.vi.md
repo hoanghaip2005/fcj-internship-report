@@ -4,11 +4,7 @@ weight: 5
 draft: false
 ---
 
-
-
-
-
-> **Cấu hình demo:** Region `us-east-1`, tài nguyên prefix `flashrush-manual-*`. Mọi chỗ có `YOUR_AWS_ACCOUNT_ID` phải thay bằng Account ID của người thực hành trước khi tạo tài nguyên hoặc dán policy.
+Thực hiện kiểm thử trên bộ tài nguyên **flashrush-manual** trong vùng **us-east-1**, cùng tài khoản đã sử dụng ở mục 5.3.
 
 **Điều kiện đầu vào:** Hạ tầng 5.3 và frontend 5.4 đã hoạt động. Bài Test trong Lambda hoặc gửi message SQS có thể tạo đơn và làm thay đổi DynamoDB. Chỉ chạy trong bộ `flashrush-manual-*` đã xác nhận.
 
@@ -82,7 +78,7 @@ Save → Test: kỳ vọng 200 và status cuối. Xóa header x-order-token rồ
 
 2. Tạo bản sao event, giữ key nhưng đổi productId thành manual-sku-other → Test. Với order cũ đã tồn tại, kỳ vọng 409 vì payload khác.
 
-3. Đổi quantity thành 2 → Test: 400 do validation, không phải test conflict hợp lệ.
+3. Dùng key mới và quantity=2 trong chiến dịch maxQtyPerOrder=1: kỳ vọng 409 CAMPAIGN_QUANTITY_LIMIT. quantity=0 hoặc số thập phân mới là ca validation 400. Không đổi payload của key đã có để kiểm tra riêng quantity.
 
 4. Khôi phục event gốc. Muốn ý định mua mới, dùng UUIDv4 khác.
 
@@ -114,7 +110,7 @@ Save → Test: kỳ vọng 200 và status cuối. Xóa header x-order-token rồ
 
 3. Test lần lượt ba event; lưu ba orderId; chờ Worker xử lý.
 
-4. DynamoDB: kỳ vọng hai CONFIRMED, một OUT_OF_STOCK, stock=0.
+4. DynamoDB: kỳ vọng hai CONFIRMED, stock=0; ý định thứ ba có thể bị từ chối 409 ngay khi intake hoặc được nhận rồi OUT_OF_STOCK ở Worker. Không bắt buộc cả ba request trả 202.
 
 5. Test lại event A giữ nguyên key: cùng orderId, không trừ kho thêm.
 
@@ -231,15 +227,15 @@ Kiểm tra theo lớp: Lambda Test → GET HTTP → website. Không sửa nhiề
 
 ## 5.5.5 Checklist nghiệm thu demo
 
-- [ ] DynamoDB: hai bảng ACTIVE, partition keys đúng, stock kiểu Number.
+- [ ] DynamoDB: ba bảng ACTIVE, partition keys đúng, stock kiểu Number.
 
 - [ ] SQS: Standard, DLQ, visibility 90 giây, maxReceiveCount=5.
 
 - [ ] IAM: hai roles riêng, trust Lambda, quyền theo nhiệm vụ.
 
-- [ ] Lambda: app.py đã Deploy, handlers đúng, mapping Enabled và partial failures bật.
+- [ ] Lambda: đủ năm module đã Deploy, handlers đúng, mapping Enabled và partial failures bật.
 
-- [ ] API Gateway: bốn routes, payload 2.0, CORS đúng.
+- [ ] API Gateway: sáu public routes, payload 2.0, CORS đúng.
 
 - [ ] S3: dist ở đúng gốc, bucket private, MIME đúng.
 
@@ -256,7 +252,6 @@ Kiểm tra theo lớp: Lambda Test → GET HTTP → website. Không sửa nhiề
 - [ ] Không gọi test tuần tự là benchmark concurrency.
 
 - [ ] Có evidence và inventory để cleanup đúng bộ manual.
-
 
 ## 5.5.6 Ảnh và bằng chứng bắt buộc
 
@@ -275,3 +270,5 @@ Ghi lại mã sản phẩm và số lượng tồn trước/sau, `orderId`, tr�
 5. Chỉ đánh dấu PASS khi thu được kết quả thật. Bộ lab trước đây có bằng chứng 100 đơn (10 CONFIRMED, 90 OUT_OF_STOCK), chạy tối đa 10 workers phía client; không phải 100 request đồng thời và không chứng minh bộ manual mới.
 
 Mẫu ghi nhận: thời gian UTC, namespace/account/region, ca kiểm thử, stock trước/sau, orderId, HTTP/status, log xác nhận, PASS/FAIL/chưa chạy. Lưu riêng token; không đưa vào báo cáo công khai.
+
+> Mỗi fixture mới phải được thêm vào productIds của chiến dịch đang hiệu lực, maxQtyPerOrder=1; chỉ tạo Products mà không có Campaigns sẽ bị từ chối. Bài test tuần tự không chứng minh tải đồng thời.

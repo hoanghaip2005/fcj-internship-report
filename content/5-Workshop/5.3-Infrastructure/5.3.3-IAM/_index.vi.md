@@ -200,3 +200,7 @@ DynamoDB transaction kiểm tra quyền của từng thao tác bên trong. Updat
 *Kiểm tra trust policy Worker cho phép Lambda assume role.*
 
 Sau đó đối chiếu Configuration → Permissions của từng Lambda để xác nhận role được gắn đúng hàm; danh sách IAM role tồn tại không tự chứng minh liên kết này.
+
+## Quyền Campaigns của baseline hiện tại
+
+API cần dynamodb:GetItem và dynamodb:Scan; Worker cần dynamodb:GetItem, dynamodb:Scan và dynamodb:ConditionCheckItem trên ARN bảng flashrush-manual-campaigns. Giữ các quyền Products/Orders/SQS/logs theo nhiệm vụ. Cấu hình biến môi trường theo mục Lambda; tham khảo [API policy](/downloads/flashrush-console/api-policy.json) và [Worker policy](/downloads/flashrush-console/worker-policy.json). Không gắn AdministratorAccess cho runtime role.

@@ -59,5 +59,4 @@ Tiếp tục với [Bảo mật và xác thực ứng dụng](../1.7-week7/).
 
 ### Tài liệu liên quan
 
-- [Blog SQS và Lambda]({{< relref "/3-BlogsPosted/3.4-Blog4/" >}})
 - [Tài liệu CloudFormation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)
